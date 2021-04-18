@@ -49,8 +49,8 @@ script:
 
 addons:
   sonarcloud:
-    organization: "alexx882-github" # der key der organisation auf sonarcloud.io
-    token: $SONAR_TOKEN # Umgebungsvariable auf travis-ci.com
+    organization: "kathikofler" # der key der organisation auf sonarcloud.io
+    token: $Gruppe9_SE2 # Umgebungsvariable auf travis-ci.com
 
 # benachrichtigungen per email ausschalten
 notifications:
