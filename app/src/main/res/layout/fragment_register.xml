@@ -10,12 +10,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp">
+        android:layout_marginTop="30dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_name_register"
+            android:id="@+id/et_name"
             android:layout_width="200dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:inputType="text"
             android:textSize="15sp"
             android:hint="Name"/>
@@ -34,7 +34,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_password_register"
             android:layout_width="200dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:textSize="15sp"
             android:hint="Password"/>
@@ -45,18 +45,8 @@
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_below="@+id/et_password_layout"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
         android:text="Register"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_routeLogin"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_below="@+id/btn_register"
-        android:layout_marginTop="10dp"
-        android:layout_centerHorizontal="true"
-        android:text="or Login"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
 </RelativeLayout>
