@@ -26,7 +26,7 @@ public class RegisterFragment extends Fragment {
         Bundle args = getArguments();
         if(args != null){
             String name = args.getString("name", "");
-            EditText et = view.findViewById(R.id.et_name_register);
+            EditText et = view.findViewById(R.id.et_name);
             et.setText(name);
         }
 
@@ -40,11 +40,6 @@ public class RegisterFragment extends Fragment {
             // todo add user to db and authenticate user and lead to home page
         });
 
-        Button btnRouteRegister = view.findViewById(R.id.btn_routeLogin);
-        btnRouteRegister.setOnClickListener(v -> {
-            // todo run function login in MainActivity (change to login)
-            // todo get inputted name and add it to argument
-        });
         return view;
     }
 }

@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +23,31 @@ import java.util.EventListener;
 public class MainActivity extends AppCompatActivity {
 
     int containerId;
+    boolean login = true; /* if true <-> shows login fragment; if false <-> shows register fragment */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // show content activity main
         setContentView(R.layout.activity_main);
+        // set OnClickListener for switch Button
+        Button btnSwitch = findViewById(R.id.btn_switch);
+        btnSwitch.setOnClickListener(v -> {
+            // get current inputted name, so its still displayed after switch
+            EditText et = findViewById(R.id.et_name);
+            String name = et.getText().toString();
+            // switch boolean login and run function login or register
+            if(login){
+                login = false;
+                updateSwitchBtnName();
+                register(name);
+            }
+            else {
+                login = true;
+                updateSwitchBtnName();
+                login(name);
+            }
+        });
         // get id from fragment container view
         containerId = findViewById(R.id.fragment_container_view).getId();
         // create fragment transaction
@@ -45,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         }
         // create fragment transaction add fragment to it and commit
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(containerId, loginFragment);
+        ft.replace(containerId, loginFragment);
         ft.commit();
     }
 
@@ -58,10 +78,21 @@ public class MainActivity extends AppCompatActivity {
             args.putString("name", name);
             registerFragment.setArguments(args);
         }
-        // create fragment transaction add fragment to it and commit
+        // create fragment transaction add fragment to it (or replace old one) and commit
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(containerId, registerFragment);
+        ft.replace(containerId, registerFragment);
         ft.commit();
     }
-    
+
+    private void updateSwitchBtnName(){
+        if(login){
+            Button btn = findViewById(R.id.btn_switch);
+            btn.setText("Or Register");
+        }
+        else {
+            Button btn = findViewById(R.id.btn_switch);
+            btn.setText("Or Login");
+        }
+    }
+
 }

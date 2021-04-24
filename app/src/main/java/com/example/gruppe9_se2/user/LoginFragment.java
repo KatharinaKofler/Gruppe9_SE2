@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.example.gruppe9_se2.MainActivity;
 import com.example.gruppe9_se2.R;
 import java.util.EventListener;
 
@@ -25,7 +28,7 @@ public class LoginFragment extends Fragment implements EventListener {
         Bundle args = getArguments();
         if(args != null){
             String name = args.getString("name", "");
-            EditText et = view.findViewById(R.id.et_name_login);
+            EditText et = view.findViewById(R.id.et_name);
             et.setText(name);
         }
 
@@ -38,11 +41,6 @@ public class LoginFragment extends Fragment implements EventListener {
             // todo authenticate user if correct and lead to home page
         });
 
-        Button btnRouteRegister = view.findViewById(R.id.btn_routeRegister);
-        btnRouteRegister.setOnClickListener(v -> {
-            // todo run function register in MainActivity (change to register)
-            // todo get inputted name and add it to argument
-        });
         return view;
     }
 }
