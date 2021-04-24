@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.gruppe9_se2.MainActivity;
 import com.example.gruppe9_se2.R;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.EventListener;
 
 public class LoginFragment extends Fragment implements EventListener {
@@ -36,6 +38,27 @@ public class LoginFragment extends Fragment implements EventListener {
 
         Button btnLogin = view.findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(v -> {
+
+            EditText name = view.findViewById(R.id.et_name);
+            EditText password = view.findViewById(R.id.et_password);
+            TextInputLayout nameLayout = view.findViewById(R.id.et_name_layout);
+            TextInputLayout passwordLayout = view.findViewById(R.id.et_password_layout);
+
+            // print error message if name or password empty
+            if(name.getText().toString().equals("")){
+                nameLayout.setError("Enter your username");
+            }
+            else {
+                nameLayout.setError(null);
+            }
+            if(password.getText().toString().equals("")){
+                passwordLayout.setError("Enter your password");
+            }
+            else {
+                passwordLayout.setError(null);
+            }
+
+
             // todo check login data for correctness
             // todo print error message if incorrect
             // todo authenticate user if correct and lead to home page
