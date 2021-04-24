@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 
@@ -14,7 +16,35 @@ public class RegisterFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_register, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_register, container, false);
+
+        // retrieve argument of name if available
+
+        Bundle args = getArguments();
+        if(args != null){
+            String name = args.getString("name", "");
+            EditText et = view.findViewById(R.id.et_name_register);
+            et.setText(name);
+        }
+
+        // set onClickListeners
+
+        Button btnLogin = view.findViewById(R.id.btn_register);
+        btnLogin.setOnClickListener(v -> {
+            // todo check username if already in use
+            // todo check password for form
+            // todo print error message if incorrect
+            // todo add user to db and authenticate user and lead to home page
+        });
+
+        Button btnRouteRegister = view.findViewById(R.id.btn_routeLogin);
+        btnRouteRegister.setOnClickListener(v -> {
+            // todo run function login in MainActivity (change to login)
+            // todo get inputted name and add it to argument
+        });
+        return view;
     }
 }
