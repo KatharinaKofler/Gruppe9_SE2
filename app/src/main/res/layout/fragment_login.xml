@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".user.LoginFragment">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="80dp"
+        android:fontFamily="@font/arabic_magic"
+        android:text="@string/game_name"
+        android:textColor="@color/primaryColor"
+        android:textSize="70sp" />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/et_name_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/tv_title"
+        android:layout_marginTop="50dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_name"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:inputType="text"
+            android:textSize="15sp"
+            android:hint="Name"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/et_password_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_name_layout"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_password"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:inputType="textPassword"
+            android:textSize="15sp"
+            android:hint="Password"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_login"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/et_password_layout"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:text="Login"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_routeRegister"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/btn_login"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:text="or Register"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+
+</RelativeLayout>
