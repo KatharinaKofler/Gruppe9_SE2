@@ -20,8 +20,6 @@ public class InviteListAdapter extends RecyclerView.Adapter<InviteListAdapter.Vi
     public InviteListAdapter() {
         super();
         localDataSet = new ArrayList<>();
-
-        localDataSet.add("Test");
     }
 
     public void insert(String name) {
@@ -29,11 +27,16 @@ public class InviteListAdapter extends RecyclerView.Adapter<InviteListAdapter.Vi
         notifyItemInserted(localDataSet.size() - 1);
     }
 
+    public void insertAll(List<String> data) {
+        localDataSet.addAll(data);
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.lobby_list_item, parent, false);
+                .inflate(R.layout.invite_list_item, parent, false);
 
         return new ViewHolder(view);
     }

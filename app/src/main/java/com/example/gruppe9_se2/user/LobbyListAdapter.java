@@ -10,9 +10,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gruppe9_se2.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.ViewHolder> {
 
-    private String[] localDataSet;
+    private List<Lobby> localData;
+
+    public LobbyListAdapter() {
+        super();
+        localData = new ArrayList<>();
+    }
+
+    public void insert(Lobby lobby) {
+        localData.add(lobby);
+        notifyItemInserted(localData.size() - 1);
+    }
+
+    public void insertAll(List<Lobby> data) {
+        localData.addAll(data);
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
@@ -25,12 +43,14 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.getTextView().setText("Lobby_Test");
+        Lobby l = localData.get(position);
+        holder.getName().setText(l.name);
+        holder.getDetails().setText("Players: " + l.playerCount);
     }
 
     @Override
     public int getItemCount() {
-        return 100;
+        return localData.size();
     }
 
     /**
@@ -38,17 +58,23 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
      * (custom ViewHolder).
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
+        private final TextView name;
+        private final TextView details;
 
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
 
-            textView = (TextView) view.findViewById(R.id.lobbyName);
+            name = (TextView) view.findViewById(R.id.lobbyName);
+            details = (TextView) view.findViewById(R.id.lobbyDetails);
         }
 
-        public TextView getTextView() {
-            return textView;
+        public TextView getName() {
+            return name;
+        }
+
+        public TextView getDetails() {
+            return details;
         }
     }
 }

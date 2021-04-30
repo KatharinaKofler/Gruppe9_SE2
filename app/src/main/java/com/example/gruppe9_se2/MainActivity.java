@@ -2,10 +2,7 @@ package com.example.gruppe9_se2;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
-
-import com.example.gruppe9_se2.user.Lobby;
 
 public class MainActivity extends AppCompatActivity {
 

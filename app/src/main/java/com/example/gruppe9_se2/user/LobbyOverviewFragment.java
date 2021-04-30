@@ -23,13 +23,19 @@ public class LobbyOverviewFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.lobbyList);
         recyclerView.setHasFixedSize(true);
         LobbyListAdapter adapter = new LobbyListAdapter();
+
+        // TODO exchange with server data
+        for (int i = 0; i < 100; i++) {
+            adapter.insert(new Lobby("Test", 700));
+        }
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
         Button btnCreate = view.findViewById(R.id.newLobby);
         btnCreate.setOnClickListener(v -> {
-            ((Lobby)getActivity()).newLobby();
+            ((LobbyActivity)getActivity()).newLobby();
         });
 
         return view;

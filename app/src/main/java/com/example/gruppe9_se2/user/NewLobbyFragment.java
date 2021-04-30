@@ -17,14 +17,16 @@ import com.example.gruppe9_se2.R;
 
 public class NewLobbyFragment extends Fragment {
 
+    InviteListAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_lobby, container, false);
 
         RecyclerView recyclerView = view.findViewById(R.id.inviteList);
-        recyclerView.setHasFixedSize(true);
-        InviteListAdapter adapter = new InviteListAdapter();
+//        recyclerView.setHasFixedSize(true);
+        adapter = new InviteListAdapter();
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
