@@ -2,6 +2,7 @@ package com.example.gruppe9_se2.user;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -28,11 +29,18 @@ public class Lobby extends AppCompatActivity {
 
         containerId = findViewById(R.id.fragment_container_view).getId();
 
+        showLobbyOverview();
+    }
+
+    public void showLobbyOverview() {
         Fragment overview = new LobbyOverviewFragment();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(containerId, overview);
         ft.commit();
+
+        getSupportActionBar().setTitle("Lobby Overview");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
     public void newLobby() {
@@ -41,5 +49,20 @@ public class Lobby extends AppCompatActivity {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(containerId, newLobby);
         ft.commit();
+
+        getSupportActionBar().setTitle("Create new lobby");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                showLobbyOverview();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
