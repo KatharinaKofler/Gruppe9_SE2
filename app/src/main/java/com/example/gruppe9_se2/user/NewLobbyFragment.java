@@ -31,12 +31,18 @@ public class NewLobbyFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
-        Button btnInvite = view.findViewById(R.id.invitePlayer);
+        Button btnInvite = view.findViewById(R.id.btn_createLobby);
         btnInvite.setOnClickListener(v -> {
             EditText username = view.findViewById(R.id.username);
 
             adapter.insert(username.getText().toString());
         });
+
+        Button button_back = view.findViewById(R.id.btn_back);
+        button_back.setOnClickListener(v -> {
+            ((Lobby)getActivity()).backToOverview();
+        });
+
 
         return view;
     }
