@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.user;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,7 +81,11 @@ public class LoginFragment extends Fragment implements EventListener {
                         LoginResponse login = response.body();
                         if (login != null) {
                             ApiManager.setToken(login.token);
-                            passwordLayout.setError("Switching to lobby");
+
+                            // Close current activity and start Lobby
+                            getActivity().finish();
+                            Intent intent = new Intent(getContext(), LobbyActivity.class);
+                            startActivity(intent);
                         }
                     } else {
                         String error = ApiHelper.getErrorMessage(response);
