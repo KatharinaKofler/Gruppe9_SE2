@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.gruppe9_se2.R;
 
 public class LobbyOverviewFragment extends Fragment {
+
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -25,9 +28,13 @@ public class LobbyOverviewFragment extends Fragment {
         LobbyListAdapter adapter = new LobbyListAdapter();
 
         // TODO exchange with server data
-        for (int i = 0; i < 100; i++) {
-            adapter.insert(new Lobby("Test", 700));
-        }
+
+
+
+        // Client erstellne (instanz erstellen) klient soll sich zu server instanz verbinden (
+
+        //for (int i = 0; i < 100; i++) {     adapter.insert(new Lobby("Test", 700));
+        //                       }
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
