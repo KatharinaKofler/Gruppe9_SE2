@@ -14,13 +14,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.api.base.ApiHelper;
+import com.example.gruppe9_se2.api.base.ApiManager;
+import com.example.gruppe9_se2.api.lobby.LobbyApi;
+import com.example.gruppe9_se2.api.lobby.LobbyRequest;
+import com.example.gruppe9_se2.api.lobby.LobbyResponse;
+import com.google.gson.JsonObject;
 
 import java.net.URI;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -51,34 +59,51 @@ public class NewLobbyFragment extends Fragment {
         Button btnInvite = view.findViewById(R.id.btn_createLobby);
         btnInvite.setOnClickListener(v -> {
 
+            final String[] lobbyID = new String[1];
             // ToDo Post Request Lobby
             final String base_URL = "https://gruppe9-se2-backend.herokuapp.com/";
-            AuthRequest request = new AuthRequest();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(base_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+            String token = ApiManager.getToken();
 
 
+            Retrofit retrofit = ApiManager.getInstance();
+            LobbyRequest request = new LobbyRequest(token);
+            LobbyApi service = retrofit.create(LobbyApi.class);
+            Call<LobbyResponse> call = service.executeLobby(token, request);
+            call.enqueue(new Callback<LobbyResponse>() {
+                @Override
+                public void onResponse(Call<LobbyResponse> call, Response<LobbyResponse> response) {
+                    if (response.isSuccessful()) {
+                        LobbyResponse lobby = response.body();
+                        if (lobby != null) {
+                            JsonObject lobbyObject = lobby.lobbyState;
 
+                            //ToDo Lobby id speichern
+                            String id = String.valueOf(lobbyObject.get("id"));
+                            lobbyID[0] = id;
+                        }
+                    } else {
+                        String error = ApiHelper.getErrorMessage(response);
+                        EditText etLobbyName = view.findViewById(R.id.et_lobby_name);
+                        etLobbyName.setError(error);
+                    }
+                }
 
-
+                @Override
+                public void onFailure(Call<LobbyResponse> call, Throwable t) {
+                    EditText etLobbyName = view.findViewById(R.id.et_lobby_name);
+                    etLobbyName.setError("Problem accessing server !!!");
+                }
+            });
 
             //Open Web Socket
             mSocket.connect();
-            EditText etLobbyName = view.findViewById(R.id.lobbyname);
-            String lobbyID = etLobbyName.getText().toString();
 
             IO.Options options = IO.Options.builder()
-                    .setExtraHeaders(singletonMap("x-lobby-id", singletonList("lobbyID")))
+                    .setExtraHeaders(singletonMap("x-lobby-id", singletonList(lobbyID[0])))
                     .build();
 
             mSocket = IO.socket(URI.create("https://gruppe9-se2-backend.herokuapp.com/"), options);
 
-
-
-            //adapter.insert(username.getText().toString());
         });
 
         Button button_back = view.findViewById(R.id.btn_back);
