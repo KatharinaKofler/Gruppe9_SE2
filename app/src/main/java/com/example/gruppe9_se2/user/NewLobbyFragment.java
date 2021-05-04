@@ -21,7 +21,7 @@ import com.example.gruppe9_se2.api.lobby.LobbyResponse;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
 
-import io.socket.client.Socket;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,7 +29,7 @@ import retrofit2.Retrofit;
 
 public class NewLobbyFragment extends Fragment {
 
-    private Socket mSocket;
+    //private Socket mSocket;
 
 
     InviteListAdapter adapter;
@@ -56,7 +56,8 @@ public class NewLobbyFragment extends Fragment {
             final String[] lobbyID = new String[1];
             // ToDo Post Request Lobby
             final String base_URL = "https://gruppe9-se2-backend.herokuapp.com/";
-            String token = ApiManager.getToken();
+            String token = "Bearer ";
+            token += ApiManager.getToken();
 
 
             Retrofit retrofit = ApiManager.getInstance();
