@@ -19,19 +19,14 @@ import com.example.gruppe9_se2.api.base.ApiManager;
 import com.example.gruppe9_se2.api.lobby.LobbyApi;
 import com.example.gruppe9_se2.api.lobby.LobbyRequest;
 import com.example.gruppe9_se2.api.lobby.LobbyResponse;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
 
-import java.net.URI;
-
-import io.socket.client.IO;
 import io.socket.client.Socket;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 
 public class NewLobbyFragment extends Fragment {
 
@@ -79,12 +74,16 @@ public class NewLobbyFragment extends Fragment {
 
                             //ToDo Lobby id speichern
                             String id = String.valueOf(lobbyObject.get("id"));
+                            System.out.println(id);
                             lobbyID[0] = id;
+                            String owner = String.valueOf(lobbyObject.get("owner"));
+                            System.out.println(owner);
+
                         }
                     } else {
                         String error = ApiHelper.getErrorMessage(response);
-                        EditText etLobbyName = view.findViewById(R.id.et_lobby_name);
-                        etLobbyName.setError(error);
+                        TextInputLayout etLobbyName = view.findViewById(R.id.et_lobby_name);
+                        etLobbyName.setError("This Error");
                     }
                 }
 
@@ -96,13 +95,13 @@ public class NewLobbyFragment extends Fragment {
             });
 
             //Open Web Socket
-            mSocket.connect();
+           /* mSocket.connect();
 
             IO.Options options = IO.Options.builder()
                     .setExtraHeaders(singletonMap("x-lobby-id", singletonList(lobbyID[0])))
                     .build();
 
-            mSocket = IO.socket(URI.create("https://gruppe9-se2-backend.herokuapp.com/"), options);
+            mSocket = IO.socket(URI.create("https://gruppe9-se2-backend.herokuapp.com/"), options);*/
 
         });
 
@@ -111,9 +110,6 @@ public class NewLobbyFragment extends Fragment {
 
             ((LobbyActivity)getActivity()).backToOverview();
         });
-
-
-
         return view;
     }
 }
