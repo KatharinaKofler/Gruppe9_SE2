@@ -31,13 +31,13 @@ public class GameStart extends AppCompatActivity {
         String lobbyID = b.getString("LobbyID");
 
         //Open Web Socket
-           mSocket.connect();
 
-            IO.Options options = IO.Options.builder()
-                    .setExtraHeaders(singletonMap("x-lobby-id", singletonList(lobbyID)))
-                    .build();
+        IO.Options options = IO.Options.builder()
+                .setExtraHeaders(singletonMap("x-lobby-id", singletonList(lobbyID)))
+                .build();
 
-            mSocket = IO.socket(URI.create("https://gruppe9-se2-backend.herokuapp.com/"), options);
+        mSocket = IO.socket(URI.create("https://gruppe9-se2-backend.herokuapp.com/"), options);
 
+        mSocket.connect();
     }
 }

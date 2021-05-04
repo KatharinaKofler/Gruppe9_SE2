@@ -45,12 +45,10 @@ public class LobbyOverviewFragment extends Fragment {
 
         // TODO exchange with server data
 
-
         // Post Request Lobby
         final String base_URL = "https://gruppe9-se2-backend.herokuapp.com/";
         String token = "Bearer ";
         token += ApiManager.getToken();
-
 
         Retrofit retrofit = ApiManager.getInstance();
         LobbyGetApi service = retrofit.create(LobbyGetApi.class);
@@ -61,6 +59,7 @@ public class LobbyOverviewFragment extends Fragment {
             public void onResponse(Call<ArrayList<Lobbies>> call, Response<ArrayList<Lobbies>> response) {
                 if (response.isSuccessful()) {
 
+                    // response.body() ist die ArrayList mit allen Lobbies
                     int max = response.body().size();
 
                     for (int i = 0; i < max; i++) {
