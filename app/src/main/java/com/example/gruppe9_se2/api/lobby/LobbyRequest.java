@@ -4,12 +4,10 @@ import com.google.gson.annotations.SerializedName;
 
 public class LobbyRequest {
 
-    @SerializedName("Authorization")
+    @SerializedName("token")
     public String token;
 
     public LobbyRequest(String token) {
         this.token = token;
     }
-
-
 }

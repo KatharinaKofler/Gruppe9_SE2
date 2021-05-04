@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -83,13 +82,13 @@ public class NewLobbyFragment extends Fragment {
                     } else {
                         String error = ApiHelper.getErrorMessage(response);
                         TextInputLayout etLobbyName = view.findViewById(R.id.et_lobby_name);
-                        etLobbyName.setError("This Error");
+                        etLobbyName.setError(error);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<LobbyResponse> call, Throwable t) {
-                    EditText etLobbyName = view.findViewById(R.id.et_lobby_name);
+                    TextInputLayout etLobbyName = view.findViewById(R.id.et_lobby_name);
                     etLobbyName.setError("Problem accessing server !!!");
                 }
             });

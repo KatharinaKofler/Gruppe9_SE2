@@ -8,7 +8,7 @@ import retrofit2.http.POST;
 public interface LobbyApi {
     @POST("lobbies")
     Call<LobbyResponse> executeLobby(
-            @Header("Authorization") String token ,
+            @Header("token") String token ,
             @Body LobbyRequest request
     );
 
