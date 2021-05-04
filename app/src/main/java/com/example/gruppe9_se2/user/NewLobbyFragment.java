@@ -19,8 +19,6 @@ import com.example.gruppe9_se2.api.lobby.LobbyApi;
 import com.example.gruppe9_se2.api.lobby.LobbyRequest;
 import com.example.gruppe9_se2.api.lobby.LobbyResponse;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.gson.JsonObject;
-
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,8 +51,8 @@ public class NewLobbyFragment extends Fragment {
         Button btnInvite = view.findViewById(R.id.btn_createLobby);
         btnInvite.setOnClickListener(v -> {
 
-            final String[] lobbyID = new String[1];
-            // ToDo Post Request Lobby
+            //final String[] lobbyID = new String[1];
+            // Post Request Lobby
             final String base_URL = "https://gruppe9-se2-backend.herokuapp.com/";
             String token = "Bearer ";
             token += ApiManager.getToken();
@@ -68,18 +66,12 @@ public class NewLobbyFragment extends Fragment {
                 @Override
                 public void onResponse(Call<LobbyResponse> call, Response<LobbyResponse> response) {
                     if (response.isSuccessful()) {
-                        LobbyResponse lobby = response.body();
-                        if (lobby != null) {
-                            JsonObject lobbyObject = lobby.lobbyState;
 
-                            //ToDo Lobby id speichern
-                            String id = String.valueOf(lobbyObject.get("id"));
-                            System.out.println(id);
-                            lobbyID[0] = id;
-                            String owner = String.valueOf(lobbyObject.get("owner"));
-                            System.out.println(owner);
+                        //Lobby id speichern
+                        String id = response.body().getId();
+                        String owner = response.body().getOwner();
+                        //lobbyID[0] = id;
 
-                        }
                     } else {
                         String error = ApiHelper.getErrorMessage(response);
                         TextInputLayout etLobbyName = view.findViewById(R.id.et_lobby_name);
