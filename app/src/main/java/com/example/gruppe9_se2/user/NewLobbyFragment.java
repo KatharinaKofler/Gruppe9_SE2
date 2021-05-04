@@ -29,36 +29,23 @@ import retrofit2.Retrofit;
 
 public class NewLobbyFragment extends Fragment {
 
-    //private Socket mSocket;
-
-
     InviteListAdapter adapter;
-    //Socket Initialization
-
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_lobby, container, false);
 
-       // RecyclerView recyclerView = view.findViewById(R.id.inviteList);
-//
-//        recyclerView.setHasFixedSize(true);
         adapter = new InviteListAdapter();
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-       // recyclerView.setLayoutManager(layoutManager);
-       // recyclerView.setAdapter(adapter);
-
 
         Button btnInvite = view.findViewById(R.id.btn_createLobby);
         btnInvite.setOnClickListener(v -> {
 
-            //final String[] lobbyID = new String[1];
             // Post Request Lobby
             final String base_URL = "https://gruppe9-se2-backend.herokuapp.com/";
             String token = "Bearer ";
             token += ApiManager.getToken();
-
 
             Retrofit retrofit = ApiManager.getInstance();
             LobbyRequest request = new LobbyRequest(token);
@@ -72,12 +59,13 @@ public class NewLobbyFragment extends Fragment {
                         //Lobby id speichern
                         String id = response.body().getId();
                         String owner = response.body().getOwner();
-                        //lobbyID[0] = id;
-
 
                         Intent intent = new Intent(getContext(), GameStart.class);
-                        startActivity(intent);
+                        Bundle b = new Bundle();
+                        b.putString("LobbyID", id);
+                        intent.putExtras(b);
 
+                        startActivity(intent);
 
 
 
@@ -94,16 +82,6 @@ public class NewLobbyFragment extends Fragment {
                     etLobbyName.setError("Problem accessing server !!!");
                 }
             });
-
-            //Open Web Socket
-           /* mSocket.connect();
-
-            IO.Options options = IO.Options.builder()
-                    .setExtraHeaders(singletonMap("x-lobby-id", singletonList(lobbyID[0])))
-                    .build();
-
-            mSocket = IO.socket(URI.create("https://gruppe9-se2-backend.herokuapp.com/"), options);*/
-
         });
 
         Button button_back = view.findViewById(R.id.btn_back);

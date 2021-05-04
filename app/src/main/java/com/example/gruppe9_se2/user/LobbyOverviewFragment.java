@@ -87,8 +87,6 @@ public class LobbyOverviewFragment extends Fragment {
         });
 
 
-
-
         Button btnCreate = view.findViewById(R.id.newLobby);
         btnCreate.setOnClickListener(v -> {
             ((LobbyActivity)getActivity()).newLobby();
