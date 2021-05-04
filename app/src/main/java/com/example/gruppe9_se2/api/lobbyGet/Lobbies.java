@@ -2,7 +2,8 @@ package com.example.gruppe9_se2.api.lobbyGet;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LobbyGetResponse {
+public class Lobbies {
+
     @SerializedName("id")
     public String id;
 

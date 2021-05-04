@@ -45,7 +45,7 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Lobby l = localData.get(position);
         holder.getName().setText(l.name);
-        holder.getDetails().setText("Players: " + l.playerCount);
+        //holder.getDetails().setText("Players: " + l.playerCount);
     }
 
     @Override
