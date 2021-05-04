@@ -1,10 +1,12 @@
 package com.example.gruppe9_se2.user;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,6 +56,7 @@ public class LobbyOverviewFragment extends Fragment {
         LobbyGetApi service = retrofit.create(LobbyGetApi.class);
         Call<ArrayList<Lobbies>> call = service.executeLobbyGet(token);
         call.enqueue(new Callback<ArrayList<Lobbies>>() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onResponse(Call<ArrayList<Lobbies>> call, Response<ArrayList<Lobbies>> response) {
                 if (response.isSuccessful()) {
@@ -71,18 +74,20 @@ public class LobbyOverviewFragment extends Fragment {
                     recyclerView.setLayoutManager(layoutManager);
                     recyclerView.setAdapter(adapter);
 
+                    TextView tvError = view.findViewById(R.id.tvError);
+                    tvError.setText("");
 
                 } else {
                     String error = ApiHelper.getErrorMessage(response);
-                    //TextInputLayout etLobbyName = view.findViewById(R.id.et_lobby_name);
-                    //etLobbyName.setError(error);
+                    TextView tvError = view.findViewById(R.id.tvError);
+                    tvError.setText(error);
                 }
             }
 
             @Override
             public void onFailure(Call<ArrayList<Lobbies>> call, Throwable t) {
-                //TextInputLayout etLobbyName = view.findViewById(R.id.et_lobby_name);
-                //etLobbyName.setError("Problem accessing server !!!");
+                TextView tvError = view.findViewById(R.id.tvError);
+                tvError.setText("Problem accessing server !!!");
             }
         });
 

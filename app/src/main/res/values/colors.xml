@@ -8,4 +8,5 @@
     <color name="secondaryDarkColor">#00163b</color>
     <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#ffffff</color>
+    <color name="errorTextColor">#a32e26</color>
 </resources>
