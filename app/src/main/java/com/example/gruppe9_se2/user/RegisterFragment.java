@@ -59,79 +59,86 @@ public class RegisterFragment extends Fragment {
             TextInputLayout nameLayout = view.findViewById(R.id.et_name_layout);
             TextInputLayout passwordLayout = view.findViewById(R.id.et_password_layout);
 
+
             // print error message if name or password empty
             if (name.getText().toString().equals("")) {
                 nameLayout.setError("Enter a nickname");
             } else {
                 nameLayout.setError(null);
-            }
 
-            // all Password Validations
-            String regexNoSpace = "^(?=\\S+$).+$"; /* contains no white space */
-            String regexLowerUppercase = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&\\-+=().!?]).{8,20}$";
-            /* contains at least one lower and upper case letter and at least 8 and at most 20 characters and at least one of these special characters and one number*/
-            // todo nice to have: error message icon, that doesn't show up over the password visible icon (eye)
-            String p = password.getText().toString();
-            if (password.getText().toString().equals("")) {
-                passwordLayout.setError("Enter a password");
-            } else if (!Pattern.compile(regexNoSpace).matcher(password.getText().toString()).matches()) {
-                passwordLayout.setError("Enter a valid password, containing no white spaces");
-            } else if (!Pattern.compile(regexLowerUppercase).matcher(p).matches()) {
-                passwordLayout.setError("A valid password (8-20) needs at least one lowercase and uppercase letter, one special character and one number");
-            } else {
-                passwordLayout.setError(null);
-            }
+                // all Password Validations
+                String regexNoSpace = "^(?=\\S+$).+$"; /* contains no white space */
+                String regexLowerUppercase = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&\\-+=().!?]).{8,20}$";
+                /* contains at least one lower and upper case letter and at least 8 and at most 20 characters and at least one of these special characters and one number*/
+                // todo nice to have: error message icon, that doesn't show up over the password visible icon (eye)
+                String p = password.getText().toString();
+                if (password.getText().toString().equals("")) {
+                    passwordLayout.setError("Enter a password");
+                } else if (!Pattern.compile(regexNoSpace).matcher(password.getText().toString()).matches()) {
+                    passwordLayout.setError("Enter a valid password, containing no white spaces");
+                } else if (!Pattern.compile(regexLowerUppercase).matcher(p).matches()) {
+                    passwordLayout.setError("A valid password (8-20) needs at least one lowercase and uppercase letter, one special character and one number");
+                } else {
+                    passwordLayout.setError(null);
 
-            // Register
-            Retrofit retrofitRegister = ApiManager.getInstance();
-            RegisterRequest requestRegister = new RegisterRequest(name.getText().toString(), password.getText().toString());
-            RegisterApi serviceRegister = retrofitRegister.create(RegisterApi.class);
-            Call<RegisterResponse> callRegister = serviceRegister.executeRegister(requestRegister);
-            callRegister.enqueue(new Callback<RegisterResponse>() {
-                @Override
-                public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
-                    if (response.isSuccessful()) {
-                        // Login
-                        Retrofit retrofitLogin = ApiManager.getInstance();
-                        LoginRequest requestLogin = new LoginRequest(name.getText().toString(), password.getText().toString());
-                        LoginApi serviceLogin = retrofitLogin.create(LoginApi.class);
-                        Call<LoginResponse> callLogin = serviceLogin.executeLogin(requestLogin);
-                        callLogin.enqueue(new Callback<LoginResponse>() {
-                            @Override
-                            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                                if (response.isSuccessful()) {
-                                    LoginResponse login = response.body();
-                                    if (login != null) {
-                                        ApiManager.setToken(login.token);
+                    // Register
+                    Retrofit retrofitRegister = ApiManager.getInstance();
+                    RegisterRequest requestRegister = new RegisterRequest(name.getText().toString(), password.getText().toString());
+                    RegisterApi serviceRegister = retrofitRegister.create(RegisterApi.class);
+                    Call<RegisterResponse> callRegister = serviceRegister.executeRegister(requestRegister);
+                    callRegister.enqueue(new Callback<RegisterResponse>() {
+                        @Override
+                        public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
+                            if (response.isSuccessful()) {
+                                // Login
+                                Retrofit retrofitLogin = ApiManager.getInstance();
+                                LoginRequest requestLogin = new LoginRequest(name.getText().toString(), password.getText().toString());
+                                LoginApi serviceLogin = retrofitLogin.create(LoginApi.class);
+                                Call<LoginResponse> callLogin = serviceLogin.executeLogin(requestLogin);
+                                callLogin.enqueue(new Callback<LoginResponse>() {
+                                    @Override
+                                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                                        if (response.isSuccessful()) {
+                                            LoginResponse login = response.body();
+                                            if (login != null) {
+                                                ApiManager.setToken(login.token);
 
-                                        // Close current activity and start Lobby
-                                        getActivity().finish();
-                                        Intent intent = new Intent(getContext(), LobbyActivity.class);
-                                        startActivity(intent);
+                                                // Close current activity and start Lobby
+                                                getActivity().finish();
+                                                Intent intent = new Intent(getContext(), LobbyActivity.class);
+                                                startActivity(intent);
+                                            }
+                                        } else {
+                                            String error = ApiHelper.getErrorMessage(response);
+                                            passwordLayout.setError(error);
+                                        }
                                     }
-                                } else {
-                                    String error = ApiHelper.getErrorMessage(response);
-                                    passwordLayout.setError(error);
-                                }
-                            }
 
-                            @Override
-                            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                                passwordLayout.setError("Problem accessing server !!!");
-                            }
-                        });
+                                    @Override
+                                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                                        passwordLayout.setError("Problem accessing server !!!");
+                                    }
+                                });
 
-                    } else {
-                        String error = ApiHelper.getErrorMessage(response);
-                        passwordLayout.setError(error);
-                    }
+                            } else {
+                                String error = ApiHelper.getErrorMessage(response);
+                                passwordLayout.setError(error);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<RegisterResponse> call, Throwable t) {
+                            passwordLayout.setError("Problem accessing server !!!");
+                        }
+                    });
+
                 }
 
-                @Override
-                public void onFailure(Call<RegisterResponse> call, Throwable t) {
-                    passwordLayout.setError("Problem accessing server !!!");
-                }
-            });
+            }
+
+
+
+
 
         });
 
