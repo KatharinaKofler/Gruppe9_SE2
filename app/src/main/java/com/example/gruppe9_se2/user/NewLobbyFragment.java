@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.user;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.example.gruppe9_se2.api.base.ApiManager;
 import com.example.gruppe9_se2.api.lobby.LobbyApi;
 import com.example.gruppe9_se2.api.lobby.LobbyRequest;
 import com.example.gruppe9_se2.api.lobby.LobbyResponse;
+import com.example.gruppe9_se2.logic.GameStart;
 import com.google.android.material.textfield.TextInputLayout;
 
 import retrofit2.Call;
@@ -71,6 +73,13 @@ public class NewLobbyFragment extends Fragment {
                         String id = response.body().getId();
                         String owner = response.body().getOwner();
                         //lobbyID[0] = id;
+
+
+                        Intent intent = new Intent(getContext(), GameStart.class);
+                        startActivity(intent);
+
+
+
 
                     } else {
                         String error = ApiHelper.getErrorMessage(response);
