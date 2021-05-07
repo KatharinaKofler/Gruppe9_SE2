@@ -1,5 +1,8 @@
 package com.example.gruppe9_se2.user;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,17 +12,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.logic.GameStart;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.ViewHolder> {
 
-    private List<Lobby> localData;
+    private final List<Lobby> localData;
+    private final Context context;
 
-    public LobbyListAdapter() {
+    public LobbyListAdapter(Context context) {
         super();
         localData = new ArrayList<>();
+        this.context = context;
     }
 
     public void insert(Lobby lobby) {
@@ -44,9 +50,19 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Lobby l = localData.get(position);
-        holder.getName().setText(l.name);
-        //holder.getDetails().setText("Players: " + l.playerCount);
+        holder.getName().setText(l.getName());
+        holder.getDetails().setText("Press to join.");
+        holder.setOnClickListener((view) -> {
+            Intent intent = new Intent(context, GameStart.class);
+            Bundle b = new Bundle();
+            b.putString("LobbyID", l.id);
+            intent.putExtras(b);
+
+            context.startActivity(intent);
+        });
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -57,9 +73,10 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView name;
         private final TextView details;
+        private View.OnClickListener onClickListener;
 
         public ViewHolder(View view) {
             super(view);
@@ -67,6 +84,7 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
 
             name = (TextView) view.findViewById(R.id.lobbyName);
             details = (TextView) view.findViewById(R.id.lobbyDetails);
+            view.setOnClickListener(this);
         }
 
         public TextView getName() {
@@ -75,6 +93,17 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
 
         public TextView getDetails() {
             return details;
+        }
+
+        public void setOnClickListener(View.OnClickListener onClickListener) {
+            this.onClickListener = onClickListener;
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (onClickListener != null) {
+                onClickListener.onClick(view);
+            }
         }
     }
 }

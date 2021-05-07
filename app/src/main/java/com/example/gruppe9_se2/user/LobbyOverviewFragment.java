@@ -39,7 +39,7 @@ public class LobbyOverviewFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.lobbyList);
         recyclerView.setHasFixedSize(true);
-        LobbyListAdapter adapter = new LobbyListAdapter();
+        LobbyListAdapter adapter = new LobbyListAdapter(getContext());
 
 
 
@@ -65,8 +65,7 @@ public class LobbyOverviewFragment extends Fragment {
                     for (int i = 0; i < max; i++) {
                         String id = response.body().get(i).getId();
                         String owner = response.body().get(i).getOwner();
-                        String name = owner + "'s Lobby";
-                        adapter.insert(new Lobby(name));
+                        adapter.insert(new Lobby(id, owner));
                     }
 
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());

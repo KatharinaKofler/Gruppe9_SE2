@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,13 +38,11 @@ public class NewLobbyFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_create_lobby, container, false);
 
         adapter = new InviteListAdapter();
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         Button btnInvite = view.findViewById(R.id.btn_createLobby);
         btnInvite.setOnClickListener(v -> {
 
             // Post Request Lobby
-            final String base_URL = "https://gruppe9-se2-backend.herokuapp.com/";
             String token = "Bearer ";
             token += ApiManager.getToken();
 
@@ -58,7 +57,6 @@ public class NewLobbyFragment extends Fragment {
 
                         //Lobby id speichern
                         String id = response.body().getId();
-                        String owner = response.body().getOwner();
 
                         Intent intent = new Intent(getContext(), GameStart.class);
                         Bundle b = new Bundle();
@@ -66,29 +64,21 @@ public class NewLobbyFragment extends Fragment {
                         intent.putExtras(b);
 
                         startActivity(intent);
-
-
-
                     } else {
                         String error = ApiHelper.getErrorMessage(response);
-                        TextInputLayout etLobbyName = view.findViewById(R.id.et_lobby_name);
-                        etLobbyName.setError(error);
+                        TextView createError = view.findViewById(R.id.createError);
+                        createError.setText(error);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<LobbyResponse> call, Throwable t) {
-                    TextInputLayout etLobbyName = view.findViewById(R.id.et_lobby_name);
-                    etLobbyName.setError("Problem accessing server !!!");
+                    TextView createError = view.findViewById(R.id.createError);
+                    createError.setText("Problem accessing server !!!");
                 }
             });
         });
 
-        Button button_back = view.findViewById(R.id.btn_back);
-        button_back.setOnClickListener(v -> {
-
-            ((LobbyActivity)getActivity()).backToOverview();
-        });
         return view;
     }
 }
