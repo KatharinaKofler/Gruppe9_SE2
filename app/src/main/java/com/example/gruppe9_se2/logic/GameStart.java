@@ -63,7 +63,12 @@ public class GameStart extends AppCompatActivity {
         mSocket.on("connect_failed", args -> {
             Log.e("myLogs", "connect_failed");
         });
-        
+
+        // sync Event after connection with websocket
+        mSocket.on("sync", lobby -> {
+            // lobby is the current lobby we joined, with current player list
+            Log.i("myLogs", "sync called");
+        });
 
         mSocket.connect();
 
