@@ -21,10 +21,7 @@ import static java.util.Collections.singletonList;
 
 public class GameStart extends AppCompatActivity {
 
-
     private Socket mSocket;
-
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,10 +29,19 @@ public class GameStart extends AppCompatActivity {
         setContentView(R.layout.activity_gamestart);
 
         Button btnStart = this.findViewById(R.id.btn_startGame);
+        //ToDo Button only visible for Lobby owner
         btnStart.setOnClickListener(v -> {
             // Send Start Game Event to server
             mSocket.emit("startGame", "");
             //ToDo insert the correct message parameter
+        });
+
+        Button btnLeave = this.findViewById(R.id.btn_leaveLobby);
+        btnLeave.setOnClickListener(v -> {
+            // Send Leave Lobby Event to server
+            mSocket.emit("leaveLobby", "");
+            //ToDo insert the correct message parameter
+            //ToDo implement leave Lobby on server
         });
 
         // Get JWT from ApiManager
