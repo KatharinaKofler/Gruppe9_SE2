@@ -1,7 +1,5 @@
 package com.example.gruppe9_se2.api.lobbyGet;
 
-import com.example.gruppe9_se2.api.lobby.LobbyResponse;
-
 import java.util.ArrayList;
 
 import retrofit2.Call;

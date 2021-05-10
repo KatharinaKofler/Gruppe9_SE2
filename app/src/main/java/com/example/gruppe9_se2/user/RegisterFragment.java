@@ -2,7 +2,6 @@ package com.example.gruppe9_se2.user;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,6 @@ import com.example.gruppe9_se2.api.register.RegisterRequest;
 import com.example.gruppe9_se2.api.register.RegisterResponse;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import retrofit2.Call;

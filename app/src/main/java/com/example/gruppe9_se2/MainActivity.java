@@ -1,24 +1,15 @@
 package com.example.gruppe9_se2;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.gruppe9_se2.user.LoginFragment;
 import com.example.gruppe9_se2.user.RegisterFragment;
-
-import java.util.ArrayList;
-import java.util.EventListener;
 
 public class MainActivity extends AppCompatActivity {
 
