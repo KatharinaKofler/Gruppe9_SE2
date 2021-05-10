@@ -9,11 +9,17 @@ public class LobbyResponse {
     @SerializedName("owner")
     public String owner;
 
+    @SerializedName("ownerId")
+    public String ownerId;
+
     public String getId(){
         return id;
     }
     public String getOwner(){
         return owner;
+    }
+    public String getOwnerId(){
+        return ownerId;
     }
 }
 
