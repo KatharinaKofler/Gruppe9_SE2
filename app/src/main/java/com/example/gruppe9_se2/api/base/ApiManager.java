@@ -28,4 +28,8 @@ public class ApiManager {
     public static void setToken(String token) {
         ApiManager.token = token;
     }
+
+    public static void deleteToken() {
+        ApiManager.token = null;
+    }
 }
