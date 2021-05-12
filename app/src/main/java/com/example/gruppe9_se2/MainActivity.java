@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.gruppe9_se2.game.WandFragment;
 import com.example.gruppe9_se2.user.LoginFragment;
 import com.example.gruppe9_se2.user.RegisterFragment;
 
@@ -21,6 +22,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // show content activity main
         setContentView(R.layout.activity_main);
+
+        // todo following only for test purpose
+        Fragment f = new WandFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        containerId = findViewById(R.id.fragment_container_view).getId();
+        ft.replace(containerId, f);
+        ft.commit();
+/*
+
         // set OnClickListener for switch Button
         Button btnSwitch = findViewById(R.id.btn_switch);
         btnSwitch.setOnClickListener(v -> {
@@ -42,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         // get id from fragment container view
         containerId = findViewById(R.id.fragment_container_view).getId();
         // create fragment transaction
-        login(null);
+        login(null);*/
     }
 
     public void login(String name){
