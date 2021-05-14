@@ -24,10 +24,11 @@ import java.util.EventListener;
 public class WandFragment extends Fragment implements EventListener {
 
     private final int[] emptyFliesenOrder = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
-    //private int[] emptyFliesenOrder = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
+    private final int[] fullFliesenOrder = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
 
 
-    //todo save all information about this Wand, so it can be a JSON
+    //todo on Button Click Next -> remove all Listeners from the imageViews and LinearLayouts
+
     JSONArray wand;
 
     @Override
@@ -72,26 +73,8 @@ public class WandFragment extends Fragment implements EventListener {
             image.setTag(R.id.drawable_id, getEmptyFLieseId(i)); // changes, represents the current image shown
             image.setTag(R.id.color_id, getColorId(i)); // never changes important to know what color it has (0: rot, 1: grün, 2: blau, 3: lila, 4: orange)
 
-            //todo remove the Listener, its only for images added this round
-            // start the drag on a long click
-            //todo change to OnTouch with MotionEvent ACTION_DOWN
-            image.setOnLongClickListener(v -> {
-
-                // start the drag of imageView
-
-                ClipData.Item item = new ClipData.Item(v.getTag(R.id.drawable_id).toString());
-                String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-
-                ClipData dragData = new ClipData(v.getTag(R.id.drawable_id).toString(), mimeTypes, item);
-                View.DragShadowBuilder myShadow = new View.DragShadowBuilder(image);
-
-                v.startDrag(dragData, myShadow, image, 0);
-
-                // this sets the image to an emptyFliese image in the correct color
-                int colorId = (int) v.getTag(R.id.color_id);
-                ((ImageView) v).setImageResource(emptyFliesenOrder[colorId]);
-                return true;
-            });
+            //todo remove the Listener, just for testing
+            image.setOnLongClickListener(this::addDragListener);
 
             // set the listeners for drag events
             linearLayout.setOnDragListener((v, event) -> {
@@ -123,9 +106,11 @@ public class WandFragment extends Fragment implements EventListener {
 
                         // set dropView to the image dragged there
                         ImageView dropView = (ImageView) ((LinearLayout) v).getChildAt(0);
-                        int drawableId = (int) dragView.getTag(R.id.drawable_id);
+                        int drawableId = Integer.parseInt((String) event.getClipData().getDescription().getLabel());
                         dropView.setImageResource(drawableId);
                         dropView.setTag(R.id.drawable_id, drawableId);
+                        //todo change to OnTouch with MotionEvent ACTION_DOWN
+                        dropView.setOnLongClickListener(this::addDragListener);
 
                         //todo send Server what was dragged and dropped where
                         // let Server send Event to other Fragment where the drag came from
@@ -134,6 +119,9 @@ public class WandFragment extends Fragment implements EventListener {
                     else{
                         //todo print error message to screen, you can't drop here
                         // and maybe tell Musterreihe Fragment
+                        // and redo stuff after startDrag() in Listener
+                        dragView.setImageResource(fullFliesenOrder[dragColor]);
+                        dragView.setTag(R.id.drawable_id, fullFliesenOrder[dragColor]);
                         return false;
                     }
                 }
@@ -145,6 +133,24 @@ public class WandFragment extends Fragment implements EventListener {
         }
 
         return view;
+    }
+
+    private boolean addDragListener(View v) {
+
+        ClipData.Item item = new ClipData.Item(v.getTag(R.id.drawable_id).toString());
+        String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
+
+        // clip description Tag is important for setting the correct drawable on drop
+        ClipData dragData = new ClipData(v.getTag(R.id.drawable_id).toString(), mimeTypes, item);
+        View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
+
+        v.startDrag(dragData, myShadow, v, 0);
+        // this sets the image to an emptyFliese image in the correct color
+        int colorId = (int) v.getTag(R.id.color_id);
+        ((ImageView) v).setImageResource(emptyFliesenOrder[colorId]);
+        v.setTag(R.id.drawable_id, emptyFliesenOrder[colorId]);
+
+        return true;
     }
 
     private int getEmptyFLieseId(int index){
