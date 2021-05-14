@@ -9,4 +9,22 @@
     <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#ffffff</color>
     <color name="errorTextColor">#a32e26</color>
+
+    <color name="emptyFlieseFill">#ffeed6</color>
+    <color name="emptyFlieseBorder">#a89d8d</color>
+
+    <color name="emptyFlieseFill1">#c98585</color>
+    <color name="emptyFlieseBorder1">#855959</color>
+
+    <color name="emptyFlieseFill2">#aecf93</color>
+    <color name="emptyFlieseBorder2">#7b9468</color>
+
+    <color name="emptyFlieseFill3">#a1bbc9</color>
+    <color name="emptyFlieseBorder3">#6b7f8a</color>
+
+    <color name="emptyFlieseFill4">#bea5c7</color>
+    <color name="emptyFlieseBorder4">#7c6982</color>
+
+    <color name="emptyFlieseFill5">#edb391</color>
+    <color name="emptyFlieseBorder5">#b5876d</color>
 </resources>
