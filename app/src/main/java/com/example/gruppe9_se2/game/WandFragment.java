@@ -84,6 +84,7 @@ public class WandFragment extends Fragment implements EventListener {
                 if (event.getAction() == DragEvent.ACTION_DROP) {
 
                     ImageView dragView = (ImageView) event.getLocalState();
+                    int drawableId = Integer.parseInt((String) event.getClipData().getDescription().getLabel());
 
                     boolean alreadyAssigned = (boolean) v.getTag(R.id.assigned);
                     int acceptableColor = (int) v.getTag(R.id.acceptable_color_id);
@@ -106,7 +107,7 @@ public class WandFragment extends Fragment implements EventListener {
 
                         // set dropView to the image dragged there
                         ImageView dropView = (ImageView) ((LinearLayout) v).getChildAt(0);
-                        int drawableId = Integer.parseInt((String) event.getClipData().getDescription().getLabel());
+
                         dropView.setImageResource(drawableId);
                         dropView.setTag(R.id.drawable_id, drawableId);
                         //todo change to OnTouch with MotionEvent ACTION_DOWN
@@ -119,9 +120,15 @@ public class WandFragment extends Fragment implements EventListener {
                     else{
                         //todo print error message to screen, you can't drop here
                         // and maybe tell Musterreihe Fragment
-                        // and redo stuff after startDrag() in Listener
+
+                        // change dragview image back to what it prev was
+                        dragView.setImageResource(drawableId);
+                        dragView.setTag(R.id.drawable_id, drawableId);
+                        ((LinearLayout)dragView.getParent()).setTag(R.id.assigned, true);
+                        //todo remove following two lines, just for testing
                         dragView.setImageResource(fullFliesenOrder[dragColor]);
                         dragView.setTag(R.id.drawable_id, fullFliesenOrder[dragColor]);
+
                         return false;
                     }
                 }
@@ -149,6 +156,7 @@ public class WandFragment extends Fragment implements EventListener {
         int colorId = (int) v.getTag(R.id.color_id);
         ((ImageView) v).setImageResource(emptyFliesenOrder[colorId]);
         v.setTag(R.id.drawable_id, emptyFliesenOrder[colorId]);
+        ((LinearLayout)v.getParent()).setTag(R.id.assigned, false);
 
         return true;
     }
