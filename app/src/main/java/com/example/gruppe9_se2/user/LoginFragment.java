@@ -16,6 +16,9 @@ import com.example.gruppe9_se2.api.login.LoginApi;
 import com.example.gruppe9_se2.api.login.LoginRequest;
 import com.example.gruppe9_se2.api.login.LoginResponse;
 import com.google.android.material.textfield.TextInputLayout;
+
+import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -76,14 +79,14 @@ public class LoginFragment extends Fragment implements EventListener {
             Call<LoginResponse> call = service.executeLogin(request);
             call.enqueue(new Callback<LoginResponse>() {
                 @Override
-                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                public void onResponse(@NotNull Call<LoginResponse> call, @NotNull Response<LoginResponse> response) {
                     if (response.isSuccessful()) {
                         LoginResponse login = response.body();
                         if (login != null) {
                             ApiManager.setToken(login.token);
 
                             // Close current activity and start Lobby
-                            getActivity().finish();
+                            requireActivity().finish();
                             Intent intent = new Intent(getContext(), LobbyActivity.class);
                             startActivity(intent);
                         }
@@ -94,7 +97,7 @@ public class LoginFragment extends Fragment implements EventListener {
                 }
 
                 @Override
-                public void onFailure(Call<LoginResponse> call, Throwable t) {
+                public void onFailure(@NotNull Call<LoginResponse> call, @NotNull Throwable t) {
                     passwordLayout.setError("Problem accessing server !!!");
                 }
             });

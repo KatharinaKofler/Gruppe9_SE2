@@ -21,6 +21,8 @@ import com.example.gruppe9_se2.api.register.RegisterRequest;
 import com.example.gruppe9_se2.api.register.RegisterResponse;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.regex.Pattern;
 
 import retrofit2.Call;
@@ -57,7 +59,6 @@ public class RegisterFragment extends Fragment {
             TextInputLayout nameLayout = view.findViewById(R.id.et_name_layout);
             TextInputLayout passwordLayout = view.findViewById(R.id.et_password_layout);
 
-
             // print error message if name or password empty
             if (name.getText().toString().equals("")) {
                 nameLayout.setError("Enter a nickname");
@@ -86,7 +87,7 @@ public class RegisterFragment extends Fragment {
                     Call<RegisterResponse> callRegister = serviceRegister.executeRegister(requestRegister);
                     callRegister.enqueue(new Callback<RegisterResponse>() {
                         @Override
-                        public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
+                        public void onResponse(@NotNull Call<RegisterResponse> call, @NotNull Response<RegisterResponse> response) {
                             if (response.isSuccessful()) {
                                 // Login
                                 Retrofit retrofitLogin = ApiManager.getInstance();
@@ -95,14 +96,14 @@ public class RegisterFragment extends Fragment {
                                 Call<LoginResponse> callLogin = serviceLogin.executeLogin(requestLogin);
                                 callLogin.enqueue(new Callback<LoginResponse>() {
                                     @Override
-                                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                                    public void onResponse(@NotNull Call<LoginResponse> call, @NotNull Response<LoginResponse> response) {
                                         if (response.isSuccessful()) {
                                             LoginResponse login = response.body();
                                             if (login != null) {
                                                 ApiManager.setToken(login.token);
 
                                                 // Close current activity and start Lobby
-                                                getActivity().finish();
+                                                requireActivity().finish();
                                                 Intent intent = new Intent(getContext(), LobbyActivity.class);
                                                 startActivity(intent);
                                             }
@@ -113,7 +114,7 @@ public class RegisterFragment extends Fragment {
                                     }
 
                                     @Override
-                                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                                    public void onFailure(@NotNull Call<LoginResponse> call, @NotNull Throwable t) {
                                         passwordLayout.setError("Problem accessing server !!!");
                                     }
                                 });
@@ -125,19 +126,12 @@ public class RegisterFragment extends Fragment {
                         }
 
                         @Override
-                        public void onFailure(Call<RegisterResponse> call, Throwable t) {
+                        public void onFailure(@NotNull Call<RegisterResponse> call, @NotNull Throwable t) {
                             passwordLayout.setError("Problem accessing server !!!");
                         }
                     });
-
                 }
-
             }
-
-
-
-
-
         });
 
         return view;
