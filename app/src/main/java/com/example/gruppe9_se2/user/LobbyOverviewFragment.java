@@ -95,6 +95,11 @@ public class LobbyOverviewFragment extends Fragment {
             ((LobbyActivity)getActivity()).newLobby();
         });
 
+        Button btnLogout = view.findViewById(R.id.logoutLobby);
+        btnLogout.setOnClickListener(v -> {
+            ((LobbyActivity)getActivity()).logoutLobby();
+        });
+
         return view;
     }
 }
