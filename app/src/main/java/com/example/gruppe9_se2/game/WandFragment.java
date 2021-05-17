@@ -2,6 +2,11 @@ package com.example.gruppe9_se2.game;
 
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -11,6 +16,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.gruppe9_se2.R;
@@ -20,12 +26,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.EventListener;
+import java.util.Random;
 
-public class WandFragment extends Fragment implements EventListener {
+
+public class WandFragment extends Fragment implements EventListener, SensorEventListener {
 
     private final int[] emptyFliesenOrder = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
     private final int[] fullFliesenOrder = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
 
+
+
+    private static final float SHAKE_THRESHOLD_GRAVITY = 1.0000001f; // change when using physical device //2.7f;
+    private static final int SHAKE_GAP_TIME_MS = 50000;
+
+    // The following are used for the shake detection
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private long mShakeTimestamp;
+    private GridLayout gridLayout;
 
     //todo on Button Click Next -> remove all Listeners from the imageViews and LinearLayouts
 
@@ -37,6 +55,8 @@ public class WandFragment extends Fragment implements EventListener {
 
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
+        System.out.println("Start");
+
         // create JSON
         wand = new JSONArray();
 
@@ -44,7 +64,7 @@ public class WandFragment extends Fragment implements EventListener {
         View view = inflater.inflate(R.layout.fragment_wand, container, false);
 
         // Fill the 5x5 Grid with ImageViews
-        GridLayout gridLayout = view.findViewById(R.id.gridWand);
+        gridLayout = view.findViewById(R.id.gridWand);
 
         for (int i = 0; i < 25; i++) {
             // fill JSON with data
@@ -63,6 +83,7 @@ public class WandFragment extends Fragment implements EventListener {
             linearLayout.setTag(R.id.index_id, i); // never changes
             linearLayout.setTag(R.id.acceptable_color_id, getColorId(i)); // never changes
             linearLayout.setTag(R.id.assigned, false); // changes
+
 
             // create imageview for the prev created linear Layout, imageviews can be dragged, but it never changes position, just the imageRessource id changes, tag holds the current drawableId and colorId
             ImageView image = new ImageView(requireContext());
@@ -142,6 +163,29 @@ public class WandFragment extends Fragment implements EventListener {
         return view;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // ShakeDetector initialization
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Add the following line to register the Session Manager Listener onResume
+        mSensorManager.registerListener(this, mAccelerometer,	SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    public void onPause() {
+        // Add the following line to unregister the Sensor Manager onPause
+        mSensorManager.unregisterListener(this);
+        super.onPause();
+    }
+
     private boolean addDragListener(View v) {
 
         ClipData.Item item = new ClipData.Item(v.getTag(R.id.drawable_id).toString());
@@ -168,6 +212,78 @@ public class WandFragment extends Fragment implements EventListener {
 
     private int getColorId(int index){
         return ((index % 5) + (index / 5)) % 5;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        System.out.println("sensor changed");
+
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+
+        float gX = x / SensorManager.GRAVITY_EARTH;
+        float gY = y / SensorManager.GRAVITY_EARTH;
+        float gZ = z / SensorManager.GRAVITY_EARTH;
+
+        // gForce will be close to 1 when there is no movement.
+        double gForce = Math.sqrt(gX * gX + gY * gY + gZ * gZ);
+
+
+        if (gForce > SHAKE_THRESHOLD_GRAVITY) {
+            final long now = System.currentTimeMillis();
+            // ignore shake events too close to each other (500ms)
+            if (mShakeTimestamp + SHAKE_GAP_TIME_MS > now) {
+                return;
+            }
+            System.out.println(gForce);
+
+            mShakeTimestamp = now;
+
+            cheat();
+
+            // TODO on successful cheat
+            // mSensorManager.unregisterListener(this);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+        // ignore
+    }
+
+    private void cheat() {
+        int index;
+        LinearLayout cell;
+        do {
+            index = (new Random()).nextInt(25);
+            cell = (LinearLayout) gridLayout.getChildAt(index);
+        } while((boolean)cell.getTag(R.id.assigned)); // TODO check board not full
+
+        System.out.println(cell);
+        System.out.println(cell.getTag(R.id.acceptable_color_id));
+
+        // TODO extract in method
+        // drop is ok -> change view
+        cell.setTag(R.id.assigned, true);
+        // update JSON
+        try {
+            JSONObject updated =  wand.getJSONObject(index);
+            updated.remove("assigned");
+            updated.put("assigned", true);
+            wand.put(index, updated);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // set dropView to the image dragged there
+        ImageView tile = (ImageView) ((LinearLayout) cell).getChildAt(0);
+
+        System.out.println(tile);
+        int colorId = (int)tile.getTag(R.id.color_id);
+        tile.setImageResource(fullFliesenOrder[colorId]);
+        tile.setTag(R.id.drawable_id, fullFliesenOrder[colorId]);
+
     }
 
 }
