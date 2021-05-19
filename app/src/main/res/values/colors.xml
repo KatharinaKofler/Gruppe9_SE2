@@ -13,20 +13,20 @@
     <color name="emptyFlieseFill">#ffeed6</color>
     <color name="emptyFlieseBorder">#a89d8d</color>
 
-    <color name="emptyFlieseFill1">#c98585</color>
-    <color name="emptyFlieseBorder1">#855959</color>
+    <color name="emptyFlieseFill1">#d1a7a7</color>
+    <color name="emptyFlieseBorder1">#b59191</color>
 
-    <color name="emptyFlieseFill2">#aecf93</color>
-    <color name="emptyFlieseBorder2">#7b9468</color>
+    <color name="emptyFlieseFill2">#c7d9b8</color>
+    <color name="emptyFlieseBorder2">#b0bfa3</color>
 
-    <color name="emptyFlieseFill3">#a1bbc9</color>
-    <color name="emptyFlieseBorder3">#6b7f8a</color>
+    <color name="emptyFlieseFill3">#bec9cf</color>
+    <color name="emptyFlieseBorder3">#a9b2b8</color>
 
-    <color name="emptyFlieseFill4">#bea5c7</color>
-    <color name="emptyFlieseBorder4">#7c6982</color>
+    <color name="emptyFlieseFill4">#c7b8cc</color>
+    <color name="emptyFlieseBorder4">#aca0b0</color>
 
-    <color name="emptyFlieseFill5">#edb391</color>
-    <color name="emptyFlieseBorder5">#b5876d</color>
+    <color name="emptyFlieseFill5">#f0cbb6</color>
+    <color name="emptyFlieseBorder5">#cfae9b</color>
 
 
     <color name="FlieseFill1">#b52222</color>
