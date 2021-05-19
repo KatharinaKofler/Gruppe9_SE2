@@ -96,8 +96,6 @@ public class WandFragment extends Fragment implements EventListener {
             linearLayout.setTag(R.id.index_id, i); // never changes
             linearLayout.setTag(R.id.acceptable_color_id, getColorId(i)); // never changes
             linearLayout.setTag(R.id.assigned, assigned); // changes
-            // set listener for drop event
-            linearLayout.setOnDragListener(this::addDropListener);
 
             // -- IMAGEVIEW --
             // create imageview for the prev created linear Layout, imageviews can be dragged, but it never changes position, just the imageRessource id changes, tag holds the current drawableId and colorId
@@ -140,7 +138,7 @@ public class WandFragment extends Fragment implements EventListener {
 
         //todo calculate points
 
-        //todo adds points to total player points
+        //todo add points to total player points
     }
 
     private void createEmptyArray(JSONArray jsonArray){
@@ -155,8 +153,22 @@ public class WandFragment extends Fragment implements EventListener {
         }
     }
 
-    // todo delete all following functions
+    private int getEmptyFLieseId(int index){
+        int color = ((index % 5) + (index / 5)) % 5;
+        return emptyFliesenOrder[color];
+    }
 
+    private int getFullFLieseId(int index){
+        int color = ((index % 5) + (index / 5)) % 5;
+        return fullFliesenOrder[color];
+    }
+
+    private int getColorId(int index){
+        return ((index % 5) + (index / 5)) % 5;
+    }
+
+    // todo delete all following functions
+/*
     private boolean addDragListener(View v) {
 
         ClipData.Item item = new ClipData.Item(v.getTag(R.id.drawable_id).toString());
@@ -242,18 +254,8 @@ public class WandFragment extends Fragment implements EventListener {
         return true;
     }
 
-    private int getEmptyFLieseId(int index){
-        int color = ((index % 5) + (index / 5)) % 5;
-        return emptyFliesenOrder[color];
-    }
 
-    private int getFullFLieseId(int index){
-        int color = ((index % 5) + (index / 5)) % 5;
-        return fullFliesenOrder[color];
-    }
 
-    private int getColorId(int index){
-        return ((index % 5) + (index / 5)) % 5;
-    }
+    */
 
 }
