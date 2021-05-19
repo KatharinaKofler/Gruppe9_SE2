@@ -59,7 +59,7 @@ public class GameStart extends AppCompatActivity {
         IO.Options options = IO.Options.builder().setExtraHeaders(extraHeaders).build();
 
         // Create Socket
-        URI uri = URI.create("https://gruppe9-se2-backend.herokuapp.com/");
+        URI uri = URI.create(getString(R.string.serverUrl));
 
         mSocket = IO.socket(uri, options);
 

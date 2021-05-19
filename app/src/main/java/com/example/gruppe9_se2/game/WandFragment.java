@@ -2,6 +2,7 @@ package com.example.gruppe9_se2.game;
 
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
@@ -15,51 +16,54 @@ import android.widget.LinearLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.api.base.ApiManager;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.EventListener;
+import java.util.HashMap;
+import java.util.List;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+
+import static java.util.Collections.singletonList;
 
 public class WandFragment extends Fragment implements EventListener {
 
     private final int[] emptyFliesenOrder = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
     private final int[] fullFliesenOrder = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
 
+    private Socket mSocket;
 
-    //todo on Button Click Next -> remove all Listeners from the imageViews and LinearLayouts
-
-    JSONArray wand;
-
-    private void createTestArray(JSONArray jsonArray){
-        for(int i=0;i<25;i++){
-            try {
-                JSONObject field = new JSONObject();
-                field.put("assigned", false);
-                jsonArray.put(i, field);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    static JSONArray wand = new JSONArray();
+    static boolean firstCreate = true;
+    GridLayout gridLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //todo send Event 'ShowWand' with attribute Player
-        //  returns JSONArray
-        wand = new JSONArray();
-
         // inflate and build the layout from JSONArray
         View view = inflater.inflate(R.layout.fragment_wand, container, false);
-        //todo following line just for testing
-        createTestArray(wand);
+
+        if(firstCreate){
+            createEmptyArray(wand);
+            //firstCreate = false;
+        }
         init(view, wand);
 
-        //todo Listeners
-        // listen for finish -> removeAllListeners(view);
+        // for testing:
+        if(firstCreate){
+            add(3, 2);
+            add(1, 4);
+            add(2, 5);
+            firstCreate = false;
+        }
 
         return view;
     }
@@ -70,7 +74,7 @@ public class WandFragment extends Fragment implements EventListener {
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
         // -- GRIDLAYOUT --
-        GridLayout gridLayout = view.findViewById(R.id.gridWand);
+        gridLayout = view.findViewById(R.id.gridWand);
 
         for (int i = 0; i < 25; i++) {
             // read JSONArray data
@@ -106,14 +110,52 @@ public class WandFragment extends Fragment implements EventListener {
             image.setTag(R.id.drawable_id, getEmptyFLieseId(i)); // changes, represents the current image shown
             image.setTag(R.id.color_id, getColorId(i)); // never changes important to know what color it has (0: rot, 1: grün, 2: blau, 3: lila, 4: orange)
 
-            //todo remove the Listener, just for testing
-            image.setOnLongClickListener(this::addDragListener);
-
             // add ImageView to LinearLayout, and LinearLayout to GridLayout
             linearLayout.addView(image);
             gridLayout.addView(linearLayout, i);
         }
     }
+
+    public void add(int row, int color){ // row 0 to 4, color 1 to 5
+        color--;
+        int imageId = fullFliesenOrder[color];
+        // find LinearLayout where to add add the imageId
+        int index = ((color + (5-row)) % 5) + (row * 5);
+        // update assigned in JSONArray
+        try {
+            JSONObject updated = wand.getJSONObject(index);
+            updated.remove("assigned");
+            updated.put("assigned", true);
+            wand.put(index, updated);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // update assigned in linearLayout
+        LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(index);
+        linearLayout.setTag(R.id.assigned, true);
+        // update image
+        ImageView imageView = (ImageView) linearLayout.getChildAt(0);
+        imageView.setImageResource(imageId);
+        imageView.setTag(R.id.drawable_id, imageId);
+
+        //todo calculate points
+
+        //todo adds points to total player points
+    }
+
+    private void createEmptyArray(JSONArray jsonArray){
+        for(int i=0;i<25;i++){
+            try {
+                JSONObject field = new JSONObject();
+                field.put("assigned", false);
+                jsonArray.put(i, field);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // todo delete all following functions
 
     private boolean addDragListener(View v) {
 
@@ -134,6 +176,11 @@ public class WandFragment extends Fragment implements EventListener {
         return true;
     }
 
+    private void setImage(ImageView iv, int drawable_id){
+        iv.setImageResource(drawable_id);
+        iv.setTag(R.id.drawable_id, drawable_id);
+    }
+
     private boolean addDropListener(View v, DragEvent event){
         // other Events: ACTION_DRAG_STARTED, ACTION_DRAG_ENTERED, ACTION_DRAG_LOCATION, ACTION_DRAG_EXITED, ACTION_DRAG_ENDED
         // Drop Event fires, when dragged Object is dropped on this View
@@ -151,8 +198,9 @@ public class WandFragment extends Fragment implements EventListener {
                 // drop is ok -> change view
                 v.setTag(R.id.assigned, true);
                 // update JSON
+                int index = 0;
                 try {
-                    int index = (int) v.getTag(R.id.index_id);
+                    index = (int) v.getTag(R.id.index_id);
                     JSONObject updated =  wand.getJSONObject(index);
                     updated.remove("assigned");
                     updated.put("assigned", true);
@@ -167,8 +215,15 @@ public class WandFragment extends Fragment implements EventListener {
                 //todo change to OnTouch with MotionEvent ACTION_DOWN
                 dropView.setOnLongClickListener(this::addDragListener);
 
-                //todo send Server what was dragged and dropped where
-                // let Server send Event to other Fragment where the drag came from
+                JSONObject drop = new JSONObject();
+                try {
+                    drop.put("from", (int) ((LinearLayout)dragView.getParent()).getTag(R.id.index_id));
+                    drop.put("to", index);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mSocket.emit("dropOnWand", drop);
+                //todo let Server send Event to other Fragment where the drag came from
             }
 
             else{
@@ -178,31 +233,13 @@ public class WandFragment extends Fragment implements EventListener {
                 // change dragview image back to what it prev was
                 setImage(dragView, drawableId);
                 ((LinearLayout)dragView.getParent()).setTag(R.id.assigned, true);
-                //todo remove following two lines, just for testing
+                //todo remove following line, just for testing
                 setImage(dragView, fullFliesenOrder[dragColor]);
 
                 return false;
             }
         }
         return true;
-    }
-
-    private void removeAllListeners(View view){
-        //todo
-        GridLayout gridLayout = view.findViewById(R.id.gridWand);
-        for (int i=0; i<gridLayout.getChildCount(); i++) {
-            LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(i);
-            ImageView imageView = (ImageView) linearLayout.getChildAt(0);
-
-            // remove listeners
-
-            // imageView.removeLis
-        }
-    }
-
-    private void setImage(ImageView iv, int drawable_id){
-        iv.setImageResource(drawable_id);
-        iv.setTag(R.id.drawable_id, drawable_id);
     }
 
     private int getEmptyFLieseId(int index){
