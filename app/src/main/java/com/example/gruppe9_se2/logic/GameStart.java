@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.logic;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiManager;
+import com.example.gruppe9_se2.user.LobbyActivity;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -33,7 +35,10 @@ public class GameStart extends AppCompatActivity {
         btnStart.setOnClickListener(v -> {
             // Send Start Game Event to server
             mSocket.emit("startGame", "");
-            //ToDo insert the correct message parameter
+            //Close current activity and start Game
+            finish();
+            Intent intent = new Intent(this, Game.class);
+            startActivity(intent);
         });
 
         Button btnLeave = this.findViewById(R.id.btn_leaveLobby);

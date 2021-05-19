@@ -21,6 +21,8 @@
         </activity>
         <activity android:name=".logic.GameStart">
         </activity>
+        <activity android:name=".logic.Game">
+        </activity>
     </application>
 
 </manifest>
