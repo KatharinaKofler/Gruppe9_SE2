@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="drawable_id" type="id"/>
+    <item name="color_id" type="id"/>
+    
+    <item name="index_id" type="id"/>
+    <item name="acceptable_color_id" type="id"/>
+    <item name="assigned" type="id"/>
+</resources>
