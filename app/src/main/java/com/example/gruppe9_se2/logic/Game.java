@@ -3,8 +3,10 @@ package com.example.gruppe9_se2.logic;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.game.WandFragment;
 
 public class Game extends AppCompatActivity {
 
@@ -16,6 +18,10 @@ public class Game extends AppCompatActivity {
 
         // create FragmentContainerViews to show each Fragment, like Spielmitte, Musterreihe, Wand, ...
 
+        int containerId = findViewById(R.id.wandFragment).getId();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(containerId, new WandFragment());
+        ft.commit();
 
 
     }

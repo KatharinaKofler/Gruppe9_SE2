@@ -7,12 +7,10 @@
 
     <GridLayout
         android:id="@+id/gridWand"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:columnCount="5"
         android:rowCount="5">
-
-
     </GridLayout>
 
 </RelativeLayout>
