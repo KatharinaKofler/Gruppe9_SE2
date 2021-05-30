@@ -1,7 +1,10 @@
 package com.example.gruppe9_se2.game;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -9,6 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.logic.Game;
 
 import java.util.ArrayList;
 
@@ -27,7 +31,7 @@ public class PlayerPopup extends AppCompatActivity {
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
         //TODO inizialize the correctly list from server
-        ArrayList <Integer> availableColors = null;
+        ArrayList <Integer> availableColors = new ArrayList<>();
         String playerName = "test";
         ((TextView)findViewById(R.id.playerName)).setText(playerName);
 
@@ -43,5 +47,14 @@ public class PlayerPopup extends AppCompatActivity {
                 grid.addView(image, (i-1)*5+j);
             }
         }
+
+        ImageButton exitPopUp = (ImageButton) findViewById(R.id.closePopUp);
+        exitPopUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(PlayerPopup.this, Game.class);
+                PlayerPopup.this.startActivity(intent);
+            }
+        });
     }
 }
