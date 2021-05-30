@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // show content activity main
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_playerpopup);
 
         // set OnClickListener for switch Button
         Button btnSwitch = findViewById(R.id.btn_switch);
