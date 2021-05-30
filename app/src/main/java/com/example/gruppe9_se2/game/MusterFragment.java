@@ -1,6 +1,7 @@
 package com.example.gruppe9_se2.game;
 
 import android.content.ClipData;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.*;
@@ -40,6 +41,8 @@ public class MusterFragment extends Fragment implements EventListener {
                     testImage.setImageResource(R.drawable.fliese1);
                     testImage.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                     testImage.setPadding(5, 5, 5, 5);
+
+                    testImage.setTag("red" + "|" + "2");
 
                     testImage.setOnTouchListener(new MyTouchListener());
 
@@ -82,11 +85,11 @@ public class MusterFragment extends Fragment implements EventListener {
     private final class MyTouchListener implements View.OnTouchListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                ClipData data = ClipData.newPlainText("", "");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
-                        view);
+                int color = (int) (1 + Math.random() * 4);
+                ClipData data = ClipData.newPlainText("color", Integer.toString(color));
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
                 view.startDrag(data, shadowBuilder, view, 0);
-                view.setVisibility(View.INVISIBLE);
+//                view.setVisibility(View.INVISIBLE);
                 return true;
             } else {
                 return false;
@@ -95,8 +98,7 @@ public class MusterFragment extends Fragment implements EventListener {
     }
 
     class MyDragListener implements View.OnDragListener {
-        Drawable enterShape = getResources().getDrawable(
-                R.drawable.shape_droptarget);
+        Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
         Drawable normalShape = getResources().getDrawable(R.drawable.shape);
 
         @Override
@@ -114,6 +116,30 @@ public class MusterFragment extends Fragment implements EventListener {
                     v.setBackground(normalShape);
                     break;
                 case DragEvent.ACTION_DROP:
+                    ClipData data = event.getClipData();
+                    String color = data.getItemAt(0).getText().toString();
+                    int resId;
+                    switch (color){
+                        case "1":
+                            resId = R.drawable.fliese_color1;
+                            break;
+                        case "2":
+                            resId = R.drawable.fliese_color2;
+                            break;
+                        case "3":
+                            resId = R.drawable.fliese_color3;
+                            break;
+                        case "4":
+                            resId = R.drawable.fliese_color4;
+                            break;
+                        case "5":
+                            resId = R.drawable.fliese_color5;
+                            break;
+                        default:
+                            resId = R.drawable.empty_fliese;
+                    }
+                    ((ImageView) v).setImageResource(resId);
+
                     // Dropped, reassign View to ViewGroup
 //                    View view = (View) event.getLocalState();
 //                    ViewGroup owner = (ViewGroup) view.getParent();
