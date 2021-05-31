@@ -1,9 +1,9 @@
 package com.example.gruppe9_se2.game;
 
 import android.content.ClipData;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -11,6 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.logic.SocketManager;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 import java.util.EventListener;
 
@@ -18,14 +21,18 @@ public class MusterFragment extends Fragment implements EventListener {
     String logTag = "musterFragmentLogs";
     //todo save all information about this Muster, so it can be a JSON
     GridLayout gridLayout;
+    Socket mSocket = SocketManager.getSocket();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //todo get the size of the Spielbrett Muster
-        int size = 150;
+        //TODO: Remove, Test only
+//        mSocket = SocketManager.makeSocket("82a1ac5f-b1dc-4034-8667-38e345bdc423");
 
         // inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_muster, container, false);
+
+        //todo get the size of the Spielbrett Muster
+        int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
         // Fill the 5x5 Grid with ImageViews
         gridLayout = view.findViewById(R.id.gridMuster);
@@ -140,15 +147,16 @@ public class MusterFragment extends Fragment implements EventListener {
 
 //                        ((ImageView) v).setImageResource(resId);
 
-                        //TODO
-
-
-
-
-
-
-
-
+                        //TODO Socket
+                        if (mSocket != null) {
+                            mSocket.emit("finishTurn", String.valueOf(Integer.parseInt(tile[0]) + 1));
+//                        mSocket.on("error", new Emitter.Listener() {
+//                            @Override
+//                            public void call(Object... args) {
+//                                Log.i(logTag,"getState");
+//                            }
+//                        });
+                        }
                     }
 
                     // Dropped, reassign View to ViewGroup
@@ -159,9 +167,7 @@ public class MusterFragment extends Fragment implements EventListener {
 //                    container.addView(view);
 //                    view.setVisibility(View.VISIBLE);
 
-
                     Toast.makeText(getContext(), "Dropped", Toast.LENGTH_SHORT).show();
-
 
                     View view = (View) event.getLocalState();
                     String color = String.valueOf((int) (1 + Math.random() * 4));
