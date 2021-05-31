@@ -38,12 +38,16 @@ public class MusterFragment extends Fragment implements EventListener {
 
                 // Test Fliese
                 if (i == 0 && j == 0) {
+                    String color = String.valueOf((int) (1 + Math.random() * 4));
+                    String count = String.valueOf((int) (1 + Math.random() * 4));
+                    int resId = getFlieseResId(color);
+
                     ImageView testImage = new ImageView(requireContext());
-                    testImage.setImageResource(R.drawable.fliese1);
+                    testImage.setImageResource(resId);
                     testImage.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                     testImage.setPadding(5, 5, 5, 5);
 
-                    testImage.setTag("red" + "|" + "2");
+                    testImage.setTag(color + "|" + count);
 
                     testImage.setOnTouchListener(new MyTouchListener());
 
@@ -86,8 +90,9 @@ public class MusterFragment extends Fragment implements EventListener {
     private final class MyTouchListener implements View.OnTouchListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                int color = (int) (1 + Math.random() * 4);
-                ClipData data = ClipData.newPlainText("tile", Integer.toString(color) + "|" + "3");
+//                String[] tags = view.getTag().toString().split("\\|");
+//                int color = (int) (1 + Math.random() * 4);
+                ClipData data = ClipData.newPlainText("tile", view.getTag().toString());
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
                 view.startDrag(data, shadowBuilder, view, 0);
 //                view.setVisibility(View.INVISIBLE);
@@ -115,32 +120,13 @@ public class MusterFragment extends Fragment implements EventListener {
                 case DragEvent.ACTION_DRAG_EXITED:
                 case DragEvent.ACTION_DRAG_ENDED:
                     v.setBackground(normalShape);
+//                    ((View) event.getLocalState()).setVisibility(View.VISIBLE);
                     break;
                 case DragEvent.ACTION_DROP:
                     ClipData data = event.getClipData();
                     String[] tile = data.getItemAt(0).getText().toString().split("\\|");
                     if (Integer.parseInt(tile[1]) > 0) {
-                        int resId;
-                        switch (tile[0]) {
-                            case "1":
-                                resId = R.drawable.fliese_color1;
-                                break;
-                            case "2":
-                                resId = R.drawable.fliese_color2;
-                                break;
-                            case "3":
-                                resId = R.drawable.fliese_color3;
-                                break;
-                            case "4":
-                                resId = R.drawable.fliese_color4;
-                                break;
-                            case "5":
-                                resId = R.drawable.fliese_color5;
-                                break;
-                            default:
-                                resId = R.drawable.empty_fliese;
-                        }
-
+                        int resId = getFlieseResId(tile[0]);
                         String[] pos = v.getTag().toString().split("\\|");
                         for (int i = 0; i < Integer.parseInt(tile[1]); i++) {
                             int tilePos = Integer.parseInt(pos[0]) * 5 + (4-i);
@@ -176,11 +162,43 @@ public class MusterFragment extends Fragment implements EventListener {
 
                     Toast.makeText(getContext(), "Dropped", Toast.LENGTH_SHORT).show();
 
+
+                    View view = (View) event.getLocalState();
+                    String color = String.valueOf((int) (1 + Math.random() * 4));
+                    String count = String.valueOf((int) (1 + Math.random() * 4));
+                    int resId = getFlieseResId(color);
+                    ((ImageView) view).setImageResource(resId);
+                    view.setTag(color + "|" + count);
+                    view.setVisibility(View.VISIBLE);
                     break;
                 default:
                     break;
             }
             return true;
         }
+    }
+
+    private int getFlieseResId(String color) {
+        int resId;
+        switch (color) {
+            case "1":
+                resId = R.drawable.fliese_color1;
+                break;
+            case "2":
+                resId = R.drawable.fliese_color2;
+                break;
+            case "3":
+                resId = R.drawable.fliese_color3;
+                break;
+            case "4":
+                resId = R.drawable.fliese_color4;
+                break;
+            case "5":
+                resId = R.drawable.fliese_color5;
+                break;
+            default:
+                resId = R.drawable.empty_fliese;
+        }
+        return resId;
     }
 }
