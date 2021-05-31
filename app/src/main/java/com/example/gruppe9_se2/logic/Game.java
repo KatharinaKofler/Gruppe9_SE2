@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.game.MusterFragment;
+import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.WandFragment;
 
 public class Game extends AppCompatActivity {
@@ -23,6 +25,14 @@ public class Game extends AppCompatActivity {
         ft.replace(containerId, new WandFragment());
         ft.commit();
 
+        containerId = findViewById(R.id.musterFragment).getId();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(containerId, new MusterFragment());
+        ft.commit();
 
+        containerId = findViewById(R.id.playerFragment).getId();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(containerId, new PlayersFragment());
+        ft.commit();
     }
 }

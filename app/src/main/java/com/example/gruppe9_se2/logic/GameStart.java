@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiManager;
-import com.example.gruppe9_se2.user.LobbyActivity;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -49,24 +48,12 @@ public class GameStart extends AppCompatActivity {
             //ToDo implement leave Lobby on server
         });
 
-        // Get JWT from ApiManager
-        String jwt = ApiManager.getToken();
+
         // Get lobby Id
         Bundle b = getIntent().getExtras();
         String lobbyID = b.getString("LobbyID");
 
-
-        // Build Options with extra Headers
-        HashMap<String, List<String>> extraHeaders = new HashMap<>();
-        extraHeaders.put("x-jwt", singletonList(jwt));
-        extraHeaders.put("x-lobby-id", singletonList(lobbyID));
-
-        IO.Options options = IO.Options.builder().setExtraHeaders(extraHeaders).build();
-
-        // Create Socket
-        URI uri = URI.create(getString(R.string.serverUrl));
-
-        mSocket = IO.socket(uri, options);
+        mSocket = SocketManager.makeSocket(lobbyID);
 
         // check for successfull connection
         mSocket.on("connect", args -> {

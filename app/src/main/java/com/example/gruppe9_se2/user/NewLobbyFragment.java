@@ -11,8 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiHelper;
@@ -21,7 +19,6 @@ import com.example.gruppe9_se2.api.lobby.LobbyApi;
 import com.example.gruppe9_se2.api.lobby.LobbyRequest;
 import com.example.gruppe9_se2.api.lobby.LobbyResponse;
 import com.example.gruppe9_se2.logic.GameStart;
-import com.google.android.material.textfield.TextInputLayout;
 
 import retrofit2.Call;
 import retrofit2.Callback;

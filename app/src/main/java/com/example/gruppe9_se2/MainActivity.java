@@ -1,13 +1,14 @@
 package com.example.gruppe9_se2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.gruppe9_se2.logic.Game;
 import com.example.gruppe9_se2.user.LoginFragment;
 import com.example.gruppe9_se2.user.RegisterFragment;
 
@@ -19,7 +20,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // show content activity main
+        Intent intent = new Intent(this, Game.class);
+        startActivity(intent);
+        /*// show content activity main
         setContentView(R.layout.activity_main);
 
         // set OnClickListener for switch Button
@@ -43,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         // get id from fragment container view
         containerId = findViewById(R.id.fragment_container_view).getId();
         // create fragment transaction
-        login(null);
+        login(null);*/
     }
 
     public void login(String name){

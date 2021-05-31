@@ -1,11 +1,7 @@
 package com.example.gruppe9_se2.game;
 
-import android.content.ClipData;
-import android.content.ClipDescription;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,22 +12,14 @@ import android.widget.LinearLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.gruppe9_se2.R;
-import com.example.gruppe9_se2.api.base.ApiManager;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URI;
 import java.util.EventListener;
-import java.util.HashMap;
-import java.util.List;
 
-import io.socket.client.IO;
 import io.socket.client.Socket;
-
-import static java.util.Collections.singletonList;
 
 public class WandFragment extends Fragment implements EventListener {
 

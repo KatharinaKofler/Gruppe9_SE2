@@ -1,0 +1,128 @@
+package com.example.gruppe9_se2.game;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.GridLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.logic.Game;
+
+public class PlayerPopup extends AppCompatActivity {
+
+    private final int[] emptyFliesen = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
+    private final int[] fullFliesen = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_playerpopup);
+
+        Bundle b = getIntent().getExtras();
+
+        String playerName = b.getString("name");
+        ((TextView)findViewById(R.id.playerName)).setText(playerName);
+
+        int playerPoints = b.getInt("points");
+        ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
+
+        createWall(b);
+        createPattern(b);
+
+        ImageButton exitPopUp = (ImageButton) findViewById(R.id.closePopUp);
+        exitPopUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(PlayerPopup.this, Game.class);
+                PlayerPopup.this.startActivity(intent);
+            }
+        });
+    }
+
+    private void createPattern(Bundle b) {
+        // PATTERN
+        GridLayout grid = findViewById(R.id.gridPattern);
+        int size = (int) getResources().getDimension(R.dimen.fliese_size);
+
+        // get wall from bundle and build wall
+        int[] pattern = b.getIntArray("pattern");
+
+        for(int i = 0; i < 5; i++){ // rows
+
+            //Binary division -> get bitmap
+            int[] bitmap = binaryDivision(pattern[i], 8);
+            // get color for this row
+            int colorIndex = bitmap[0] * 4 + bitmap[1] * 2 + bitmap[2];
+
+            for(int j = 0; j<5; j++){ // column
+
+                // add imageView
+                ImageView image = new ImageView(this);
+                image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+                image.setPadding(5,5,5,5);
+
+                if(bitmap[j+3] == 1) image.setImageResource(fullFliesen[colorIndex-1]);
+                else{
+                    // i == 0 -> 0 0 0 0 0 -> if j >= 4 (4-i)
+                    // i == 1 -> 0 0 0 1 1 -> if j >= 3 (4-i)
+                    // i == 2 -> 0 0 1 1 1 -> if j >= 2 (4-i)
+                    if(j>=(4-i)){
+                        if(colorIndex!=0) {
+                            image.setImageResource(emptyFliesen[colorIndex - 1]);
+                        }
+                        else image.setImageResource(R.drawable.empty_fliese);
+                    }
+
+                }
+
+                grid.addView(image, i*5+j);
+            }
+        }
+
+    }
+
+    private void createWall(Bundle b){
+        // WALL
+        GridLayout grid = findViewById(R.id.gridWall);
+        int size = (int) getResources().getDimension(R.dimen.fliese_size);
+
+        // get wall from bundle and build wall
+        int[] wall = b.getIntArray("wall");
+        // for every row:
+        for(int i = 0; i<5; i++){ // rows
+
+            //Binary division -> get bitmap, storing which field is full
+            int[] bitmap = binaryDivision(wall[i], 5);
+
+            for(int k = 0; k < 5; k++){
+                // add imageView
+                ImageView image = new ImageView(this);
+                image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+                image.setPadding(5,5,5,5);
+                int colorIndex = ((k)+(i)) % 5; // (column + row) % 5
+
+                if(bitmap[k] == 1) image.setImageResource(fullFliesen[colorIndex]);
+                else image.setImageResource(emptyFliesen[colorIndex]);
+
+                grid.addView(image, i*5+k);
+            }
+        }
+    }
+
+
+    private int[] binaryDivision(int value, int length){
+        int[] bitmap = new int[length];
+        for(int l = 0; l < length; l++){
+            bitmap[length-1-l] = value%2;
+            value = value/2;
+        }
+        return bitmap;
+    }
+}

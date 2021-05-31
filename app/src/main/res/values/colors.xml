@@ -10,8 +10,8 @@
     <color name="secondaryTextColor">#ffffff</color>
     <color name="errorTextColor">#a32e26</color>
 
-    <color name="emptyFlieseFill">#ffeed6</color>
-    <color name="emptyFlieseBorder">#a89d8d</color>
+    <color name="emptyFlieseFill">#EFEFEF</color>
+    <color name="emptyFlieseBorder">#DCDCDC</color>
 
     <color name="emptyFlieseFill1">#d1a7a7</color>
     <color name="emptyFlieseBorder1">#b59191</color>
