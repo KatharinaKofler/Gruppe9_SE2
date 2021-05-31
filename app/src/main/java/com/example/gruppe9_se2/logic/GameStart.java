@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiManager;
-import com.example.gruppe9_se2.user.LobbyActivity;
 
 import java.net.URI;
 import java.util.HashMap;

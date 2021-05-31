@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.gruppe9_se2.game.PlayerPopup;
+import com.example.gruppe9_se2.logic.Game;
 import com.example.gruppe9_se2.user.LoginFragment;
 import com.example.gruppe9_se2.user.RegisterFragment;
 
@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = new Intent(this, PlayerPopup.class);
+        Intent intent = new Intent(this, Game.class);
         startActivity(intent);
         /*// show content activity main
         setContentView(R.layout.activity_main);

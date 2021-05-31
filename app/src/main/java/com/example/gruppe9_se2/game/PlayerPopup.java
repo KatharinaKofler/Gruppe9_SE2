@@ -30,18 +30,23 @@ public class PlayerPopup extends AppCompatActivity {
         GridLayout grid = findViewById(R.id.gridPopUp);
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
-        //TODO inizialize the correctly list from server
-        ArrayList <Integer> availableColors = new ArrayList<>();
-        String playerName = "test";
+        Bundle b = getIntent().getExtras();
+
+        String playerName = b.getString("name");
         ((TextView)findViewById(R.id.playerName)).setText(playerName);
 
+        int playerPoints = b.getInt("points");
+        ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
+
         for(int i = 1; i<6; i++){
+            ArrayList<Integer> row = b.getIntegerArrayList(String.valueOf(i));
+
             for(int j = 0; j<5; j++){
                 ImageView image = new ImageView(this);
                 image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                 image.setPadding(5,5,5,5);
                 int colorIndex = (j+(i-1))%5;
-                if(availableColors.contains(colorIndex+1)) image.setImageResource(fullFliesen[colorIndex]);
+                if(row.contains(colorIndex+1)) image.setImageResource(fullFliesen[colorIndex]);
                 else image.setImageResource(emptyFliesen[colorIndex]);
 
                 grid.addView(image, (i-1)*5+j);
