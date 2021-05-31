@@ -17,6 +17,7 @@ import java.util.EventListener;
 public class MusterFragment extends Fragment implements EventListener {
     String logTag = "musterFragmentLogs";
     //todo save all information about this Muster, so it can be a JSON
+    GridLayout gridLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -27,7 +28,7 @@ public class MusterFragment extends Fragment implements EventListener {
         View view = inflater.inflate(R.layout.fragment_muster, container, false);
 
         // Fill the 5x5 Grid with ImageViews
-        GridLayout gridLayout = view.findViewById(R.id.gridMuster);
+        gridLayout = view.findViewById(R.id.gridMuster);
 
         // Sample for Musterreihe
         for (int i = 0; i < 5; i++) {
@@ -54,7 +55,7 @@ public class MusterFragment extends Fragment implements EventListener {
                     //todo create drawable for empty Image State
                     int imageId = R.drawable.empty_fliese;
                     image.setImageResource(imageId);
-                    image.setTag((i + 1) + "|" + (j + 1));
+                    image.setTag((i) + "|" + (j));
                     image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                     image.setPadding(5, 5, 5, 5);
 
@@ -62,7 +63,7 @@ public class MusterFragment extends Fragment implements EventListener {
                         @Override
                         public void onClick(View v) {
                             String[] pos = v.getTag().toString().split("\\|");
-                            Toast.makeText(getContext(), "Click Row: " + pos[0] + " Col: " + pos[1], Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Click Row: " + pos[0]+1 + " Col: " + pos[1]+1, Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -86,7 +87,7 @@ public class MusterFragment extends Fragment implements EventListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 int color = (int) (1 + Math.random() * 4);
-                ClipData data = ClipData.newPlainText("color", Integer.toString(color));
+                ClipData data = ClipData.newPlainText("tile", Integer.toString(color) + "|" + "3");
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
                 view.startDrag(data, shadowBuilder, view, 0);
 //                view.setVisibility(View.INVISIBLE);
@@ -117,28 +118,52 @@ public class MusterFragment extends Fragment implements EventListener {
                     break;
                 case DragEvent.ACTION_DROP:
                     ClipData data = event.getClipData();
-                    String color = data.getItemAt(0).getText().toString();
-                    int resId;
-                    switch (color){
-                        case "1":
-                            resId = R.drawable.fliese_color1;
-                            break;
-                        case "2":
-                            resId = R.drawable.fliese_color2;
-                            break;
-                        case "3":
-                            resId = R.drawable.fliese_color3;
-                            break;
-                        case "4":
-                            resId = R.drawable.fliese_color4;
-                            break;
-                        case "5":
-                            resId = R.drawable.fliese_color5;
-                            break;
-                        default:
-                            resId = R.drawable.empty_fliese;
+                    String[] tile = data.getItemAt(0).getText().toString().split("\\|");
+                    if (Integer.parseInt(tile[1]) > 0) {
+                        int resId;
+                        switch (tile[0]) {
+                            case "1":
+                                resId = R.drawable.fliese_color1;
+                                break;
+                            case "2":
+                                resId = R.drawable.fliese_color2;
+                                break;
+                            case "3":
+                                resId = R.drawable.fliese_color3;
+                                break;
+                            case "4":
+                                resId = R.drawable.fliese_color4;
+                                break;
+                            case "5":
+                                resId = R.drawable.fliese_color5;
+                                break;
+                            default:
+                                resId = R.drawable.empty_fliese;
+                        }
+
+                        String[] pos = v.getTag().toString().split("\\|");
+                        for (int i = 0; i < Integer.parseInt(tile[1]); i++) {
+                            int tilePos = Integer.parseInt(pos[0]) * 5 + (4-i);
+
+                            LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(tilePos);
+                            ImageView image = (ImageView) linearLayout.getChildAt(0);
+                            if (image != null) {
+                                image.setImageResource(resId);
+                            }
+                        }
+
+//                        ((ImageView) v).setImageResource(resId);
+
+                        //TODO
+
+
+
+
+
+
+
+
                     }
-                    ((ImageView) v).setImageResource(resId);
 
                     // Dropped, reassign View to ViewGroup
 //                    View view = (View) event.getLocalState();
