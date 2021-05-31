@@ -1,6 +1,5 @@
 package com.example.gruppe9_se2.logic;
 
-import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiManager;
 
 import java.net.URI;
@@ -30,8 +29,8 @@ public class SocketManager {
             IO.Options options = IO.Options.builder().setExtraHeaders(extraHeaders).build();
 
             // Create Socket
-            // URI uri = URI.create("https://gruppe9-se2-backend.herokuapp.com/");
-            URI uri = URI.create("http://localhost:8080/");
+            URI uri = URI.create("https://gruppe9-se2-backend.herokuapp.com/");
+            //URI uri = URI.create("http://localhost:8080/");
 
             instance = IO.socket(uri, options);
         }

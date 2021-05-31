@@ -19,8 +19,6 @@ import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.logic.SocketManager;
 
-import java.util.ArrayList;
-
 import io.socket.client.Socket;
 
 public class PlayersFragment extends Fragment {
@@ -34,9 +32,17 @@ public class PlayersFragment extends Fragment {
 
         LinearLayout linearLayout = view.findViewById(R.id.playersLinearLayout);
 
+
         Socket mySocket = SocketManager.getSocket();
         if(mySocket != null){
-            // TODO events
+           /* // TODO events
+            // Name, Points, Board of every Player
+            mySocket.on("gameStart", args -> {
+                args
+            });
+            mySocket.on("startNewRound", args -> {
+                args
+            });*/
         }
 
         //TODO take Number of Players from server
@@ -59,21 +65,17 @@ public class PlayersFragment extends Fragment {
                     b.putString("name", playerName);
                     b.putInt("points", points);
 
-                    ArrayList<Integer> row1 = new ArrayList<>();
-                    row1.add(1);
-                    row1.add(4);
-                    ArrayList<Integer> row2 = new ArrayList<>();
-                    ArrayList<Integer> row3 = new ArrayList<>();
-                    row3.add(2);
-                    row3.add(3);
-                    ArrayList<Integer> row4 = new ArrayList<>();
-                    ArrayList<Integer> row5 = new ArrayList<>();
+                    int[] wall = {19, 5, 28, 0, 0}; // todo
+                    // 19 ->  10011 -> erste, vierte, fünfte Fliese belegt
+                    // 5 -> 00101; 28 -> 11100
+                    int[] pattern = {97, 0, 39, 0, 163 };
+                    // C C C F F F F F
+                    // 0 1 1 0 0 0 0 1 -> one field in color 3 -> 97
+                    // 0 0 1 0 0 1 1 1 -> three fields in color 1 -> 39
+                    // 1 0 1 0 0 0 1 1 -> two fields in color 5 -> 163
 
-                    b.putIntegerArrayList("1", row1);
-                    b.putIntegerArrayList("2", row2);
-                    b.putIntegerArrayList("3", row3);
-                    b.putIntegerArrayList("4", row4);
-                    b.putIntegerArrayList("5", row5);
+                    b.putIntArray("wall", wall);
+                    b.putIntArray("pattern", pattern);
 
                     intent.putExtras(b);
 

@@ -22,7 +22,7 @@ public class Game extends AppCompatActivity {
         int containerId = findViewById(R.id.wandFragment).getId();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(containerId, new WandFragment());
-        //ft.commit();
+        ft.commit();
 
         int playerContainerId = findViewById(R.id.playerFragment).getId();
         FragmentTransaction ftPlayer = getSupportFragmentManager().beginTransaction();
