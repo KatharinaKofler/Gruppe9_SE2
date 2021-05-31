@@ -17,7 +17,7 @@ public class SocketManager {
     private static Socket instance;
 
     public static Socket makeSocket(String lobbyId){
-        if(instance != null){
+        if(instance == null){
 
             // Get JWT from ApiManager
             String jwt = ApiManager.getToken();
