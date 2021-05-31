@@ -17,8 +17,11 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.logic.SocketManager;
 
 import java.util.ArrayList;
+
+import io.socket.client.Socket;
 
 public class PlayersFragment extends Fragment {
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -31,6 +34,10 @@ public class PlayersFragment extends Fragment {
 
         LinearLayout linearLayout = view.findViewById(R.id.playersLinearLayout);
 
+        Socket mySocket = SocketManager.getSocket();
+        if(mySocket != null){
+            // TODO events
+        }
 
         //TODO take Number of Players from server
         int playersNr = 4;
