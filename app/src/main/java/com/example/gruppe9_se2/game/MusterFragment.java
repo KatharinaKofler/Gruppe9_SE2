@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.helper.ResourceHelper;
 import com.example.gruppe9_se2.logic.SocketManager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -47,7 +48,7 @@ public class MusterFragment extends Fragment implements EventListener {
                 if (i == 0 && j == 0) {
                     String color = String.valueOf((int) (1 + Math.random() * 4));
                     String count = String.valueOf((int) (1 + Math.random() * 4));
-                    int resId = getFlieseResId(color);
+                    int resId = ResourceHelper.getFlieseResId(color);
 
                     ImageView testImage = new ImageView(requireContext());
                     testImage.setImageResource(resId);
@@ -133,7 +134,7 @@ public class MusterFragment extends Fragment implements EventListener {
                     ClipData data = event.getClipData();
                     String[] tile = data.getItemAt(0).getText().toString().split("\\|");
                     if (Integer.parseInt(tile[1]) > 0) {
-                        int resId = getFlieseResId(tile[0]);
+                        int resId = ResourceHelper.getFlieseResId(tile[0]);
                         String[] pos = v.getTag().toString().split("\\|");
                         for (int i = 0; i < Integer.parseInt(tile[1]); i++) {
                             int tilePos = Integer.parseInt(pos[0]) * 5 + (4-i);
@@ -172,7 +173,7 @@ public class MusterFragment extends Fragment implements EventListener {
                     View view = (View) event.getLocalState();
                     String color = String.valueOf((int) (1 + Math.random() * 4));
                     String count = String.valueOf((int) (1 + Math.random() * 4));
-                    int resId = getFlieseResId(color);
+                    int resId = ResourceHelper.getFlieseResId(color);
                     ((ImageView) view).setImageResource(resId);
                     view.setTag(color + "|" + count);
                     view.setVisibility(View.VISIBLE);
@@ -184,27 +185,4 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
-    private int getFlieseResId(String color) {
-        int resId;
-        switch (color) {
-            case "1":
-                resId = R.drawable.fliese_color1;
-                break;
-            case "2":
-                resId = R.drawable.fliese_color2;
-                break;
-            case "3":
-                resId = R.drawable.fliese_color3;
-                break;
-            case "4":
-                resId = R.drawable.fliese_color4;
-                break;
-            case "5":
-                resId = R.drawable.fliese_color5;
-                break;
-            default:
-                resId = R.drawable.empty_fliese;
-        }
-        return resId;
-    }
 }
