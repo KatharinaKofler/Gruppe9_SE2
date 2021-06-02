@@ -12,10 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.helper.ResourceHelper;
 
 import java.util.EventListener;
 
 public class BodenFragment extends Fragment implements EventListener {
+    GridLayout gridLayout;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // inflate the layout for this fragment
@@ -23,7 +26,7 @@ public class BodenFragment extends Fragment implements EventListener {
 
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
-        GridLayout gridLayout = view.findViewById(R.id.gridBoden);
+        gridLayout = view.findViewById(R.id.gridBoden);
 
         for (int i = 0; i < 7; i++) {
             LinearLayout linearLayout = new LinearLayout(requireContext());
@@ -61,6 +64,21 @@ public class BodenFragment extends Fragment implements EventListener {
             gridLayout.addView(linearLayout, i);
         }
 
+        // TODO: Remove dummy data
+        for (int i = 1; i < 4; i++) {
+            String color = String.valueOf((int) (1 + Math.random() * 4));
+            setBodenElement(i, color);
+        }
+
         return view;
+    }
+
+    private void setBodenElement(int pos, String color) {
+        LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(6+pos);
+        ImageView image = (ImageView) linearLayout.getChildAt(0);
+        if (image != null) {
+            int resId = ResourceHelper.getFlieseResId(color);
+            image.setImageResource(resId);
+        }
     }
 }
