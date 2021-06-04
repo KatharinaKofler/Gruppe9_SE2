@@ -196,7 +196,9 @@ public class MusterFragment extends Fragment implements EventListener {
 
     private void setMusterElement(int row, Element element, int count) {
         int resId = ResourceHelper.getFlieseResId(element.getColor());
-        for (int i = 0; i < count; i++) {
+        int floor = element.addCount(row, count);
+
+        for (int i = 0; i < element.getCount(); i++) {
             int tilePos = (row - 1) * 5 + (4 - i);
 
             LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(tilePos);
@@ -206,12 +208,12 @@ public class MusterFragment extends Fragment implements EventListener {
             }
         }
 
-        // Test
-        int xxx = 1;
-        Bundle result = new Bundle();
-        result.putInt("color", element.getColor());
-        result.putInt("count", xxx);
-        getParentFragmentManager().setFragmentResult("floor", result);
+        if (floor > 0) {
+            Bundle result = new Bundle();
+            result.putInt("color", element.getColor());
+            result.putInt("count", floor);
+            getParentFragmentManager().setFragmentResult("floor", result);
+        }
     }
 
     private class Element {
@@ -233,8 +235,15 @@ public class MusterFragment extends Fragment implements EventListener {
             return count;
         }
 
-        public void setCount(int count) {
-            this.count = count;
+        public int addCount(int row, int count) {
+            int temp = this.count + count;
+            if (temp <= row) {
+                this.count = temp;
+                return 0;
+            } else {
+                this.count = row;
+                return temp - row;
+            }
         }
     }
 }
