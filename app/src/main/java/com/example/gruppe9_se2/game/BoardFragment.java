@@ -2,6 +2,7 @@ package com.example.gruppe9_se2.game;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
@@ -21,6 +22,16 @@ public class BoardFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_board, container, false);
         return view;
+    }
+
+    private final class TileTouchListener implements View.OnTouchListener {
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     private void generatePlates(int numberPlates, int[][] tileColors) {
@@ -53,5 +64,35 @@ public class BoardFragment extends Fragment {
 
             plates.addView(tiles, i);
         }
+    }
+
+    private void addToCenter(int color, View view){
+        GridLayout center = view.findViewById(R.id.gridCenter);
+        ImageView tile = new ImageView(requireContext());
+        int size = (int) getResources().getDimension(R.dimen.fliese_size);
+        tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+        tile.setPadding(5,5,5,5);
+
+        tile.setImageResource(fullFliesenOrder[color]);
+        int count = countColorCenter(color, view);
+        tile.setTag(color + "|" + count);
+        tile.setOnTouchListener(new TileTouchListener());
+
+        center.addView(tile);
+    }
+
+    private int countColorCenter(int color, View view) {
+        int count = 0;
+        GridLayout center = view.findViewById(R.id.gridCenter);
+        int n = center.getChildCount();
+        for (int i = 0; i < n; i++) {
+            ImageView image = (ImageView) center.getChildAt(i);
+            String[] pos = image.getTag().toString().split("\\|");
+            int tagColor = Integer.parseInt(pos[0]);
+            if(tagColor == color){
+                count++;
+            }
+        }
+        return count;
     }
 }
