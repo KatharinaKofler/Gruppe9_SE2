@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.game;
 
+import android.content.ClipData;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -27,12 +28,33 @@ public class BoardFragment extends Fragment {
     private final class TileTouchListener implements View.OnTouchListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+
+                ClipData data = ClipData.newPlainText("tile", (String) view.getTag());
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                view.startDrag(data, shadowBuilder, view, 0);
+                view.setVisibility(View.INVISIBLE);
                 return true;
             } else {
                 return false;
             }
         }
     }
+
+    public void dropped(int indexPlate, int color){
+        GridLayout plate = (GridLayout) ((GridLayout) view.findViewById(R.id.gridPlates)).getChildAt(indexPlate);
+        for (int i = 0; i < 4; i++) {
+            ImageView image = (ImageView) plate.getChildAt(i);
+
+            String[] pos = image.getTag().toString().split("\\|");
+            int tagColor = Integer.parseInt(pos[0]);
+
+            if(tagColor!=color){
+                addToCenter(color, view);
+            }
+            image.setVisibility(View.INVISIBLE);
+        }
+    }
+
 
     private void generatePlates(int numberPlates, int[][] tileColors) {
 
