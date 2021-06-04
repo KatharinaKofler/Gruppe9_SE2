@@ -89,6 +89,11 @@ public class BoardFragment extends Fragment {
             tiles.setBackgroundResource(R.drawable.plate_design);
             tiles.setPadding(10, 10, 10, 10);
 
+            int[] countColor = new int[5];
+            for(int color : tileColors[i]){
+                countColor[color-1]++;
+            }
+
             for(int color : tileColors[i]){
                 ImageView tile = new ImageView(requireContext());
 
