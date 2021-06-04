@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
 
 public class BoardFragment extends Fragment {
-    private final int[] fullFliesenOrder = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
+    private final int[] tileResourceMap = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
     View view;
 
     @Override
@@ -100,7 +100,7 @@ public class BoardFragment extends Fragment {
                 int size = (int) getResources().getDimension(R.dimen.fliese_size);
                 tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                 tile.setPadding(5,5,5,5);
-                tile.setImageResource(fullFliesenOrder[color - 1]);
+                tile.setImageResource(tileResourceMap[color - 1]);
 
                 tiles.addView(tile);
             }
@@ -116,7 +116,7 @@ public class BoardFragment extends Fragment {
         tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
         tile.setPadding(5,5,5,5);
 
-        tile.setImageResource(fullFliesenOrder[color]);
+        tile.setImageResource(tileResourceMap[color]);
         int count = countColorCenter(color, view);
         tile.setTag(color + "|" + count);
         tile.setOnTouchListener(new TileTouchListener());
