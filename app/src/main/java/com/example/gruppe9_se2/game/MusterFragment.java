@@ -75,7 +75,7 @@ public class MusterFragment extends Fragment implements EventListener {
                     //todo create drawable for empty Image State
                     int imageId = R.drawable.empty_fliese;
                     image.setImageResource(imageId);
-                    image.setTag((i) + "|" + (j));
+                    image.setTag((i+1) + "|" + (j+1));
                     image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                     image.setPadding(5, 5, 5, 5);
 
@@ -146,7 +146,7 @@ public class MusterFragment extends Fragment implements EventListener {
                         int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
                         int color = Integer.parseInt(tile[0]);
 
-                        Element element = elements[row];
+                        Element element = elements[row-1];
                         if (element.getColor() == 0) {
                             element.setColor(color);
                         }
@@ -155,24 +155,7 @@ public class MusterFragment extends Fragment implements EventListener {
                             return false;
                         }
 
-                        int resId = ResourceHelper.getFlieseResId(color);
-                        for (int i = 0; i < count; i++) {
-                            int tilePos = row * 5 + (4-i);
-
-                            LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(tilePos);
-                            ImageView image = (ImageView) linearLayout.getChildAt(0);
-                            if (image != null) {
-                                image.setImageResource(resId);
-                            }
-                        }
-
-                        int test = 1;
-                        Bundle result = new Bundle();
-                        result.putInt("color", color);
-                        result.putInt("count", test);
-                        getParentFragmentManager().setFragmentResult("floor", result);
-
-//                        ((ImageView) v).setImageResource(resId);
+                        setMusterElement(row, element, count);
 
                         //TODO Socket
                         if (mSocket != null) {
@@ -211,6 +194,25 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
+    private void setMusterElement(int row, Element element, int count) {
+        int resId = ResourceHelper.getFlieseResId(element.getColor());
+        for (int i = 0; i < count; i++) {
+            int tilePos = (row - 1) * 5 + (4 - i);
+
+            LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(tilePos);
+            ImageView image = (ImageView) linearLayout.getChildAt(0);
+            if (image != null) {
+                image.setImageResource(resId);
+            }
+        }
+
+        // Test
+        int xxx = 1;
+        Bundle result = new Bundle();
+        result.putInt("color", element.getColor());
+        result.putInt("count", xxx);
+        getParentFragmentManager().setFragmentResult("floor", result);
+    }
 
     private class Element {
         private int color = 0;
