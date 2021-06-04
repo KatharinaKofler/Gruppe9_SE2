@@ -22,6 +22,22 @@ public class BoardFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_board, container, false);
+
+        //TODO replace test values with event handler
+
+        int numberPlates = 9;
+        int[][] tileColors = {{1, 5, 3, 5}, {3, 3, 3, 5}, {2, 4, 2, 1}, {1, 5, 3, 5}, {1, 5, 3, 5}, {1, 5, 3, 5}, {1, 5, 3, 5}, {1, 5, 3, 5}, {1, 5, 3, 5}};
+        int[] centerColors = {27, 0, 0, 0, 0};
+
+        generatePlates(numberPlates, tileColors);
+
+        addToCenter(0, view);
+        addToCenter(1, view);
+        addToCenter(2, view);
+        addToCenter(3, view);
+        addToCenter(4, view);
+        addToCenter(3, view);
+
         return view;
     }
 
