@@ -24,10 +24,18 @@ public class MusterFragment extends Fragment implements EventListener {
     GridLayout gridLayout;
     Socket mSocket = SocketManager.getSocket();
 
+    // Elements-Array to store Musterreihe
+    Element[] elements = new Element[5];
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //TODO: Remove, Test only
 //        mSocket = SocketManager.makeSocket("82a1ac5f-b1dc-4034-8667-38e345bdc423");
+
+        // Initialize empty Elements-Array
+        for (int i = 0; i < elements.length; i++) {
+            elements[i] = new Element();
+        }
 
         // inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_muster, container, false);
@@ -133,11 +141,23 @@ public class MusterFragment extends Fragment implements EventListener {
                 case DragEvent.ACTION_DROP:
                     ClipData data = event.getClipData();
                     String[] tile = data.getItemAt(0).getText().toString().split("\\|");
-                    if (Integer.parseInt(tile[1]) > 0) {
-                        int resId = ResourceHelper.getFlieseResId(tile[0]);
-                        String[] pos = v.getTag().toString().split("\\|");
-                        for (int i = 0; i < Integer.parseInt(tile[1]); i++) {
-                            int tilePos = Integer.parseInt(pos[0]) * 5 + (4-i);
+                    int count = Integer.parseInt(tile[1]);
+                    if (count > 0) {
+                        int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
+                        int color = Integer.parseInt(tile[0]);
+
+                        Element element = elements[row];
+                        if (element.getColor() == 0) {
+                            element.setColor(color);
+                        }
+
+                        if (element.getColor() != color) {
+                            return false;
+                        }
+
+                        int resId = ResourceHelper.getFlieseResId(color);
+                        for (int i = 0; i < count; i++) {
+                            int tilePos = row * 5 + (4-i);
 
                             LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(tilePos);
                             ImageView image = (ImageView) linearLayout.getChildAt(0);
@@ -171,11 +191,11 @@ public class MusterFragment extends Fragment implements EventListener {
                     Toast.makeText(getContext(), "Dropped", Toast.LENGTH_SHORT).show();
 
                     View view = (View) event.getLocalState();
-                    String color = String.valueOf((int) (1 + Math.random() * 4));
-                    String count = String.valueOf((int) (1 + Math.random() * 4));
-                    int resId = ResourceHelper.getFlieseResId(color);
+                    String newColor = String.valueOf((int) (1 + Math.random() * 4));
+                    String newCount = String.valueOf((int) (1 + Math.random() * 4));
+                    int resId = ResourceHelper.getFlieseResId(newColor);
                     ((ImageView) view).setImageResource(resId);
-                    view.setTag(color + "|" + count);
+                    view.setTag(newColor + "|" + newCount);
                     view.setVisibility(View.VISIBLE);
                     break;
                 default:
@@ -185,4 +205,28 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
+
+    private class Element {
+        private int color = 0;
+        private int count = 0;
+
+        public Element() {
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public void setColor(int color) {
+            this.color = color;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+    }
 }
