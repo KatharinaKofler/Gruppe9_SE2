@@ -166,6 +166,12 @@ public class MusterFragment extends Fragment implements EventListener {
                             }
                         }
 
+                        int test = 1;
+                        Bundle result = new Bundle();
+                        result.putInt("color", color);
+                        result.putInt("count", test);
+                        getParentFragmentManager().setFragmentResult("floor", result);
+
 //                        ((ImageView) v).setImageResource(resId);
 
                         //TODO Socket
