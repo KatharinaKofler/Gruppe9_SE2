@@ -56,6 +56,7 @@ public class PlayersFragment extends Fragment {
             Button playerButton = new Button(requireContext(), null, R.style.Widget_AppCompat_Button_Borderless);
 
             //Button onclick Listener
+            int finalI = i;
             playerButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -64,6 +65,7 @@ public class PlayersFragment extends Fragment {
                     Bundle b = new Bundle();
                     b.putString("name", playerName);
                     b.putInt("points", points);
+                    b.putInt("id", finalI); // TODO take player id from server
 
                     int[] wall = {19, 5, 28, 0, 0}; // todo
                     // 19 ->  10011 -> erste, vierte, fünfte Fliese belegt

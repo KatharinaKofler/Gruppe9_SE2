@@ -9,10 +9,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.logic.Game;
+import com.example.gruppe9_se2.logic.SocketManager;
+
+import io.socket.client.Socket;
 
 public class PlayerPopup extends AppCompatActivity {
 
@@ -33,6 +37,8 @@ public class PlayerPopup extends AppCompatActivity {
         int playerPoints = b.getInt("points");
         ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
 
+        int playerId = b.getInt("id");
+
         createWall(b);
         createPattern(b);
 
@@ -42,6 +48,18 @@ public class PlayerPopup extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(PlayerPopup.this, Game.class);
                 PlayerPopup.this.startActivity(intent);
+            }
+        });
+
+        ImageButton accuse = (ImageButton) findViewById(R.id.accuse);
+        accuse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Socket socket = SocketManager.getSocket();
+                if (socket != null) {
+                    socket.emit("accuse", playerId);
+                    // TODO handle server response
+                }
             }
         });
     }
