@@ -69,6 +69,7 @@ public class Game extends AppCompatActivity {
 
         Socket socket = SocketManager.getSocket();
         socket.emit("cheat");
+        hasCheated = true;
         // TODO handle response from server
     }
 
