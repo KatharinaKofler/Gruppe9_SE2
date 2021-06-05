@@ -29,6 +29,14 @@ public class PlayerPopup extends AppCompatActivity {
 
         setContentView(R.layout.activity_playerpopup);
 
+        // hide status bar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        // hide action bar
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
         Bundle b = getIntent().getExtras();
 
         String playerName = b.getString("name");
