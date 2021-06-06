@@ -58,6 +58,7 @@ public class NewLobbyFragment extends Fragment {
                         Intent intent = new Intent(getContext(), GameStart.class);
                         Bundle b = new Bundle();
                         b.putString("LobbyID", id);
+                        b.putBoolean("isOwner", true);
                         intent.putExtras(b);
 
                         startActivity(intent);

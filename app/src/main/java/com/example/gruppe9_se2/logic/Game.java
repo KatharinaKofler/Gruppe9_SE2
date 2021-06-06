@@ -17,8 +17,6 @@ import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.ShakeDetector;
 import com.example.gruppe9_se2.game.WandFragment;
 
-import io.socket.client.Socket;
-
 public class Game extends AppCompatActivity {
 
     private SensorManager mSensorManager;
@@ -56,8 +54,6 @@ public class Game extends AppCompatActivity {
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(containerId, new PlayersFragment());
         ft.commit();
-
-      
      
         containerId = findViewById(R.id.boardFragment).getId();
         ft = getSupportFragmentManager().beginTransaction();
@@ -75,8 +71,8 @@ public class Game extends AppCompatActivity {
     private void cheat() {
         if (hasCheated) return;
 
-        Socket socket = SocketManager.getSocket();
-        socket.emit("cheat");
+/*        Socket socket = SocketManager.getSocket();
+        socket.emit("cheat");*/
         hasCheated = true;
         // TODO handle response from server
     }
