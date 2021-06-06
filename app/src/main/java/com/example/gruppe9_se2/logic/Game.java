@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.game.BoardFragment;
 import com.example.gruppe9_se2.game.MusterFragment;
 import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.ShakeDetector;
@@ -56,6 +57,13 @@ public class Game extends AppCompatActivity {
         ft.replace(containerId, new PlayersFragment());
         ft.commit();
 
+      
+     
+        containerId = findViewById(R.id.boardFragment).getId();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(containerId, new BoardFragment());
+        ft.commit();
+
         // ShakeDetector initialization
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager
@@ -85,5 +93,6 @@ public class Game extends AppCompatActivity {
         // Add the following line to unregister the Sensor Manager onPause
         mSensorManager.unregisterListener(shakeDetector);
         super.onPause();
+
     }
 }
