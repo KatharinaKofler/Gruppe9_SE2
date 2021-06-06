@@ -43,4 +43,8 @@
 
     <color name="FlieseFill5">#e35705</color>
     <color name="FlieseBorder5">#7d2e00</color>
+
+    <color name="stroke">#89798f</color>
+    <color name="background">#e8daed</color>
+
 </resources>

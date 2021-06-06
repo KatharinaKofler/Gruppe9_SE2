@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:background="@color/background"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,27 +32,45 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/musterFragment"
+  
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/pattern_wall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:background="@drawable/popup_border"
 
-        android:layout_marginEnd="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/wandFragment"
-        app:layout_constraintTop_toBottomOf="@+id/playerFragment" />
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/wandFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-
-        android:layout_marginEnd="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playerFragment"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playerFragment" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="20dp">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/musterFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+
+            android:layout_margin="20dp"/>
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/wandFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+
+            app:layout_constraintStart_toEndOf="@id/musterFragment"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            android:layout_margin="20dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/playerFragment"

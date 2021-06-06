@@ -9,10 +9,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.logic.Game;
+import com.example.gruppe9_se2.logic.SocketManager;
+
+import io.socket.client.Socket;
 
 public class PlayerPopup extends AppCompatActivity {
 
@@ -25,6 +29,14 @@ public class PlayerPopup extends AppCompatActivity {
 
         setContentView(R.layout.activity_playerpopup);
 
+        // hide status bar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        // hide action bar
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
         Bundle b = getIntent().getExtras();
 
         String playerName = b.getString("name");
@@ -32,6 +44,8 @@ public class PlayerPopup extends AppCompatActivity {
 
         int playerPoints = b.getInt("points");
         ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
+
+        int playerId = b.getInt("id");
 
         createWall(b);
         createPattern(b);
@@ -42,6 +56,18 @@ public class PlayerPopup extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(PlayerPopup.this, Game.class);
                 PlayerPopup.this.startActivity(intent);
+            }
+        });
+
+        ImageButton accuse = (ImageButton) findViewById(R.id.accuse);
+        accuse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Socket socket = SocketManager.getSocket();
+                if (socket != null) {
+                    socket.emit("accuse", playerId);
+                    // TODO handle server response
+                }
             }
         });
     }
