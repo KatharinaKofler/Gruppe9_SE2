@@ -19,8 +19,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Intent intent = new Intent(this, Game.class);
+        //startActivity(intent);
         // show content activity main
         setContentView(R.layout.activity_main);
+
         // set OnClickListener for switch Button
         Button btnSwitch = findViewById(R.id.btn_switch);
         btnSwitch.setOnClickListener(v -> {

@@ -56,6 +56,7 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
             Intent intent = new Intent(context, GameStart.class);
             Bundle b = new Bundle();
             b.putString("LobbyID", l.id);
+            b.putBoolean("isOwner", false);
             intent.putExtras(b);
 
             context.startActivity(intent);

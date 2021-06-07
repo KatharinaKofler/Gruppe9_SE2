@@ -9,4 +9,42 @@
     <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#ffffff</color>
     <color name="errorTextColor">#a32e26</color>
+
+    <color name="emptyFlieseFill">#EFEFEF</color>
+    <color name="emptyFlieseBorder">#DCDCDC</color>
+
+    <color name="emptyFlieseFill1">#d1a7a7</color>
+    <color name="emptyFlieseBorder1">#b59191</color>
+
+    <color name="emptyFlieseFill2">#c7d9b8</color>
+    <color name="emptyFlieseBorder2">#b0bfa3</color>
+
+    <color name="emptyFlieseFill3">#bec9cf</color>
+    <color name="emptyFlieseBorder3">#a9b2b8</color>
+
+    <color name="emptyFlieseFill4">#c7b8cc</color>
+    <color name="emptyFlieseBorder4">#aca0b0</color>
+
+    <color name="emptyFlieseFill5">#f0cbb6</color>
+    <color name="emptyFlieseBorder5">#cfae9b</color>
+
+
+    <color name="FlieseFill1">#b52222</color>
+    <color name="FlieseBorder1">#801717</color>
+
+    <color name="FlieseFill2">#65ba20</color>
+    <color name="FlieseBorder2">#3b6e12</color>
+
+    <color name="FlieseFill3">#117db8</color>
+    <color name="FlieseBorder3">#09547d</color>
+
+    <color name="FlieseFill4">#8814b3</color>
+    <color name="FlieseBorder4">#4c0b63</color>
+
+    <color name="FlieseFill5">#e35705</color>
+    <color name="FlieseBorder5">#7d2e00</color>
+
+    <color name="stroke">#89798f</color>
+    <color name="background">#e8daed</color>
+
 </resources>
