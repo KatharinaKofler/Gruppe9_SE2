@@ -1,4 +1,4 @@
-package com.example.gruppe9_se2.api.lobbyGet;
+package com.example.gruppe9_se2.api.lobbieGet;
 
 import com.google.gson.annotations.SerializedName;
 

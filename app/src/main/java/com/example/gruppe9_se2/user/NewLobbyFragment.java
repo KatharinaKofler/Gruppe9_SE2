@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiHelper;
 import com.example.gruppe9_se2.api.base.ApiManager;
-import com.example.gruppe9_se2.api.lobby.LobbyApi;
-import com.example.gruppe9_se2.api.lobby.LobbyRequest;
-import com.example.gruppe9_se2.api.lobby.LobbyResponse;
+import com.example.gruppe9_se2.api.lobbie.LobbieApi;
+import com.example.gruppe9_se2.api.lobbie.LobbieRequest;
+import com.example.gruppe9_se2.api.lobbie.LobbieResponse;
 import com.example.gruppe9_se2.logic.GameStart;
 
 import retrofit2.Call;
@@ -44,12 +44,12 @@ public class NewLobbyFragment extends Fragment {
             token += ApiManager.getToken();
 
             Retrofit retrofit = ApiManager.getInstance();
-            LobbyRequest request = new LobbyRequest(token);
-            LobbyApi service = retrofit.create(LobbyApi.class);
-            Call<LobbyResponse> call = service.executeLobby(token, request);
-            call.enqueue(new Callback<LobbyResponse>() {
+            LobbieRequest request = new LobbieRequest(token);
+            LobbieApi service = retrofit.create(LobbieApi.class);
+            Call<LobbieResponse> call = service.executeLobby(token, request);
+            call.enqueue(new Callback<LobbieResponse>() {
                 @Override
-                public void onResponse(Call<LobbyResponse> call, Response<LobbyResponse> response) {
+                public void onResponse(Call<LobbieResponse> call, Response<LobbieResponse> response) {
                     if (response.isSuccessful()) {
 
                         //Lobby id speichern
@@ -70,7 +70,7 @@ public class NewLobbyFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(Call<LobbyResponse> call, Throwable t) {
+                public void onFailure(Call<LobbieResponse> call, Throwable t) {
                     TextView createError = view.findViewById(R.id.createError);
                     createError.setText("Problem accessing server !!!");
                 }

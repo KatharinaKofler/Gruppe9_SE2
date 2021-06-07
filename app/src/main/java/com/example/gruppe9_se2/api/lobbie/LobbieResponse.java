@@ -1,8 +1,8 @@
-package com.example.gruppe9_se2.api.lobby;
+package com.example.gruppe9_se2.api.lobbie;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LobbyResponse {
+public class LobbieResponse {
     @SerializedName("id")
     public String id;
 

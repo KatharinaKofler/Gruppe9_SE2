@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiHelper;
 import com.example.gruppe9_se2.api.base.ApiManager;
-import com.example.gruppe9_se2.api.lobbyGet.Lobbies;
-import com.example.gruppe9_se2.api.lobbyGet.LobbyGetApi;
+import com.example.gruppe9_se2.api.lobbieGet.Lobbies;
+import com.example.gruppe9_se2.api.lobbieGet.LobbieGetApi;
 
 import java.util.ArrayList;
 
@@ -51,7 +51,7 @@ public class LobbyOverviewFragment extends Fragment {
         token += ApiManager.getToken();
 
         Retrofit retrofit = ApiManager.getInstance();
-        LobbyGetApi service = retrofit.create(LobbyGetApi.class);
+        LobbieGetApi service = retrofit.create(LobbieGetApi.class);
         Call<ArrayList<Lobbies>> call = service.executeLobbyGet(token);
         call.enqueue(new Callback<ArrayList<Lobbies>>() {
             @SuppressLint("ResourceAsColor")
