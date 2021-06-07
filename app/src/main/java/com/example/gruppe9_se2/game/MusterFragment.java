@@ -3,20 +3,25 @@ package com.example.gruppe9_se2.game;
 import android.content.ClipData;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.*;
+import android.view.DragEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import androidx.fragment.app.Fragment;
+
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
 import com.example.gruppe9_se2.logic.SocketManager;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 
 import java.util.EventListener;
+
+import io.socket.client.Socket;
 
 public class MusterFragment extends Fragment implements EventListener {
     String logTag = "musterFragmentLogs";
