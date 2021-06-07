@@ -102,11 +102,12 @@ public class WandFragment extends Fragment implements EventListener {
         }
     }
 
-    public void add(int row, int color){ // row 0 to 4, color 1 to 5
+    public void add(int row, int color){ // row 0 to 4, color 0 to 4
         color--;
         int imageId = fullFliesenOrder[color];
         // find LinearLayout where to add add the imageId
-        int index = ((color + (5-row)) % 5) + (row * 5);
+        int index = color + (6*row);
+        if(index > (5-color)*5) index -= 5;
         // update assigned in JSONArray
         try {
             JSONObject updated = wand.getJSONObject(index);
@@ -142,12 +143,14 @@ public class WandFragment extends Fragment implements EventListener {
     }
 
     private int getEmptyFLieseId(int index){
-        int color = ((index % 5) + (index / 5)) % 5;
+        int color = ((index % 5) - (index / 5));
+        if(color<0) color += 5;
         return emptyFliesenOrder[color];
     }
 
     private int getFullFLieseId(int index){
-        int color = ((index % 5) + (index / 5)) % 5;
+        int color = ((index % 5) - (index / 5));
+        if(color<0) color += 5;
         return fullFliesenOrder[color];
     }
 
