@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.game;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -71,12 +73,17 @@ public class BodenFragment extends Fragment {
         gridLayout = view.findViewById(R.id.gridBoden);
 
         for (int i = 0; i < 7; i++) {
-            LinearLayout linearLayout = new LinearLayout(requireContext());
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            RelativeLayout layout = new RelativeLayout(requireContext());
+            layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            ImageView imageView = new ImageView(requireContext());
+            imageView.setImageResource(R.drawable.empty_fliese);
+            imageView.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+            imageView.setPadding(5, 5, 5, 5);
 
             TextView textView = new TextView(requireContext());
             textView.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-            textView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+            textView.setGravity(Gravity.CENTER);
 
             String label;
             if (i < 2) {
@@ -89,35 +96,28 @@ public class BodenFragment extends Fragment {
             textView.setText(label);
             textView.setTypeface(null, Typeface.BOLD);
 
-            linearLayout.addView(textView);
-            gridLayout.addView(linearLayout, i);
-        }
-
-        for (int i = 7; i < 14; i++) {
-            LinearLayout linearLayout = new LinearLayout(requireContext());
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            ImageView imageView = new ImageView(requireContext());
-            imageView.setImageResource(R.drawable.empty_fliese);
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-            imageView.setPadding(5, 5, 5, 5);
-
-            linearLayout.addView(imageView);
-            gridLayout.addView(linearLayout, i);
+            layout.addView(imageView);
+            layout.addView(textView);
+            gridLayout.addView(layout, i);
         }
 
         return view;
     }
 
     private void setBodenElement(int pos, int color) {
-        LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(6 + pos);
-        ImageView image = (ImageView) linearLayout.getChildAt(0);
+        RelativeLayout layout = (RelativeLayout) gridLayout.getChildAt(pos-1);
+        ImageView image = (ImageView) layout.getChildAt(0);
         if (image != null) {
             int resId = ResourceHelper.getFlieseResId(color);
             image.setImageResource(resId);
 
             Element e = elements[pos-1];
             e.setColor(color);
+        }
+
+        TextView text = (TextView) layout.getChildAt(1);
+        if (text != null)  {
+            text.setTextColor(Color.WHITE);
         }
     }
 
