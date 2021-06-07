@@ -48,26 +48,33 @@
             android:id="@+id/musterFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bodenFragment" />
 
-            android:layout_margin="20dp"/>
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/bodenFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/musterFragment"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/wandFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
             app:layout_constraintStart_toEndOf="@id/musterFragment"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-
-            android:layout_margin="20dp" />
+            app:layout_constraintBottom_toTopOf="@id/bodenFragment"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

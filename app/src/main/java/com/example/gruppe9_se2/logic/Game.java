@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.game.BoardFragment;
+import com.example.gruppe9_se2.game.BodenFragment;
 import com.example.gruppe9_se2.game.MusterFragment;
 import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.ShakeDetector;
@@ -48,6 +49,11 @@ public class Game extends AppCompatActivity {
         containerId = findViewById(R.id.musterFragment).getId();
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(containerId, new MusterFragment());
+        ft.commit();
+
+        containerId = findViewById(R.id.bodenFragment).getId();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(containerId, new BodenFragment());
         ft.commit();
 
         containerId = findViewById(R.id.playerFragment).getId();
