@@ -1,11 +1,14 @@
 package com.example.gruppe9_se2.logic;
 
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import android.widget.ImageView;
+import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,31 +24,41 @@ import java.util.ArrayList;
 import io.socket.client.Socket;
 
 public class GameStart extends AppCompatActivity {
-
     private Socket mSocket;
-
     private ArrayList<String> playerIDList = new ArrayList<>();
+    private int playerCount;
+    private AnimationDrawable loadingAnimation;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loadingAnimation.start();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gamestart);
 
+        ImageView loadingImage = findViewById(R.id.loadingAnimation);
+        loadingImage.setBackgroundResource(R.drawable.loading_animation_list);
+        loadingAnimation = (AnimationDrawable) loadingImage.getBackground();
+
+        findViewById(R.id.loadingText).setVisibility(View.INVISIBLE);
+
         Bundle b = getIntent().getExtras();
         Boolean isOwner = b.getBoolean("isOwner");
 
         Button btnStart = this.findViewById(R.id.btn_startGame);
-        if(!isOwner) btnStart.setVisibility(View.INVISIBLE);
-        else{
+        if (!isOwner) {
+            btnStart.setVisibility(View.INVISIBLE);
+            ((TextView) findViewById(R.id.gamestartText)).setText("Wait for all your players to join");
+        } else {
             btnStart.setOnClickListener(v -> {
-                // Send Start Game Event to server
-                mSocket.emit("startGame", "");
-                //Close current activity and start Game
-                Bundle gameBundle = new Bundle();
-                gameBundle.putInt("playerNumber", playerIDList.size()+1);
-                finish();
-                Intent intent = new Intent(this, Game.class);
-                startActivity(intent);
+                // Send Start Game Request Event to server
+                mSocket.emit("gameStartRequest");
+                findViewById(R.id.loadingText).setVisibility(View.VISIBLE);
+                btnStart.setVisibility(View.INVISIBLE);
             });
         }
 
@@ -57,7 +70,6 @@ public class GameStart extends AppCompatActivity {
             Intent intent = new Intent(this, LobbyActivity.class);
             startActivity(intent);
         });
-
 
         // Get lobby Id
         String lobbyID = b.getString("LobbyID");
@@ -81,9 +93,11 @@ public class GameStart extends AppCompatActivity {
             try {
                 JSONObject lobbyObject = (JSONObject) lobby[0];
                 JSONArray playersJSON = lobbyObject.getJSONArray("players");
-                for (int i = 0; i < playersJSON.length(); i++) {
-                    playerIDList.add(playersJSON.getString(i));
-                }
+                playerCount = 1 + playersJSON.length();
+                ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount));
+//                for (int i = 0; i < playersJSON.length(); i++) {
+//                    playerIDList.add(playersJSON.getString(i));
+//                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -95,6 +109,8 @@ public class GameStart extends AppCompatActivity {
             try {
                 String id = ((JSONObject) uid[0]).getString("id");
                 playerIDList.add(id);
+                playerCount++;
+                ((TextView)findViewById(R.id.playercountText)).setText(playerText(playerCount));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -106,6 +122,8 @@ public class GameStart extends AppCompatActivity {
             try {
                 String id = ((JSONObject) uid[0]).getString("id");
                 playerIDList.remove(id);
+                playerCount--;
+                ((TextView)findViewById(R.id.playercountText)).setText(playerText(playerCount));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -120,5 +138,12 @@ public class GameStart extends AppCompatActivity {
         });
 
         mSocket.connect();
+    }
+
+    private CharSequence playerText(int count) {
+        if (count == 1) {
+            return "1 Player";
+        }
+        return count + " Players";
     }
 }
