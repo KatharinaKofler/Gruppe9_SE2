@@ -23,10 +23,6 @@
         <activity android:name=".logic.GameStart">
         </activity>
         <activity
-            android:name=".logic.Game"
-            android:screenOrientation="landscape">
-        </activity>
-        <activity
             android:name=".game.PlayerPopup"
             android:screenOrientation="landscape">
         </activity>
