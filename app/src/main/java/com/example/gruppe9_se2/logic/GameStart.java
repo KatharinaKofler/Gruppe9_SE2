@@ -53,6 +53,13 @@ public class GameStart extends AppCompatActivity {
     PlayersFragment playersFragment;
     WandFragment wandFragment;
 
+    // everything for shakedetector
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private ShakeDetector shakeDetector;
+
+    // everything for Cheat
+    private boolean hasCheated = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,6 +89,22 @@ public class GameStart extends AppCompatActivity {
 
         setupSocket();
 
+        setupShakeDetector();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // to register the Session Manager Listener onResume
+        mSensorManager.registerListener(shakeDetector, mAccelerometer,	SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    protected void onPause() {
+        // to unregister the Sensor Manager onPause
+        mSensorManager.unregisterListener(shakeDetector);
+        super.onPause();
     }
 
     private void setupSocket() {
@@ -208,6 +231,25 @@ public class GameStart extends AppCompatActivity {
     private void startTurn() {
         GameStart gameStart = this;
         gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "It's your turn!", Toast.LENGTH_LONG).show());
+    }
+
+    // cheat function
+
+    private void setupShakeDetector() {
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        shakeDetector = new ShakeDetector();
+        shakeDetector.setCallback(this::cheat);
+    }
+
+    private void cheat() {
+        if (hasCheated) return;
+
+        Socket socket = SocketManager.getSocket();
+        socket.emit("cheat");
+        hasCheated = true;
+        // TODO handle response from server
     }
 
 }
