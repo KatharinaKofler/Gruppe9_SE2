@@ -41,11 +41,13 @@ import io.socket.client.Socket;
 
 public class GameStart extends AppCompatActivity {
     private Socket mSocket;
+    private int playerCount;
     private AnimationDrawable loadingAnimation;
 
     private Bundle b;
 
     GameStart gameStart;
+
     // all game fragments
     BoardFragment boardFragment;
     BodenFragment bodenFragment;
@@ -60,6 +62,12 @@ public class GameStart extends AppCompatActivity {
 
     // everything for Cheat
     private boolean hasCheated = false;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loadingAnimation.start();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,6 +155,43 @@ public class GameStart extends AppCompatActivity {
 
     }
 
+    private void setupGamestart() {
+        // setup Image Animation
+        ImageView loadingImage = findViewById(R.id.loadingAnimation);
+        loadingImage.setBackgroundResource(R.drawable.loading_animation_list);
+        loadingAnimation = (AnimationDrawable) loadingImage.getBackground();
+
+        // set LoadingText invisible
+        findViewById(R.id.loadingText).setVisibility(View.INVISIBLE);
+
+        // setup game start button
+        b = getIntent().getExtras();
+        Button btnStart = this.findViewById(R.id.btn_startGame);
+        if (!b.getBoolean("isOwner")) {
+            // not Owner -> set start button invisible and change text
+            btnStart.setVisibility(View.INVISIBLE);
+            ((TextView) findViewById(R.id.gamestartText)).setText("Wait for all your players to join");
+        } else {
+            // is Owner -> add onClickListener for start game button
+            btnStart.setEnabled(false);
+            btnStart.setOnClickListener(v -> {
+                // Send Start Game Request Event to server
+                mSocket.emit("gameStartRequest");
+                findViewById(R.id.loadingText).setVisibility(View.VISIBLE);
+                btnStart.setVisibility(View.INVISIBLE);
+            });
+        }
+
+        // setup lobby leave button
+        Button btnLeave = this.findViewById(R.id.btn_leaveLobby);
+        btnLeave.setOnClickListener(v -> {
+            // Send Leave Lobby Event to server
+            mSocket.disconnect();
+            Log.i("myLogs", "Disconnect");
+            Intent intent = new Intent(this, LobbyActivity.class);
+            startActivity(intent);
+        });
+    }
 
     private void setupGame() {
         int containerId = findViewById(R.id.wandFragment).getId();
@@ -189,6 +234,12 @@ public class GameStart extends AppCompatActivity {
         try {
             JSONObject lobbyObject = (JSONObject) args[0];
             JSONArray playersJSON = lobbyObject.getJSONArray("players");
+
+            playerCount = 1 + playersJSON.length();
+            runOnUiThread(() -> ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount)));
+            if (playerCount > 1) {
+                runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(true));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -197,12 +248,23 @@ public class GameStart extends AppCompatActivity {
     private void playerJoin(Object[] args) {
         // User Id after a new User join the current Lobby
         Log.i("myLogs", "user joined");
+
+        playerCount++;
+        runOnUiThread(() -> ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount)));
+        if (playerCount > 1) {
+            runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(true));
+        }
     }
 
     private void playerLeave(Object[] args) {
         // User Id after a player left the current Lobby
         Log.i("myLogs", "user left");
 
+        playerCount--;
+        ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount));
+        if (playerCount < 2) {
+            runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(false));
+        }
     }
 
     private void dispandLobby(Object[] args) {
@@ -210,6 +272,13 @@ public class GameStart extends AppCompatActivity {
         Log.i("myLogs", "disbandLobby");
         Intent intent = new Intent(this, LobbyActivity.class);
         startActivity(intent);
+    }
+
+    private CharSequence playerText(int count) {
+        if (count == 1) {
+            return "1 Player";
+        }
+        return count + " Players";
     }
 
     private void gameStartAnnounce(Object[] args) {

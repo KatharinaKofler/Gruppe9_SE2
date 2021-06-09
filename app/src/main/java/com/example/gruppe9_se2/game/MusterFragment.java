@@ -3,30 +3,25 @@ package com.example.gruppe9_se2.game;
 import android.content.ClipData;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.DragEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import androidx.fragment.app.Fragment;
-
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
 import com.example.gruppe9_se2.logic.SocketManager;
+import io.socket.client.Socket;
 
 import java.util.EventListener;
 
-import io.socket.client.Socket;
-
 public class MusterFragment extends Fragment implements EventListener {
     String logTag = "musterFragmentLogs";
-    //todo save all information about this Muster, so it can be a JSON
+
+    View view;
     GridLayout gridLayout;
+
     Socket mSocket = SocketManager.getSocket();
 
     // Elements-Array to store Musterreihe
@@ -43,7 +38,7 @@ public class MusterFragment extends Fragment implements EventListener {
         }
 
         // inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_muster, container, false);
+        view = inflater.inflate(R.layout.fragment_muster, container, false);
 
         //todo get the size of the Spielbrett Muster
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
@@ -57,25 +52,9 @@ public class MusterFragment extends Fragment implements EventListener {
                 LinearLayout linearLayout = new LinearLayout(requireContext());
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                // Test Fliese
                 if (i == 0 && j == 0) {
-                    String color = String.valueOf((int) (1 + Math.random() * 4));
-                    String count = String.valueOf((int) (1 + Math.random() * 4));
-                    int resId = ResourceHelper.getFlieseResId(color);
-
-                    ImageView testImage = new ImageView(requireContext());
-                    testImage.setImageResource(resId);
-                    testImage.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-                    testImage.setPadding(5, 5, 5, 5);
-
-                    testImage.setTag(color + "|" + count);
-
-                    testImage.setOnTouchListener(new MyTouchListener());
-
-                    linearLayout.addView(testImage);
-                }
-
-                if (j >= 4 - i) {
+                    // Platzhalter für die neue Zwischenablage
+                } else if (j >= 4 - i) {
                     ImageView image = new ImageView(requireContext());
                     //todo create drawable for empty Image State
                     int imageId = R.drawable.empty_fliese;
@@ -94,13 +73,14 @@ public class MusterFragment extends Fragment implements EventListener {
 
                     // Test Drop nur auf letzter Spalte
                     if (j == 4) {
-                        image.setOnDragListener(new MyDragListener());
+                        image.setOnDragListener(new MyPatternDragListener());
                     }
 
                     linearLayout.addView(image);
+                    gridLayout.addView(linearLayout, i * 5 + j);
+                } else {
+                    gridLayout.addView(linearLayout, i * 5 + j);
                 }
-
-                gridLayout.addView(linearLayout, i * 5 + j);
             }
         }
 
@@ -124,17 +104,13 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
-    class MyDragListener implements View.OnDragListener {
+    class MyPatternDragListener implements View.OnDragListener {
         Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
         Drawable normalShape = getResources().getDrawable(R.drawable.shape);
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
-            int action = event.getAction();
             switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_STARTED:
-                    // do nothing
-                    break;
                 case DragEvent.ACTION_DRAG_ENTERED:
                     v.setBackground(enterShape);
                     break;
@@ -184,13 +160,6 @@ public class MusterFragment extends Fragment implements EventListener {
 
                     Toast.makeText(getContext(), "Dropped", Toast.LENGTH_SHORT).show();
 
-                    View view = (View) event.getLocalState();
-                    String newColor = String.valueOf((int) (1 + Math.random() * 4));
-                    String newCount = String.valueOf((int) (1 + Math.random() * 4));
-                    int resId = ResourceHelper.getFlieseResId(newColor);
-                    ((ImageView) view).setImageResource(resId);
-                    view.setTag(newColor + "|" + newCount);
-                    view.setVisibility(View.VISIBLE);
                     break;
                 default:
                     break;
