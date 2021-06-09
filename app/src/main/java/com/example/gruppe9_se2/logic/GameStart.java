@@ -1,18 +1,33 @@
 package com.example.gruppe9_se2.logic;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimationDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.game.BoardFragment;
+import com.example.gruppe9_se2.game.BodenFragment;
+import com.example.gruppe9_se2.game.MusterFragment;
+import com.example.gruppe9_se2.game.PlayersFragment;
+import com.example.gruppe9_se2.game.ShakeDetector;
+import com.example.gruppe9_se2.game.WandFragment;
 import com.example.gruppe9_se2.user.LobbyActivity;
 
 import org.json.JSONArray;
@@ -20,130 +35,179 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import io.socket.client.Socket;
 
 public class GameStart extends AppCompatActivity {
     private Socket mSocket;
-    private ArrayList<String> playerIDList = new ArrayList<>();
-    private int playerCount;
     private AnimationDrawable loadingAnimation;
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        loadingAnimation.start();
-    }
+    private Bundle b;
+
+    GameStart gameStart;
+    // all game fragments
+    BoardFragment boardFragment;
+    BodenFragment bodenFragment;
+    MusterFragment musterFragment;
+    PlayersFragment playersFragment;
+    WandFragment wandFragment;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gamestart);
+        gameStart = this;
 
-        ImageView loadingImage = findViewById(R.id.loadingAnimation);
-        loadingImage.setBackgroundResource(R.drawable.loading_animation_list);
-        loadingAnimation = (AnimationDrawable) loadingImage.getBackground();
+        // get bundle
+        b = getIntent().getExtras();
 
-        findViewById(R.id.loadingText).setVisibility(View.INVISIBLE);
+        // hide status bar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        // hide action bar
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.hide();
 
-        Bundle b = getIntent().getExtras();
-        Boolean isOwner = b.getBoolean("isOwner");
+        // hide game, show gamestart
+        findViewById(R.id.game).setVisibility(View.INVISIBLE);
+        findViewById(R.id.gamestart).setVisibility(View.VISIBLE);
 
-        Button btnStart = this.findViewById(R.id.btn_startGame);
-        if (!isOwner) {
-            btnStart.setVisibility(View.INVISIBLE);
-            ((TextView) findViewById(R.id.gamestartText)).setText("Wait for all your players to join");
-        } else {
-            btnStart.setOnClickListener(v -> {
-                // Send Start Game Request Event to server
-                mSocket.emit("gameStartRequest");
-                findViewById(R.id.loadingText).setVisibility(View.VISIBLE);
-                btnStart.setVisibility(View.INVISIBLE);
-            });
-        }
+        setupGamestart();
 
-        Button btnLeave = this.findViewById(R.id.btn_leaveLobby);
-        btnLeave.setOnClickListener(v -> {
-            // Send Leave Lobby Event to server
-            mSocket.disconnect();
-            Log.i("myLogs", "Disconnect");
-            Intent intent = new Intent(this, LobbyActivity.class);
-            startActivity(intent);
-        });
+        setupGame();
 
-        // Get lobby Id
+        setupSocket();
+
+    }
+
+    private void setupSocket() {
         String lobbyID = b.getString("LobbyID");
         mSocket = SocketManager.makeSocket(lobbyID);
 
+        SocketManager.getSocket().connect();
         // check for successfull connection
-        mSocket.on("connect", args -> {
+        SocketManager.getSocket().on("connect", args -> {
             Log.i("myLogs", "Connection successfull");
         });
 
         // error if connect failed
-        mSocket.on("connect_failed", args -> {
+        SocketManager.getSocket().on("connect_failed", args -> {
             Log.e("myLogs", "connect_failed");
         });
 
-        // sync Event after connection with websocket
-        mSocket.on("sync", lobby -> {
-            // lobby is the current lobby we joined, with current player list
-            Log.i("myLogs", "sync called");
-            //returns current Player List
-            try {
-                JSONObject lobbyObject = (JSONObject) lobby[0];
-                JSONArray playersJSON = lobbyObject.getJSONArray("players");
-                playerCount = 1 + playersJSON.length();
-                ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount));
-//                for (int i = 0; i < playersJSON.length(); i++) {
-//                    playerIDList.add(playersJSON.getString(i));
-//                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        // gamestart Listeners
+        SocketManager.getSocket().on("sync", this::sync);
+        SocketManager.getSocket().on("playerJoin", this::playerJoin);
+        SocketManager.getSocket().on("playerLeave", this::playerLeave);
+        SocketManager.getSocket().on("disbandLobby", this::dispandLobby);
+        SocketManager.getSocket().on("gameStartAnnounce", this::gameStartAnnounce);
+        // game Listeners
+        SocketManager.getSocket().on("updateAvailableTiles", args -> {
+        });
+        SocketManager.getSocket().on("nextPlayer", args -> {
+        });
+        SocketManager.getSocket().on("startTurn", args -> startTurn());
+        SocketManager.getSocket().on("startRound", args -> {
+        });
+        SocketManager.getSocket().on("boardLookupResponse", args -> {
+        });
+        SocketManager.getSocket().on("gameEnd", args -> {
+        });
+        SocketManager.getSocket().on("error", errorMessage -> {
+            // print error message somewhere
+            Log.e("SOCKET_ERROR", (String) errorMessage[0]);
         });
 
-        mSocket.on("playerJoin", uid -> {
-            // User Id after a new User join the current Lobby
-            Log.i("myLogs", "user joined");
-            try {
-                String id = ((JSONObject) uid[0]).getString("id");
-                playerIDList.add(id);
-                playerCount++;
-                ((TextView)findViewById(R.id.playercountText)).setText(playerText(playerCount));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        });
-
-        mSocket.on("playerLeave", uid -> {
-            // User Id after a player left the current Lobby
-            Log.i("myLogs", "user left");
-            try {
-                String id = ((JSONObject) uid[0]).getString("id");
-                playerIDList.remove(id);
-                playerCount--;
-                ((TextView)findViewById(R.id.playercountText)).setText(playerText(playerCount));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        });
-
-        mSocket.on("disbandLobby", args -> {
-            // Close Lobby
-            Log.i("myLogs", "Lobby will be closed");
-            playerIDList = new ArrayList<>();
-            Intent intent = new Intent(this, LobbyActivity.class);
-            startActivity(intent);
-        });
-
-        mSocket.connect();
     }
 
-    private CharSequence playerText(int count) {
-        if (count == 1) {
-            return "1 Player";
+
+    private void setupGame() {
+        int containerId = findViewById(R.id.wandFragment).getId();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        wandFragment = new WandFragment();
+        ft.replace(containerId, wandFragment);
+        ft.commit();
+
+        containerId = findViewById(R.id.musterFragment).getId();
+        ft = getSupportFragmentManager().beginTransaction();
+        musterFragment = new MusterFragment();
+        ft.replace(containerId, musterFragment);
+        ft.commit();
+
+        containerId = findViewById(R.id.bodenFragment).getId();
+        ft = getSupportFragmentManager().beginTransaction();
+        bodenFragment = new BodenFragment();
+        ft.replace(containerId, bodenFragment);
+        ft.commit();
+
+        containerId = findViewById(R.id.playerFragment).getId();
+        ft = getSupportFragmentManager().beginTransaction();
+        playersFragment = new PlayersFragment();
+        ft.replace(containerId, playersFragment);
+        ft.commit();
+
+        containerId = findViewById(R.id.boardFragment).getId();
+        ft = getSupportFragmentManager().beginTransaction();
+        boardFragment = new BoardFragment();
+        ft.replace(containerId, boardFragment);
+        ft.commit();
+    }
+
+    // gamestart Methods
+
+    private void sync(Object[] args) {
+        // lobby is the current lobby we joined, with current player list
+        Log.i("myLogs", "sync called");
+        //returns current Player List
+        try {
+            JSONObject lobbyObject = (JSONObject) args[0];
+            JSONArray playersJSON = lobbyObject.getJSONArray("players");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        return count + " Players";
     }
+
+    private void playerJoin(Object[] args) {
+        // User Id after a new User join the current Lobby
+        Log.i("myLogs", "user joined");
+    }
+
+    private void playerLeave(Object[] args) {
+        // User Id after a player left the current Lobby
+        Log.i("myLogs", "user left");
+
+    }
+
+    private void dispandLobby(Object[] args) {
+        // Close Lobby
+        Log.i("myLogs", "disbandLobby");
+        Intent intent = new Intent(this, LobbyActivity.class);
+        startActivity(intent);
+    }
+
+    private void gameStartAnnounce(Object[] args) {
+        // hide gamestart, show game
+        runOnUiThread(() -> {
+            findViewById(R.id.game).setVisibility(View.VISIBLE);
+            findViewById(R.id.gamestart).setVisibility(View.INVISIBLE);
+        });
+
+        // remove gamestart event listeners
+        SocketManager.getSocket().off("sync");
+        SocketManager.getSocket().off("playerJoin");
+        SocketManager.getSocket().off("playerLeave");
+
+    }
+
+    // game Methods
+
+    private void startTurn() {
+        GameStart gameStart = this;
+        gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "It's your turn!", Toast.LENGTH_LONG).show());
+    }
+
 }
