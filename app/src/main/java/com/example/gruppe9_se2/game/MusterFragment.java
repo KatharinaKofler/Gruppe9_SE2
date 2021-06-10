@@ -1,6 +1,7 @@
 package com.example.gruppe9_se2.game;
 
 import android.content.ClipData;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.*;
@@ -8,6 +9,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
@@ -59,9 +61,8 @@ public class MusterFragment extends Fragment implements EventListener {
                 LinearLayout linearLayout = new LinearLayout(requireContext());
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                if (i == 0 && j == 0) {
-                    // Platzhalter für die neue Zwischenablage
-                } else if (j >= 4 - i) {
+                if(i==0 && j==0) initNewTileField();
+                else if (j >= 4 - i) {
                     ImageView image = new ImageView(requireContext());
                     //todo create drawable for empty Image State
                     int imageId = R.drawable.empty_fliese;
@@ -92,6 +93,50 @@ public class MusterFragment extends Fragment implements EventListener {
         }
 
         return view;
+    }
+
+    private void initNewTileField() {
+        GridLayout gridLayout = view.findViewById(R.id.gridMuster);
+        int size = (int) getResources().getDimension(R.dimen.fliese_size);
+
+        RelativeLayout layout = new RelativeLayout(requireContext());
+        layout.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        ImageView newTiles = new ImageView(requireContext());
+        newTiles.setImageResource(R.drawable.empty_fliese);
+        newTiles.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+        newTiles.setPadding(5, 5, 5, 5);
+
+        TextView textView = new TextView(requireContext());
+        textView.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+        textView.setGravity(Gravity.CENTER);
+        textView.setTypeface(null, Typeface.BOLD);
+
+        layout.addView(newTiles, 0);
+        layout.addView(textView, 1);
+        gridLayout.addView(layout, 0);
+    }
+
+    private void addNewTileField(RelativeLayout layout, int color, int count) {
+        ImageView newTiles = (ImageView) layout.getChildAt(0);
+        int[] tileResourceMap = {R.drawable.fliese_color1, R.drawable.fliese_color2,
+                R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
+        newTiles.setImageResource(tileResourceMap[color]);
+        newTiles.setTag((color + 1) + "|" + count);
+        newTiles.setOnTouchListener(new MyTouchListener());
+
+        TextView textView = (TextView) layout.getChildAt(1);
+        textView.setText(Integer.toString(count));
+    }
+
+    private void clearNewTileField(RelativeLayout layout) {
+        ImageView newTiles = (ImageView) layout.getChildAt(0);
+        newTiles.setImageResource(R.drawable.empty_fliese);
+        newTiles.setOnTouchListener(null);
+
+        TextView textView = (TextView) layout.getChildAt(1);
+        textView.setText(null);
     }
 
     public void dragListenerNewTileField(GameStart gameStart) {
@@ -136,6 +181,7 @@ public class MusterFragment extends Fragment implements EventListener {
                     gameStart.takePlateTiles(args);
                 }
                 imageView.setOnDragListener(null);
+                addNewTileField((RelativeLayout) v.getParent(), color, count);
                 gameStart.disableOnTouchBoard();
             }
             return true;
@@ -174,6 +220,7 @@ public class MusterFragment extends Fragment implements EventListener {
 //                    ((View) event.getLocalState()).setVisibility(View.VISIBLE);
                     break;
                 case DragEvent.ACTION_DROP:
+                    clearNewTileField((RelativeLayout) ((View) event.getLocalState()).getParent());
                     ClipData data = event.getClipData();
                     String[] tile = data.getItemAt(0).getText().toString().split("\\|");
                     int count = Integer.parseInt(tile[1]);
