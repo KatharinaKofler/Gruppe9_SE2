@@ -138,6 +138,7 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("gameStartAnnounce", this::gameStartAnnounce);
         // game Listeners
         SocketManager.getSocket().on("updateAvailableTiles", args -> {
+            boardFragment.updateTiles(gameStart, args);
         });
         SocketManager.getSocket().on("nextPlayer", args -> {
         });
@@ -179,6 +180,7 @@ public class GameStart extends AppCompatActivity {
                 mSocket.emit("gameStartRequest");
                 findViewById(R.id.loadingText).setVisibility(View.VISIBLE);
                 btnStart.setVisibility(View.INVISIBLE);
+                boardFragment.initTiles(gameStart, playerCount * 2 + 1);
             });
         }
 
@@ -300,6 +302,11 @@ public class GameStart extends AppCompatActivity {
     private void startTurn() {
         GameStart gameStart = this;
         gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "It's your turn!", Toast.LENGTH_LONG).show());
+        boardFragment.startTurn();
+    }
+
+    public void disableOnTouchBoard() {
+        boardFragment.disableOnTouch();
     }
 
     // cheat function
