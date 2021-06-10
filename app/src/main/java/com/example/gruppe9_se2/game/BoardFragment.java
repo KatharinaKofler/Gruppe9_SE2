@@ -2,6 +2,7 @@ package com.example.gruppe9_se2.game;
 
 import android.content.ClipData;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,41 +12,127 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+
+
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.logic.GameStart;
+import com.example.gruppe9_se2.logic.SocketManager;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import io.socket.client.Socket;
 
 public class BoardFragment extends Fragment {
+
+    private View view;
+    private GameStart gameStart;
+
     private final int[] tileResourceMap = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
-    View view;
+    private static int[][] plates;
+    private static int[] center;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_board, container, false);
-
-        //TODO replace test values with event handler
-
-        int numberPlates = 9;
-        int[][] tileColors = {{1, 5, 3, 5}, {3, 3, 3, 5}, {2, 4, 2, 1}, {1, 5, 3, 5}, {1, 5, 3, 5}, {1, 5, 3, 5}, {1, 5, 3, 5}, {1, 5, 3, 5}, {1, 5, 3, 5}};
-        int[] centerColors = {27, 0, 0, 0, 0};
-
-        generatePlates(numberPlates, tileColors);
-
-        addToCenter(0, view);
-        addToCenter(1, view);
-        addToCenter(2, view);
-        addToCenter(3, view);
-        addToCenter(4, view);
-        addToCenter(3, view);
-
         return view;
+    }
+
+    public void updateTiles(GameStart gameStart, Object[] args){
+        this.gameStart = gameStart;
+        JSONObject tilesObject = (JSONObject) args[0];
+        Log.d("myLogs", "update available tiles called");
+        try {
+            JSONObject platesObject = tilesObject.getJSONObject("plates");
+            int numberPlates = platesObject.length();
+
+            if(plates==null){
+                plates = new int[numberPlates][4];
+                center = new int[5];
+            }
+
+            for (int i = 0; i < platesObject.length(); i++) {
+                JSONArray singlePlateArray = platesObject.getJSONArray("plate"+i);
+                if(singlePlateArray.length()<4){
+                    for (int j = 0; j < 4; j++) {
+                        plates[i][j] = 0;
+                    }
+                }
+                else{
+                    for (int j = 0; j < 4; j++) {
+                        plates[i][j] = singlePlateArray.getInt(j);
+                    }
+                }
+            }
+
+            JSONObject centerObject = tilesObject.getJSONObject("center");
+            center[0] = centerObject.getInt("black");
+            center[1] = centerObject.getInt("white");
+            center[2] = centerObject.getInt("blue");
+            center[3] = centerObject.getInt("yellow");
+            center[4] = centerObject.getInt("red");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // update plates
+        generatePlates(gameStart, plates);
+
+        // update center
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < center[i]; j++) {
+                addToCenter(i, center[i]);
+            }
+        }
+    }
+
+    public void startTurn() {
+        // for plate tiles
+        GridLayout board = view.findViewById(R.id.gridPlates);
+        for (int i = 0; i < board.getChildCount(); i++) {
+            GridLayout plate = (GridLayout) board.getChildAt(i);
+            for (int j = 0; j < plate.getChildCount(); j++) {
+                ImageView tile = (ImageView) plate.getChildAt(j);
+                int color = (tile.getTag(R.id.color_id)!=null) ? (int) tile.getTag(R.id.color_id) : 0;
+                if(color != -1) tile.setOnTouchListener(new TileTouchListener());
+            }
+        }
+        // for center tiles
+        GridLayout center = view.findViewById(R.id.gridCenter);
+        for (int i = 0; i < center.getChildCount(); i++) {
+            ImageView tile = (ImageView) center.getChildAt(i);
+            int color = (tile.getTag(R.id.color_id)!=null) ? (int) tile.getTag(R.id.color_id) : 0;
+            if(color != -1)tile.setOnTouchListener(new TileTouchListener());
+        }
+    }
+
+    public void disableOnTouch() {
+        // for plate tiles
+        GridLayout board = view.findViewById(R.id.gridPlates);
+        for (int i = 0; i < board.getChildCount(); i++) {
+            GridLayout plate = (GridLayout) board.getChildAt(i);
+            for (int j = 0; j < plate.getChildCount(); j++) {
+                ImageView tile = (ImageView) plate.getChildAt(j);
+                tile.setOnTouchListener(null);
+            }
+        }
+        // for center tiles
+        GridLayout center = view.findViewById(R.id.gridCenter);
+        for (int i = 0; i < center.getChildCount(); i++) {
+            ImageView tile = (ImageView) center.getChildAt(i);
+            tile.setOnTouchListener(null);
+        }
     }
 
     private final class TileTouchListener implements View.OnTouchListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-
-                ClipData data = ClipData.newPlainText("tile", (String) view.getTag());
+                ClipData data = ClipData.newPlainText("tile", view.getTag(R.id.color_id) + "|" + view.getTag(R.id.count_id));
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
                 view.startDrag(data, shadowBuilder, view, 0);
                 view.setVisibility(View.INVISIBLE);
@@ -56,24 +143,37 @@ public class BoardFragment extends Fragment {
         }
     }
 
-    public void dropped(int indexPlate, int color){
-        GridLayout plate = (GridLayout) ((GridLayout) view.findViewById(R.id.gridPlates)).getChildAt(indexPlate);
-        for (int i = 0; i < 4; i++) {
-            ImageView image = (ImageView) plate.getChildAt(i);
+    private void generatePlates(GameStart gameStart, int[][] tileColors) {
 
-            String[] pos = image.getTag().toString().split("\\|");
-            int tagColor = Integer.parseInt(pos[0]);
+        int numberPlates = tileColors.length;
+        GridLayout plates = view.findViewById(R.id.gridPlates);
 
-            if(tagColor!=color){
-                addToCenter(color, view);
+        for(int i=0; i<numberPlates; i++){
+            GridLayout tiles = (GridLayout) plates.getChildAt(i);
+
+            int[] countColor = new int[5];
+            for(int color : tileColors[i]){
+                if(color!=0) countColor[color-1]++;
             }
-            image.setVisibility(View.INVISIBLE);
+
+            for (int j = 0; j < 4; j++) {
+                int color = tileColors[i][j];
+                ImageView tile = (ImageView) tiles.getChildAt(j);
+
+                gameStart.runOnUiThread(() -> {
+                    if(color == 0) tile.setImageResource(R.drawable.empty_fliese);
+                    else {
+                        tile.setImageResource(tileResourceMap[color - 1]);
+                        tile.setTag(R.id.count_id, countColor[color - 1]);
+                    }
+                    tile.setTag(R.id.color_id, color - 1);
+                    tile.setVisibility(View.VISIBLE);
+                });
+            }
         }
     }
 
-
-    private void generatePlates(int numberPlates, int[][] tileColors) {
-
+    public void initTiles(GameStart gameStart, int numberPlates){
         GridLayout plates = view.findViewById(R.id.gridPlates);
 
         for(int i=0; i<numberPlates; i++){
@@ -89,27 +189,24 @@ public class BoardFragment extends Fragment {
             tiles.setBackgroundResource(R.drawable.plate_design);
             tiles.setPadding(10, 10, 10, 10);
 
-            int[] countColor = new int[5];
-            for(int color : tileColors[i]){
-                countColor[color-1]++;
-            }
-
-            for(int color : tileColors[i]){
+            for (int j = 0; j < 4; j++) {
                 ImageView tile = new ImageView(requireContext());
 
                 int size = (int) getResources().getDimension(R.dimen.fliese_size);
                 tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                 tile.setPadding(5,5,5,5);
-                tile.setImageResource(tileResourceMap[color - 1]);
+                tile.setTag(R.id.plateNr_id, i);
+                tile.setTag(R.id.isCenter, 0);
 
                 tiles.addView(tile);
             }
 
-            plates.addView(tiles, i);
+            int finalI = i;
+            gameStart.runOnUiThread(() -> plates.addView(tiles, finalI));
         }
     }
 
-    private void addToCenter(int color, View view){
+    private void addToCenter(int color, int count){
         GridLayout center = view.findViewById(R.id.gridCenter);
         ImageView tile = new ImageView(requireContext());
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
@@ -117,25 +214,11 @@ public class BoardFragment extends Fragment {
         tile.setPadding(5,5,5,5);
 
         tile.setImageResource(tileResourceMap[color]);
-        int count = countColorCenter(color, view);
-        tile.setTag(color + "|" + count);
-        tile.setOnTouchListener(new TileTouchListener());
+        tile.setTag(R.id.color_id, color);
+        tile.setTag(R.id.count_id, count);
+        tile.setTag(R.id.isCenter, 1);
 
-        center.addView(tile);
-    }
+        gameStart.runOnUiThread(() -> center.addView(tile));
 
-    private int countColorCenter(int color, View view) {
-        int count = 0;
-        GridLayout center = view.findViewById(R.id.gridCenter);
-        int n = center.getChildCount();
-        for (int i = 0; i < n; i++) {
-            ImageView image = (ImageView) center.getChildAt(i);
-            String[] pos = image.getTag().toString().split("\\|");
-            int tagColor = Integer.parseInt(pos[0]);
-            if(tagColor == color){
-                count++;
-            }
-        }
-        return count;
     }
 }
