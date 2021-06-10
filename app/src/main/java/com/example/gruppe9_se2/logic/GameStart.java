@@ -2,7 +2,6 @@ package com.example.gruppe9_se2.logic;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -10,8 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,9 +30,6 @@ import com.example.gruppe9_se2.user.LobbyActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 import io.socket.client.Socket;
 
@@ -137,16 +131,12 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("disbandLobby", this::dispandLobby);
         SocketManager.getSocket().on("gameStartAnnounce", this::gameStartAnnounce);
         // game Listeners
-        SocketManager.getSocket().on("updateAvailableTiles", args -> {
-            boardFragment.updateTiles(gameStart, args);
-        });
+        SocketManager.getSocket().on("updateAvailableTiles", args -> boardFragment.updateTiles(gameStart, args));
         SocketManager.getSocket().on("nextPlayer", args -> {
         });
         SocketManager.getSocket().on("startTurn", args -> startTurn());
-        SocketManager.getSocket().on("startRound", args -> {
-        });
-        SocketManager.getSocket().on("boardLookupResponse", args -> {
-        });
+        SocketManager.getSocket().on("startRound", args -> updateAllPoints((JSONArray) args[0]));
+        SocketManager.getSocket().on("boardLookupResponse", args -> playersFragment.responsePlayerBoard((JSONObject) args[0]));
         SocketManager.getSocket().on("gameEnd", args -> {
         });
         SocketManager.getSocket().on("error", errorMessage -> {
@@ -242,6 +232,9 @@ public class GameStart extends AppCompatActivity {
             if (playerCount > 1) {
                 runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(true));
             }
+            for (int i = 0; i < playersJSON.length(); i++) {
+                playersFragment.addPlayerId(playersJSON.getString(i));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -251,21 +244,38 @@ public class GameStart extends AppCompatActivity {
         // User Id after a new User join the current Lobby
         Log.i("myLogs", "user joined");
 
-        playerCount++;
-        runOnUiThread(() -> ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount)));
-        if (playerCount > 1) {
-            runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(true));
+        try {
+            String id = ((JSONObject) args[0]).getString("id");
+            playersFragment.addPlayerId(id);
+
+            playerCount++;
+            runOnUiThread(() -> ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount)));
+            if (playerCount > 1) {
+                runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(true));
+            }
         }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     private void playerLeave(Object[] args) {
         // User Id after a player left the current Lobby
         Log.i("myLogs", "user left");
 
-        playerCount--;
-        ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount));
-        if (playerCount < 2) {
-            runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(false));
+        try {
+            String id = ((JSONObject) args[0]).getString("id");
+            playersFragment.removePlayerId(id);
+            playerCount--;
+            ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount));
+            if (playerCount < 2) {
+                runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(false));
+            }
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -295,6 +305,31 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().off("playerJoin");
         SocketManager.getSocket().off("playerLeave");
 
+        playersFragment.initPlayerButtons(gameStart);
+    }
+
+    public void requestPlayerBoard(String playerId) {
+        try {
+            JSONObject args = new JSONObject();
+            args.put("playerId", playerId);
+            SocketManager.getSocket().emit("boardLookupRequest", args);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateAllPoints(JSONArray scores) {
+        // todo check if its JSONArray with those parameters
+        try {
+            for (int i = 0; i < scores.length(); i++) {
+                JSONObject playerScore = scores.getJSONObject(i);
+                String id = playerScore.getString("id");
+                int score = playerScore.getInt("score");
+                playersFragment.updatePoints(id, score);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // game Methods

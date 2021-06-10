@@ -101,7 +101,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:id="@+id/game">
 
-        <!-- hier @+id/playerFragment Container -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/playerFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/board"
