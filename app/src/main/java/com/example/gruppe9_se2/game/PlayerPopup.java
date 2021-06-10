@@ -13,7 +13,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
-import com.example.gruppe9_se2.logic.Game;
+import com.example.gruppe9_se2.logic.GameStart;
 import com.example.gruppe9_se2.logic.SocketManager;
 
 import io.socket.client.Socket;
@@ -35,7 +35,7 @@ public class PlayerPopup extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
         // hide action bar
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if(actionBar != null) actionBar.hide();
 
         Bundle b = getIntent().getExtras();
 
@@ -45,7 +45,7 @@ public class PlayerPopup extends AppCompatActivity {
         int playerPoints = b.getInt("points");
         ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
 
-        int playerId = b.getInt("id");
+        String playerId = b.getString("id");
 
         createWall(b);
         createPattern(b);
@@ -54,7 +54,7 @@ public class PlayerPopup extends AppCompatActivity {
         exitPopUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PlayerPopup.this, Game.class);
+                Intent intent = new Intent(PlayerPopup.this, GameStart.class);
                 PlayerPopup.this.startActivity(intent);
             }
         });
@@ -141,7 +141,6 @@ public class PlayerPopup extends AppCompatActivity {
             }
         }
     }
-
 
     private int[] binaryDivision(int value, int length){
         int[] bitmap = new int[length];
