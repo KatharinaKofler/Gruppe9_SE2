@@ -6,4 +6,8 @@
     <item name="index_id" type="id"/>
     <item name="acceptable_color_id" type="id"/>
     <item name="assigned" type="id"/>
+
+    <item name="count_id" type="id"/>
+    <item name="isCenter" type="id"/>
+    <item name="plateNr_id" type="id"/>
 </resources>

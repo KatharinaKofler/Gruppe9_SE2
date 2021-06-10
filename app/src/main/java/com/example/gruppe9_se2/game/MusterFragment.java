@@ -7,11 +7,17 @@ import android.view.*;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
+import com.example.gruppe9_se2.logic.GameStart;
 import com.example.gruppe9_se2.logic.SocketManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import io.socket.client.Socket;
 
 import java.util.EventListener;
@@ -21,6 +27,7 @@ public class MusterFragment extends Fragment implements EventListener {
 
     View view;
     GridLayout gridLayout;
+    GameStart gameStart;
 
     Socket mSocket = SocketManager.getSocket();
 
@@ -87,6 +94,53 @@ public class MusterFragment extends Fragment implements EventListener {
         return view;
     }
 
+    public void dragListenerNewTileField(GameStart gameStart) {
+        this.gameStart = gameStart;
+        GridLayout gridLayout = view.findViewById(R.id.gridMuster);
+        ImageView tile = (ImageView) ((RelativeLayout) gridLayout.getChildAt(0)).getChildAt(0);
+        tile.setOnDragListener(new NewTileDragListener());
+    }
+
+    private class NewTileDragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            if (event.getAction() == DragEvent.ACTION_DROP) {
+                ImageView imageView = (ImageView) event.getLocalState();
+
+                int color = (int) imageView.getTag(R.id.color_id);
+                int plate = (int) imageView.getTag(R.id.plateNr_id);
+                int count = (int) imageView.getTag(R.id.count_id);
+
+                // check if Image comes from Center or Plates
+                int i = (int) imageView.getTag(R.id.isCenter);
+                if (i == 1) {
+                    // Center
+                    // args.color = int 1 bis 5
+                    JSONObject args = new JSONObject();
+                    try {
+                        args.put("color", color + 1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    gameStart.takeCenterTiles(args);
+                } else {
+                    // Plates
+                    // args.plate string plate0 bis plate8 und args.color = int 1 bis 5
+                    JSONObject args = new JSONObject();
+                    try {
+                        args.put("plate", "plate" + plate);
+                        args.put("color", color + 1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    gameStart.takePlateTiles(args);
+                }
+                imageView.setOnDragListener(null);
+                gameStart.disableOnTouchBoard();
+            }
+            return true;
+        }
+    }
 
     private final class MyTouchListener implements View.OnTouchListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {

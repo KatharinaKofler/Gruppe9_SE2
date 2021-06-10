@@ -303,10 +303,19 @@ public class GameStart extends AppCompatActivity {
         GameStart gameStart = this;
         gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "It's your turn!", Toast.LENGTH_LONG).show());
         boardFragment.startTurn();
+        musterFragment.dragListenerNewTileField(gameStart);
     }
 
     public void disableOnTouchBoard() {
         boardFragment.disableOnTouch();
+    }
+
+    public void takeCenterTiles(JSONObject args) {
+        SocketManager.getSocket().emit("takeCenterTiles", args);
+    }
+
+    public void takePlateTiles(JSONObject args) {
+        SocketManager.getSocket().emit("takePlateTiles", args);
     }
 
     // cheat function
