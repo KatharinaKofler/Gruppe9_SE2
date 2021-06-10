@@ -170,4 +170,23 @@ public class PlayersFragment extends Fragment {
         }
 
     }
+
+    public void markCurrentPlayer(JSONObject args) {
+        try {
+            String currentPlayer = args.getString("id");
+            for (int i = 0; i < playerList.size(); i++) {
+                Button currentPlayerButton = (Button)playerButtonLayout.getChildAt(i);
+                if(playerList.get(i)[0].equals(currentPlayer)){
+                    currentPlayerButton.setTextColor(getResources().getColor(R.color.errorTextColor));
+                }
+                else{
+                    currentPlayerButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
