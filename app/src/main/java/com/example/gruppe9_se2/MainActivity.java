@@ -19,6 +19,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set game title
+        setTitle(R.string.game_title);
+        
         //Intent intent = new Intent(this, Game.class);
         //startActivity(intent);
         // show content activity main

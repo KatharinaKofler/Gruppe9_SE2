@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Gruppe9_SE2</string>
-    <string name="game_name">Azul</string>
+    <string name="app_name">Azul</string>
+    <string name="game_name">@string/app_name</string>
+    <string name="game_title">Azul (Gruppe 9)</string>
     <string name="logout">Do you want to logout?</string>
     <!--<string name="serverUrl">https://gruppe9-se2-backend.herokuapp.com/</string>-->
     <string name="serverUrl">http://localhost:8080/</string>
