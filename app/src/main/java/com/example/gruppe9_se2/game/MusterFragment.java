@@ -139,7 +139,6 @@ public class MusterFragment extends Fragment implements EventListener {
                 ImageView imageView = (ImageView) event.getLocalState();
 
                 int color = (int) imageView.getTag(R.id.color_id);
-                int plate = (int) imageView.getTag(R.id.plateNr_id);
                 int count = (int) imageView.getTag(R.id.count_id);
 
                 // check if Image comes from Center or Plates
@@ -157,6 +156,7 @@ public class MusterFragment extends Fragment implements EventListener {
                 } else {
                     // Plates
                     // args.plate string plate0 bis plate8 und args.color = int 1 bis 5
+                    int plate = (int) imageView.getTag(R.id.plateNr_id);
                     JSONObject args = new JSONObject();
                     try {
                         args.put("plate", "plate" + plate);
