@@ -5,42 +5,28 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.*;
-import android.widget.GridLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
 import com.example.gruppe9_se2.logic.GameStart;
 import com.example.gruppe9_se2.logic.SocketManager;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import io.socket.client.Socket;
 
 import java.util.EventListener;
 
 public class MusterFragment extends Fragment implements EventListener {
-    String logTag = "musterFragmentLogs";
+    GameStart gameStart;
 
     View view;
     GridLayout gridLayout;
-    GameStart gameStart;
-
-    Socket mSocket = SocketManager.getSocket();
 
     // Elements-Array to store Musterreihe
     Element[] elements = new Element[5];
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //TODO: Remove, Test only
-//        mSocket = SocketManager.makeSocket("82a1ac5f-b1dc-4034-8667-38e345bdc423");
-
         // Initialize empty Elements-Array
         for (int i = 0; i < elements.length; i++) {
             elements[i] = new Element();
@@ -238,17 +224,6 @@ public class MusterFragment extends Fragment implements EventListener {
                         }
 
                         setMusterElement(row, element, count);
-
-                        //TODO Socket
-                        if (mSocket != null) {
-                            mSocket.emit("finishTurn", String.valueOf(Integer.parseInt(tile[0]) + 1));
-//                        mSocket.on("error", new Emitter.Listener() {
-//                            @Override
-//                            public void call(Object... args) {
-//                                Log.i(logTag,"getState");
-//                            }
-//                        });
-                        }
                     }
 
                     // Dropped, reassign View to ViewGroup
@@ -258,8 +233,6 @@ public class MusterFragment extends Fragment implements EventListener {
 //                    LinearLayout container = (LinearLayout) v;
 //                    container.addView(view);
 //                    view.setVisibility(View.VISIBLE);
-
-                    Toast.makeText(getContext(), "Dropped", Toast.LENGTH_SHORT).show();
 
                     break;
                 default:
@@ -289,6 +262,17 @@ public class MusterFragment extends Fragment implements EventListener {
             result.putInt("count", floor);
             getParentFragmentManager().setFragmentResult("floor", result);
         }
+
+        //TODO Socket
+        JSONObject args = new JSONObject();
+        try {
+            args.put("placeRow", row);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+//        gameStart.finishTurn(args);
+
+        SocketManager.getSocket().emit("finishTurn", args);
     }
 
     private class Element {
