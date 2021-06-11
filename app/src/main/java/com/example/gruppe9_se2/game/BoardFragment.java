@@ -34,6 +34,9 @@ public class BoardFragment extends Fragment {
     private static int[][] plates;
     private static int[] center;
 
+    private boolean init = false;
+    private boolean myTurn = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -42,33 +45,63 @@ public class BoardFragment extends Fragment {
         return view;
     }
 
-    public void updateTiles(GameStart gameStart, Object[] args){
+    public void updateAllPlates(GameStart gameStart, Object[] args) {
+        // get tiles from args
         this.gameStart = gameStart;
         JSONObject tilesObject = (JSONObject) args[0];
-        Log.d("myLogs", "update available tiles called");
         try {
             JSONObject platesObject = tilesObject.getJSONObject("plates");
             int numberPlates = platesObject.length();
 
-            if(plates==null){
+            if (plates == null) {
                 plates = new int[numberPlates][4];
                 center = new int[5];
             }
 
-            for (int i = 0; i < platesObject.length(); i++) {
-                JSONArray singlePlateArray = platesObject.getJSONArray("plate"+i);
-                if(singlePlateArray.length()<4){
-                    for (int j = 0; j < 4; j++) {
-                        plates[i][j] = 0;
-                    }
-                }
-                else{
-                    for (int j = 0; j < 4; j++) {
-                        plates[i][j] = singlePlateArray.getInt(j);
-                    }
-                }
-            }
+            GridLayout platesGrid = view.findViewById(R.id.gridPlates);
 
+            gameStart.runOnUiThread(() -> {
+                try {
+                    for (int i = 0; i < platesObject.length(); i++) {
+                        JSONArray singlePlateArray = null;
+
+                        singlePlateArray = platesObject.getJSONArray("plate" + i);
+
+                        if (singlePlateArray.length() < 4) {
+                            for (int j = 0; j < 4; j++) {
+                                plates[i][j] = 0;
+                            }
+                        } else {
+                            for (int j = 0; j < 4; j++) {
+                                plates[i][j] = singlePlateArray.getInt(j);
+                            }
+                        }
+
+                        // count each color on this plate
+                        int[] countColor = new int[5];
+                        for (int color : plates[i]) {
+                            if (color != 0) countColor[color - 1]++;
+                        }
+
+                        // show tiles
+                        if (!init) {
+                            initPlate(platesGrid, i);
+                        }
+
+                        // update tiles on this plate
+                        updatePlate(platesGrid, i, countColor);
+
+                    }
+                    init = true;
+                    if(myTurn){
+                        startTurn();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            // get center tiles from args
             JSONObject centerObject = tilesObject.getJSONObject("center");
             center[0] = centerObject.getInt("black");
             center[1] = centerObject.getInt("white");
@@ -76,38 +109,96 @@ public class BoardFragment extends Fragment {
             center[3] = centerObject.getInt("yellow");
             center[4] = centerObject.getInt("red");
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        // update plates
-        generatePlates(gameStart, plates);
-
-        // update center
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < center[i]; j++) {
-                addToCenter(i, center[i]);
+            // update center
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < center[i]; j++) {
+                    addToCenter(i, center[i]);
+                }
             }
+        } catch (JSONException jsonException) {
+            jsonException.printStackTrace();
         }
     }
 
-    public void startTurn() {
-        // for plate tiles
-        GridLayout board = view.findViewById(R.id.gridPlates);
-        for (int i = 0; i < board.getChildCount(); i++) {
-            GridLayout plate = (GridLayout) board.getChildAt(i);
-            for (int j = 0; j < plate.getChildCount(); j++) {
-                ImageView tile = (ImageView) plate.getChildAt(j);
-                int color = (tile.getTag(R.id.color_id)!=null) ? (int) tile.getTag(R.id.color_id) : 0;
-                if(color != -1) tile.setOnTouchListener(new TileTouchListener());
-            }
+    private void initPlate(GridLayout platesGrid, int i) {
+        // create plate
+        GridLayout plate = new GridLayout(requireContext());
+        GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+        params.height = GridLayout.LayoutParams.WRAP_CONTENT;
+        params.width = GridLayout.LayoutParams.WRAP_CONTENT;
+        params.setMargins(10, 10, 10, 10);
+        plate.setLayoutParams(params);
+        plate.setColumnCount(2);
+        plate.setRowCount(2);
+        plate.setBackgroundResource(R.drawable.plate_design);
+        plate.setPadding(10, 10, 10, 10);
+        for (int j = 0; j < 4; j++) {
+            // create tiles
+            ImageView tile = new ImageView(requireContext());
+            int size = (int) getResources().getDimension(R.dimen.fliese_size);
+            tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+            tile.setPadding(5, 5, 5, 5);
+            tile.setTag(R.id.plateNr_id, i);
+            tile.setTag(R.id.isCenter, 0);
+            plate.addView(tile, j);
         }
-        // for center tiles
+        platesGrid.addView(plate, i);
+    }
+
+    private void updatePlate(GridLayout platesGrid, int i, int[] countColor) {
+        GridLayout plate = (GridLayout) platesGrid.getChildAt(i);
+        for (int j = 0; j < 4; j++) {
+            ImageView tile = (ImageView) plate.getChildAt(j);
+            int color = plates[i][j];
+            if (color == 0) {
+                tile.setImageResource(R.drawable.empty_fliese);
+            } else {
+                tile.setImageResource(tileResourceMap[color - 1]);
+                tile.setTag(R.id.count_id, countColor[color - 1]);
+            }
+            tile.setTag(R.id.color_id, color - 1);
+            tile.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void addToCenter(int color, int count) {
         GridLayout center = view.findViewById(R.id.gridCenter);
-        for (int i = 0; i < center.getChildCount(); i++) {
-            ImageView tile = (ImageView) center.getChildAt(i);
-            int color = (tile.getTag(R.id.color_id)!=null) ? (int) tile.getTag(R.id.color_id) : 0;
-            if(color != -1)tile.setOnTouchListener(new TileTouchListener());
+        ImageView tile = new ImageView(requireContext());
+        int size = (int) getResources().getDimension(R.dimen.fliese_size);
+        tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+        tile.setPadding(5, 5, 5, 5);
+
+        tile.setImageResource(tileResourceMap[color]);
+        tile.setTag(R.id.color_id, color);
+        tile.setTag(R.id.count_id, count);
+        tile.setTag(R.id.isCenter, 1);
+
+        gameStart.runOnUiThread(() -> center.addView(tile));
+
+    }
+
+    public void startTurn() {
+        if(!init){
+            myTurn = true;
+        }
+        else {
+            // for plate tiles
+            GridLayout board = view.findViewById(R.id.gridPlates);
+            for (int i = 0; i < board.getChildCount(); i++) {
+                GridLayout plate = (GridLayout) board.getChildAt(i);
+                for (int j = 0; j < plate.getChildCount(); j++) {
+                    ImageView tile = (ImageView) plate.getChildAt(j);
+                    int color = (tile.getTag(R.id.color_id) != null) ? (int) tile.getTag(R.id.color_id) : 0;
+                    if (color != -1) tile.setOnTouchListener(new TileTouchListener());
+                }
+            }
+            // for center tiles
+            GridLayout center = view.findViewById(R.id.gridCenter);
+            for (int i = 0; i < center.getChildCount(); i++) {
+                ImageView tile = (ImageView) center.getChildAt(i);
+                int color = (tile.getTag(R.id.color_id) != null) ? (int) tile.getTag(R.id.color_id) : 0;
+                if (color != -1) tile.setOnTouchListener(new TileTouchListener());
+            }
         }
     }
 
@@ -141,84 +232,5 @@ public class BoardFragment extends Fragment {
                 return false;
             }
         }
-    }
-
-    private void generatePlates(GameStart gameStart, int[][] tileColors) {
-
-        int numberPlates = tileColors.length;
-        GridLayout plates = view.findViewById(R.id.gridPlates);
-
-        for(int i=0; i<numberPlates; i++){
-            GridLayout tiles = (GridLayout) plates.getChildAt(i);
-
-            int[] countColor = new int[5];
-            for(int color : tileColors[i]){
-                if(color!=0) countColor[color-1]++;
-            }
-
-            for (int j = 0; j < 4; j++) {
-                int color = tileColors[i][j];
-                ImageView tile = (ImageView) tiles.getChildAt(j);
-
-                gameStart.runOnUiThread(() -> {
-                    if(color == 0) tile.setImageResource(R.drawable.empty_fliese);
-                    else {
-                        tile.setImageResource(tileResourceMap[color - 1]);
-                        tile.setTag(R.id.count_id, countColor[color - 1]);
-                    }
-                    tile.setTag(R.id.color_id, color - 1);
-                    tile.setVisibility(View.VISIBLE);
-                });
-            }
-        }
-    }
-
-    public void initTiles(GameStart gameStart, int numberPlates){
-        GridLayout plates = view.findViewById(R.id.gridPlates);
-
-        for(int i=0; i<numberPlates; i++){
-            GridLayout tiles = new GridLayout(requireContext());
-
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.width = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.setMargins(10, 10, 10, 10);
-            tiles.setLayoutParams(params);
-            tiles.setColumnCount(2);
-            tiles.setRowCount(2);
-            tiles.setBackgroundResource(R.drawable.plate_design);
-            tiles.setPadding(10, 10, 10, 10);
-
-            for (int j = 0; j < 4; j++) {
-                ImageView tile = new ImageView(requireContext());
-
-                int size = (int) getResources().getDimension(R.dimen.fliese_size);
-                tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-                tile.setPadding(5,5,5,5);
-                tile.setTag(R.id.plateNr_id, i);
-                tile.setTag(R.id.isCenter, 0);
-
-                tiles.addView(tile);
-            }
-
-            int finalI = i;
-            gameStart.runOnUiThread(() -> plates.addView(tiles, finalI));
-        }
-    }
-
-    private void addToCenter(int color, int count){
-        GridLayout center = view.findViewById(R.id.gridCenter);
-        ImageView tile = new ImageView(requireContext());
-        int size = (int) getResources().getDimension(R.dimen.fliese_size);
-        tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-        tile.setPadding(5,5,5,5);
-
-        tile.setImageResource(tileResourceMap[color]);
-        tile.setTag(R.id.color_id, color);
-        tile.setTag(R.id.count_id, count);
-        tile.setTag(R.id.isCenter, 1);
-
-        gameStart.runOnUiThread(() -> center.addView(tile));
-
     }
 }

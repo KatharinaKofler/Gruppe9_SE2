@@ -131,7 +131,7 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("disbandLobby", this::dispandLobby);
         SocketManager.getSocket().on("gameStartAnnounce", this::gameStartAnnounce);
         // game Listeners
-        SocketManager.getSocket().on("updateAvailableTiles", args -> boardFragment.updateTiles(gameStart, args));
+        SocketManager.getSocket().on("updateAvailableTiles", args -> boardFragment.updateAllPlates(gameStart, args));
         SocketManager.getSocket().on("nextPlayer", args -> playersFragment.markCurrentPlayer((JSONObject) args[0]));
         SocketManager.getSocket().on("startTurn", args -> startTurn());
         SocketManager.getSocket().on("startRound", args -> updateAllPoints((JSONArray) args[0]));
@@ -169,7 +169,6 @@ public class GameStart extends AppCompatActivity {
                 mSocket.emit("gameStartRequest");
                 findViewById(R.id.loadingText).setVisibility(View.VISIBLE);
                 btnStart.setVisibility(View.INVISIBLE);
-                boardFragment.initTiles(gameStart, playerCount * 2 + 1);
             });
         }
 
