@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
@@ -17,21 +19,28 @@ import org.json.JSONObject;
 import java.util.EventListener;
 
 public class MusterFragment extends Fragment implements EventListener {
-    GameStart gameStart;
+    // GameStart
+    private GameStart gameStart;
 
-    View view;
-    GridLayout gridLayout;
+    // Views
+    private View view;
+    private GridLayout gridLayout;
 
     // Elements-Array to store Musterreihe
-    Element[] elements = new Element[5];
+    private final Element[] elements = new Element[5];
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         // Initialize empty Elements-Array
         for (int i = 0; i < elements.length; i++) {
             elements[i] = new Element();
         }
+    }
 
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_muster, container, false);
 
@@ -47,23 +56,14 @@ public class MusterFragment extends Fragment implements EventListener {
                 LinearLayout linearLayout = new LinearLayout(requireContext());
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                if(i==0 && j==0) initNewTileField();
-                else if (j >= 4 - i) {
+                if (i == 0 && j == 0) {
+                    initNewTileField();
+                } else if (j >= 4 - i) {
                     ImageView image = new ImageView(requireContext());
-                    //todo create drawable for empty Image State
-                    int imageId = R.drawable.empty_fliese;
-                    image.setImageResource(imageId);
-                    image.setTag((i+1) + "|" + (j+1));
+                    image.setImageResource(R.drawable.empty_fliese);
+                    image.setTag((i + 1) + "|" + (j + 1));
                     image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                     image.setPadding(5, 5, 5, 5);
-
-                    image.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            String[] pos = v.getTag().toString().split("\\|");
-                            Toast.makeText(getContext(), "Click Row: " + pos[0]+1 + " Col: " + pos[1]+1, Toast.LENGTH_SHORT).show();
-                        }
-                    });
 
                     // Test Drop nur auf letzter Spalte
                     if (j == 4) {
@@ -214,7 +214,7 @@ public class MusterFragment extends Fragment implements EventListener {
                         int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
                         int color = Integer.parseInt(tile[0]);
 
-                        Element element = elements[row-1];
+                        Element element = elements[row - 1];
                         if (element.getColor() == 0) {
                             element.setColor(color);
                         }
