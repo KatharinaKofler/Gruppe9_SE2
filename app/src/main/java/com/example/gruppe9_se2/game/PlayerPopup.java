@@ -1,6 +1,5 @@
 package com.example.gruppe9_se2.game;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridLayout;
@@ -13,7 +12,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
-import com.example.gruppe9_se2.logic.GameStart;
 import com.example.gruppe9_se2.logic.SocketManager;
 
 import io.socket.client.Socket;
@@ -39,23 +37,26 @@ public class PlayerPopup extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
 
-        String playerName = b.getString("name");
+        //String playerName = b.getString("name");
+        String playerName = "Test";
         ((TextView)findViewById(R.id.playerName)).setText(playerName);
 
-        int playerPoints = b.getInt("points");
+        //int playerPoints = b.getInt("points");
+        int playerPoints = 42;
         ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
 
-        String playerId = b.getString("id");
+        //String playerId = b.getString("id");
 
-        createWall(b);
-        createPattern(b);
+        //createWall(b);
+        //createPattern(b);
 
         ImageButton exitPopUp = (ImageButton) findViewById(R.id.closePopUp);
         exitPopUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PlayerPopup.this, GameStart.class);
-                PlayerPopup.this.startActivity(intent);
+                finish();
+                //Intent intent = new Intent(PlayerPopup.this, GameStart.class);
+                //PlayerPopup.this.startActivity(intent);
             }
         });
 
@@ -65,7 +66,7 @@ public class PlayerPopup extends AppCompatActivity {
             public void onClick(View view) {
                 Socket socket = SocketManager.getSocket();
                 if (socket != null) {
-                    socket.emit("accuse", playerId);
+                    //socket.emit("accuse", playerId);
                     // TODO handle server response
                 }
             }

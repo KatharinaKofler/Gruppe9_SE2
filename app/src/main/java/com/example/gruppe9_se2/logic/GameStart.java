@@ -21,9 +21,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.game.BoardFragment;
 import com.example.gruppe9_se2.game.BodenFragment;
-import com.example.gruppe9_se2.game.EndGameActivity;
 import com.example.gruppe9_se2.game.MusterFragment;
-import com.example.gruppe9_se2.game.PlayerResult;
 import com.example.gruppe9_se2.game.PlayerPopup;
 import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.ShakeDetector;
@@ -347,6 +345,7 @@ public class GameStart extends AppCompatActivity {
         gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "It's your turn!", Toast.LENGTH_LONG).show());
         boardFragment.startTurn();
         musterFragment.dragListenerNewTileField(gameStart);
+        playersFragment.markMe(true);
     }
 
     public void disableOnTouchBoard() {
@@ -356,6 +355,7 @@ public class GameStart extends AppCompatActivity {
     public void takeCenterTiles(JSONObject args) {
         SocketManager.getSocket().emit("takeCenterTiles", args);
     }
+
 
     public void takePlateTiles(JSONObject args) {
         SocketManager.getSocket().emit("takePlateTiles", args);
