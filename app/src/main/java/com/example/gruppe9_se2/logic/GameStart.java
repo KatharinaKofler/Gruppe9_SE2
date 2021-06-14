@@ -24,6 +24,7 @@ import com.example.gruppe9_se2.game.BodenFragment;
 import com.example.gruppe9_se2.game.EndGameActivity;
 import com.example.gruppe9_se2.game.MusterFragment;
 import com.example.gruppe9_se2.game.PlayerResult;
+import com.example.gruppe9_se2.game.PlayerPopup;
 import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.ShakeDetector;
 import com.example.gruppe9_se2.game.WandFragment;
@@ -41,15 +42,14 @@ public class GameStart extends AppCompatActivity {
     private AnimationDrawable loadingAnimation;
 
     private Bundle b;
-
-    GameStart gameStart;
+    private GameStart gameStart;
 
     // all game fragments
-    BoardFragment boardFragment;
-    BodenFragment bodenFragment;
-    MusterFragment musterFragment;
-    PlayersFragment playersFragment;
-    WandFragment wandFragment;
+    private BoardFragment boardFragment;
+    private BodenFragment bodenFragment;
+    private MusterFragment musterFragment;
+    private PlayersFragment playersFragment;
+    private WandFragment wandFragment;
 
     // everything for shakedetector
     private SensorManager mSensorManager;
@@ -101,7 +101,7 @@ public class GameStart extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // to register the Session Manager Listener onResume
-        mSensorManager.registerListener(shakeDetector, mAccelerometer,	SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(shakeDetector, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -262,12 +262,9 @@ public class GameStart extends AppCompatActivity {
             if (playerCount > 1) {
                 runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(true));
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 
     private void playerLeave(Object[] args) {
@@ -278,12 +275,11 @@ public class GameStart extends AppCompatActivity {
             String id = ((JSONObject) args[0]).getString("id");
             playersFragment.removePlayerId(id);
             playerCount--;
-            ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount));
+            runOnUiThread(() -> ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount)));
             if (playerCount < 2) {
                 runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(false));
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -318,13 +314,16 @@ public class GameStart extends AppCompatActivity {
     }
 
     public void requestPlayerBoard(String playerId) {
-        try {
+        Intent intent = new Intent(GameStart.this, PlayerPopup.class);
+        startActivity(intent);
+        /*try {
             JSONObject args = new JSONObject();
             args.put("playerId", playerId);
             SocketManager.getSocket().emit("boardLookupRequest", args);
+
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void updateAllPoints(JSONArray scores) {
