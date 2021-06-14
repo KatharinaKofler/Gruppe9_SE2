@@ -21,7 +21,9 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.game.BoardFragment;
 import com.example.gruppe9_se2.game.BodenFragment;
+import com.example.gruppe9_se2.game.EndGameActivity;
 import com.example.gruppe9_se2.game.MusterFragment;
+import com.example.gruppe9_se2.game.PlayerResult;
 import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.ShakeDetector;
 import com.example.gruppe9_se2.game.WandFragment;
@@ -137,6 +139,15 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("startRound", args -> updateAllPoints((JSONArray) args[0]));
         SocketManager.getSocket().on("boardLookupResponse", args -> playersFragment.responsePlayerBoard((JSONObject) args[0]));
         SocketManager.getSocket().on("gameEnd", args -> {
+            // TODO
+//            List<PlayerResult> results = new ArrayList<>();
+//            results.add(new PlayerResult(1, "Carina1", 47));
+//            results.add(new PlayerResult(1, "Carina1", 47));
+//            results.add(new PlayerResult(1, "Carina1", 47));
+//            results.add(new PlayerResult(1, "Carina1", 47));
+//            Intent intent = new Intent(this, EndGameActivity.class);
+//            intent.putExtra("results", (Serializable) results);
+//            startActivity(intent);
         });
         SocketManager.getSocket().on("error", errorMessage -> {
             // print error message somewhere
