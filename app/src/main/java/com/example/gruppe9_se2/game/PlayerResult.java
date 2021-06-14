@@ -1,6 +1,8 @@
 package com.example.gruppe9_se2.game;
 
-public class PlayerResult {
+import java.io.Serializable;
+
+public class PlayerResult implements Serializable {
     public int rank;
     public String username;
     public int points;

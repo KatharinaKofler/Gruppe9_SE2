@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gruppe9_se2.R;
 
+import java.util.ArrayList;
+
 public class EndGameActivity extends AppCompatActivity {
 
     @Override
@@ -17,15 +19,18 @@ public class EndGameActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_endgame);
 
+        Bundle b = getIntent().getExtras();
+
+        ArrayList<PlayerResult> results = (ArrayList<PlayerResult>) b.getSerializable("results");
+
         RecyclerView recyclerView = findViewById(R.id.result_list);
         recyclerView.setHasFixedSize(true);
 
         ResultListAdapter adapter = new ResultListAdapter();
 
-        adapter.insert(new PlayerResult(1, "Carina1", 47));
-        adapter.insert(new PlayerResult(2, "Carina2", 32));
-        adapter.insert(new PlayerResult(3, "Carina3", 27));
-        adapter.insert(new PlayerResult(4, "Carina4", 26));
+        for (PlayerResult r : results) {
+            adapter.insert(r);
+        }
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
