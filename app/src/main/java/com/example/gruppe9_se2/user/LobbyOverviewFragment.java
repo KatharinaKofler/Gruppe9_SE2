@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiHelper;
@@ -37,16 +38,40 @@ public class LobbyOverviewFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lobbies_overview, container, false);
 
-        RecyclerView recyclerView = view.findViewById(R.id.lobbyList);
-        recyclerView.setHasFixedSize(true);
-        LobbyListAdapter adapter = new LobbyListAdapter(getContext());
+        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.swiperefresh);
 
 
+        refreshLayout.setOnRefreshListener(() -> {
+            loadData(view);
+        });
 
         // TODO exchange with server data
 
         // Post Request Lobby
         final String base_URL = "https://gruppe9-se2-backend.herokuapp.com/";
+
+        loadData(view);
+
+        Button btnCreate = view.findViewById(R.id.newLobby);
+        btnCreate.setOnClickListener(v -> {
+            ((LobbyActivity)getActivity()).newLobby();
+        });
+
+        Button btnLogout = view.findViewById(R.id.logoutLobby);
+        btnLogout.setOnClickListener(v -> {
+            ((LobbyActivity)getActivity()).logoutLobby();
+        });
+
+        return view;
+    }
+
+    private void loadData(View view) {
+
+        RecyclerView recyclerView = view.findViewById(R.id.lobbyList);
+        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.swiperefresh);
+        recyclerView.setHasFixedSize(true);
+        LobbyListAdapter adapter = new LobbyListAdapter(getContext());
+
         String token = "Bearer ";
         token += ApiManager.getToken();
 
@@ -74,7 +99,7 @@ public class LobbyOverviewFragment extends Fragment {
 
                     TextView tvError = view.findViewById(R.id.tvError);
                     tvError.setText("");
-
+                    refreshLayout.setRefreshing(false);
                 } else {
                     String error = ApiHelper.getErrorMessage(response);
                     TextView tvError = view.findViewById(R.id.tvError);
@@ -88,18 +113,5 @@ public class LobbyOverviewFragment extends Fragment {
                 tvError.setText("Problem accessing server !!!");
             }
         });
-
-
-        Button btnCreate = view.findViewById(R.id.newLobby);
-        btnCreate.setOnClickListener(v -> {
-            ((LobbyActivity)getActivity()).newLobby();
-        });
-
-        Button btnLogout = view.findViewById(R.id.logoutLobby);
-        btnLogout.setOnClickListener(v -> {
-            ((LobbyActivity)getActivity()).logoutLobby();
-        });
-
-        return view;
     }
 }
