@@ -36,6 +36,7 @@ public class BoardFragment extends Fragment {
 
     private boolean init = false;
     private boolean myTurn = false;
+    private volatile boolean freshCenter = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,6 +110,7 @@ public class BoardFragment extends Fragment {
             center[3] = centerObject.getInt("yellow");
             center[4] = centerObject.getInt("red");
 
+            freshCenter = false;
             // update center
             for (int i = 0; i < 5; i++) {
                 for (int j = 0; j < center[i]; j++) {
@@ -161,6 +163,14 @@ public class BoardFragment extends Fragment {
         }
     }
 
+    private void cleanCenter(){
+        GridLayout center = view.findViewById(R.id.gridCenter);
+        gameStart.runOnUiThread(() -> {
+            center.removeAllViews();
+            freshCenter = true;
+        });
+    }
+
     private void addToCenter(int color, int count) {
         GridLayout center = view.findViewById(R.id.gridCenter);
         ImageView tile = new ImageView(requireContext());
@@ -173,7 +183,10 @@ public class BoardFragment extends Fragment {
         tile.setTag(R.id.count_id, count);
         tile.setTag(R.id.isCenter, 1);
 
-        gameStart.runOnUiThread(() -> center.addView(tile));
+        gameStart.runOnUiThread(() -> {
+            if(!freshCenter) cleanCenter();
+            center.addView(tile);
+        });
 
     }
 
