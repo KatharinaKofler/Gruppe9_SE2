@@ -132,6 +132,7 @@ public class BodenFragment extends Fragment {
         try {
             boolean success = arg.getBoolean("success");
             if (success) {
+                clearFloor();
                 gameStart.deleteShakeDetector();
             } else {
                 Toast.makeText(requireContext(), "You can't cheat here", Toast.LENGTH_SHORT).show();
@@ -139,6 +140,16 @@ public class BodenFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void clearFloor() {
+        for (int i = 0; i < 7; i++) {
+            RelativeLayout layout = (RelativeLayout) gridLayout.getChildAt(i);
+            ImageView image = (ImageView) layout.getChildAt(0);
+            image.setImageResource(R.drawable.empty_fliese);
+            elements[i].setColor(0);
+        }
+
     }
 
     private class Element {
