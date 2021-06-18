@@ -12,11 +12,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
+
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
+import com.example.gruppe9_se2.logic.GameStart;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class BodenFragment extends Fragment {
     GridLayout gridLayout;
@@ -53,7 +60,7 @@ public class BodenFragment extends Fragment {
                         continue;
                     }
 
-                    setBodenElement(i+1, color);
+                    setBodenElement(i + 1, color);
                     j++;
                     if (j >= count) {
                         break;
@@ -105,19 +112,32 @@ public class BodenFragment extends Fragment {
     }
 
     private void setBodenElement(int pos, int color) {
-        RelativeLayout layout = (RelativeLayout) gridLayout.getChildAt(pos-1);
+        RelativeLayout layout = (RelativeLayout) gridLayout.getChildAt(pos - 1);
         ImageView image = (ImageView) layout.getChildAt(0);
         if (image != null) {
             int resId = ResourceHelper.getFlieseResId(color);
             image.setImageResource(resId);
 
-            Element e = elements[pos-1];
+            Element e = elements[pos - 1];
             e.setColor(color);
         }
 
         TextView text = (TextView) layout.getChildAt(1);
-        if (text != null)  {
+        if (text != null) {
             text.setTextColor(Color.WHITE);
+        }
+    }
+
+    public void cheatResponse(JSONObject arg, GameStart gameStart) {
+        try {
+            boolean success = arg.getBoolean("success");
+            if (success) {
+                gameStart.deleteShakeDetector();
+            } else {
+                Toast.makeText(requireContext(), "You can't cheat here", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
