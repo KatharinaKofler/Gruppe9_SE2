@@ -132,6 +132,19 @@ public class MusterFragment extends Fragment implements EventListener {
         tile.setOnDragListener(new NewTileDragListener());
     }
 
+    public void cheatResponse(JSONObject arg, GameStart gameStart) {
+        try {
+            boolean success = arg.getBoolean("success");
+            if (success){
+                //TODO: delete bodenreihe
+                gameStart.deleteShakeDetector();
+            } else { Toast.makeText(requireContext(), "You can't cheat here", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     private class NewTileDragListener implements View.OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {

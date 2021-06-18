@@ -136,6 +136,7 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("startTurn", args -> startTurn());
         SocketManager.getSocket().on("startRound", args -> updateAllPoints((JSONArray) args[0]));
         SocketManager.getSocket().on("boardLookupResponse", args -> playersFragment.responsePlayerBoard((JSONObject) args[0]));
+        SocketManager.getSocket().on("cheatResponse",args -> musterFragment.cheatResponse((JSONObject) args[0], gameStart));
         SocketManager.getSocket().on("gameEnd", args -> {
             // TODO
 //            List<PlayerResult> results = new ArrayList<>();
@@ -365,10 +366,14 @@ public class GameStart extends AppCompatActivity {
 
     private void setupShakeDetector() {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager
-                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         shakeDetector = new ShakeDetector();
         shakeDetector.setCallback(this::cheat);
+    }
+
+    public void deleteShakeDetector(){
+        shakeDetector = null;
+        shakeDetector.setCallback(null);
     }
 
     private void cheat() {
