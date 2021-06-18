@@ -136,7 +136,8 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("startTurn", args -> startTurn());
         SocketManager.getSocket().on("startRound", args -> updateAllPoints((JSONArray) args[0]));
         SocketManager.getSocket().on("boardLookupResponse", args -> playersFragment.responsePlayerBoard((JSONObject) args[0]));
-        SocketManager.getSocket().on("cheatResponse",args -> musterFragment.cheatResponse((JSONObject) args[0], gameStart));
+        SocketManager.getSocket().on("cheatResponse", args -> musterFragment.cheatResponse((JSONObject) args[0], gameStart));
+        SocketManager.getSocket().on("accuseResponse", args -> accuseResponse((JSONObject) args[0]));
         SocketManager.getSocket().on("gameEnd", args -> {
             // TODO
 //            List<PlayerResult> results = new ArrayList<>();
@@ -371,7 +372,7 @@ public class GameStart extends AppCompatActivity {
         shakeDetector.setCallback(this::cheat);
     }
 
-    public void deleteShakeDetector(){
+    public void deleteShakeDetector() {
         shakeDetector = null;
         shakeDetector.setCallback(null);
     }
@@ -385,4 +386,25 @@ public class GameStart extends AppCompatActivity {
         // TODO handle response from server
     }
 
+    private void accuseResponse(JSONObject arg) {
+        try {
+            String accused = arg.getString("accused");
+            String accuser = arg.getString("accuser");
+            boolean cheated = arg.getBoolean("cheated");
+            String message;
+            if (cheated)
+                message = "Oh no! " + getNameById(accuser) + " caught " + getNameById(accused) + " cheating. Minus 10 points for " + getNameById(accused) + ".";
+            else
+                message = getNameById(accuser) + " thought " + getNameById(accused) + " cheated. Unfortunate for " + getNameById(accuser) + ", because " + getNameById(accused) + " didn't cheat. Minus 10 points for " + getNameById(accuser) + ".";
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            //TODO: accuse button für accused spieler deaktivieren
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getNameById(String accused) {
+        //TODO: rest getUser
+        return "test";
+    }
 }
