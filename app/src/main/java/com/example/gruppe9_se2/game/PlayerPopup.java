@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.logic.SocketManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import io.socket.client.Socket;
 
 public class PlayerPopup extends AppCompatActivity {
@@ -21,6 +24,7 @@ public class PlayerPopup extends AppCompatActivity {
     private final int[] emptyFliesen = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
     private final int[] fullFliesen = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
     private boolean caught = false;
+    String playerId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +50,7 @@ public class PlayerPopup extends AppCompatActivity {
         int playerPoints = 42;
         ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
 
-        //String playerId = b.getString("id");
+        playerId = b.getString("id");
 
         //createWall(b);
         //createPattern(b);
@@ -70,8 +74,13 @@ public class PlayerPopup extends AppCompatActivity {
                 public void onClick(View view) {
                     Socket socket = SocketManager.getSocket();
                     if (socket != null) {
-                        socket.emit("accuse", playerId);
-                        //TODO: get own playerID(JSON OBJECT)
+                        JSONObject object = new JSONObject();
+                        try {
+                            object.put("id", playerId);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        socket.emit("accuse", object);
 
                     }
                 }
