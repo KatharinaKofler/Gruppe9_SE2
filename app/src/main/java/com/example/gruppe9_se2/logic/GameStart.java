@@ -24,8 +24,10 @@ import com.example.gruppe9_se2.api.users.UsersApi;
 import com.example.gruppe9_se2.api.users.UsersResponse;
 import com.example.gruppe9_se2.game.BoardFragment;
 import com.example.gruppe9_se2.game.BodenFragment;
+import com.example.gruppe9_se2.game.EndGameActivity;
 import com.example.gruppe9_se2.game.MusterFragment;
 import com.example.gruppe9_se2.game.PlayerPopup;
+import com.example.gruppe9_se2.game.PlayerResult;
 import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.ShakeDetector;
 import com.example.gruppe9_se2.game.WandFragment;
@@ -34,6 +36,12 @@ import com.example.gruppe9_se2.user.LobbyActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import io.socket.client.Socket;
 import retrofit2.Call;
@@ -146,15 +154,31 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("cheatResponse", args -> bodenFragment.cheatResponse((JSONObject) args[0], gameStart));
         SocketManager.getSocket().on("accuseResponse", args -> accuseResponse((JSONObject) args[0]));
         SocketManager.getSocket().on("gameEnd", args -> {
-            // TODO: GameEnd
-//            List<PlayerResult> results = new ArrayList<>();
-//            results.add(new PlayerResult(1, "Carina1", 47));
-//            results.add(new PlayerResult(1, "Carina1", 47));
-//            results.add(new PlayerResult(1, "Carina1", 47));
-//            results.add(new PlayerResult(1, "Carina1", 47));
-//            Intent intent = new Intent(this, EndGameActivity.class);
-//            intent.putExtra("results", (Serializable) results);
-//            startActivity(intent);
+            JSONArray scores = (JSONArray) args[0];
+            List<PlayerResult> results = new ArrayList<>();
+            for (int i = 0; i < scores.length(); i++) {
+                JSONObject score = null;
+                try {
+                    score = scores.getJSONObject(i);
+                    int points = score.getInt("points");
+                    String uid = score.getString("uid");
+                    results.add(new PlayerResult(0, getNameById(uid), points));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            Comparator<PlayerResult> compareByPoints = (PlayerResult p1, PlayerResult p2) -> {
+                Integer p1P = p1.points;
+                Integer p2P = p2.points;
+                return p1P.compareTo(p2P);
+            };
+            Collections.sort(results, compareByPoints);
+            for (int i = 0; i < results.size(); i++) {
+                results.get(i).rank = i + 1;
+            }
+            Intent intent = new Intent(this, EndGameActivity.class);
+            intent.putExtra("results", (Serializable) results);
+            startActivity(intent);
         });
         SocketManager.getSocket().on("error", errorMessage -> {
             // print error message somewhere
