@@ -19,6 +19,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.gruppe9_se2.R;
+import com.example.gruppe9_se2.api.base.ApiManager;
+import com.example.gruppe9_se2.api.users.UsersApi;
+import com.example.gruppe9_se2.api.users.UsersResponse;
 import com.example.gruppe9_se2.game.BoardFragment;
 import com.example.gruppe9_se2.game.BodenFragment;
 import com.example.gruppe9_se2.game.MusterFragment;
@@ -33,6 +36,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.socket.client.Socket;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class GameStart extends AppCompatActivity {
     private Socket mSocket;
@@ -403,8 +410,28 @@ public class GameStart extends AppCompatActivity {
         }
     }
 
-    private String getNameById(String accused) {
-        //TODO: rest getUser
-        return "test";
+    private String getNameById(String playerId) {
+        final String[] name = new String[1];
+        // Post Request getUser
+        String token = "Bearer ";
+        token += ApiManager.getToken();
+
+        Retrofit retrofit = ApiManager.getInstance();
+        UsersApi service = retrofit.create(UsersApi.class);
+        Call<UsersResponse> call = service.executeUsers(playerId, token);
+        call.enqueue(new Callback<UsersResponse>() {
+
+            @Override
+            public void onResponse(Call<UsersResponse> call, Response<UsersResponse> response) {
+                Log.e("getUser", "onResponse successfull: " + response.code());
+                name[0] = response.body().getUsername();
+            }
+
+            @Override
+            public void onFailure(Call<UsersResponse> call, Throwable t) {
+                Log.e("getUser", "onFailure");
+            }
+        });
+        return name[0];
     }
 }
