@@ -146,7 +146,7 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("cheatResponse", args -> bodenFragment.cheatResponse((JSONObject) args[0], gameStart));
         SocketManager.getSocket().on("accuseResponse", args -> accuseResponse((JSONObject) args[0]));
         SocketManager.getSocket().on("gameEnd", args -> {
-            // TODO
+            // TODO: GameEnd
 //            List<PlayerResult> results = new ArrayList<>();
 //            results.add(new PlayerResult(1, "Carina1", 47));
 //            results.add(new PlayerResult(1, "Carina1", 47));
@@ -390,7 +390,6 @@ public class GameStart extends AppCompatActivity {
         Socket socket = SocketManager.getSocket();
         socket.emit("cheat");
         hasCheated = true;
-        // TODO handle response from server
     }
 
     private void accuseResponse(JSONObject arg) {
@@ -399,12 +398,12 @@ public class GameStart extends AppCompatActivity {
             String accuser = arg.getString("accuser");
             boolean cheated = arg.getBoolean("cheated");
             String message;
-            if (cheated)
+            if (cheated) {
                 message = "Oh no! " + getNameById(accuser) + " caught " + getNameById(accused) + " cheating. Minus 10 points for " + getNameById(accused) + ".";
-            else
+                playersFragment.playerCaught(accused);
+            } else
                 message = getNameById(accuser) + " thought " + getNameById(accused) + " cheated. Unfortunate for " + getNameById(accuser) + ", because " + getNameById(accused) + " didn't cheat. Minus 10 points for " + getNameById(accuser) + ".";
             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-            //TODO: accuse button für accused spieler deaktivieren
         } catch (JSONException e) {
             e.printStackTrace();
         }

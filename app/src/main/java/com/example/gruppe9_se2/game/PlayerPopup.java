@@ -20,7 +20,7 @@ public class PlayerPopup extends AppCompatActivity {
 
     private final int[] emptyFliesen = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
     private final int[] fullFliesen = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
-
+    private boolean caught = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +36,7 @@ public class PlayerPopup extends AppCompatActivity {
         if(actionBar != null) actionBar.hide();
 
         Bundle b = getIntent().getExtras();
+        caught = b.getBoolean("caught");
 
         //String playerName = b.getString("name");
         String playerName = "Test";
@@ -61,16 +62,22 @@ public class PlayerPopup extends AppCompatActivity {
         });
 
         ImageButton accuse = (ImageButton) findViewById(R.id.accuse);
-        accuse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Socket socket = SocketManager.getSocket();
-                if (socket != null) {
-                    //socket.emit("accuse", playerId);
-                    // TODO handle server response
+        if(caught){
+            accuse.setVisibility(View.INVISIBLE);
+        } else {
+            accuse.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Socket socket = SocketManager.getSocket();
+                    if (socket != null) {
+                        socket.emit("accuse", playerId);
+                        //TODO: get own playerID(JSON OBJECT)
+
+                    }
                 }
-            }
-        });
+            });
+        }
+
     }
 
     private void createPattern(Bundle b) {

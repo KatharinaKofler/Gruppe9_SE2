@@ -43,6 +43,7 @@ public class PlayersFragment extends Fragment {
     private boolean callMarkMe = false;
     private boolean markMe;
     private JSONObject currentplayerArgs;
+    private boolean [] caught = new boolean[4];
 
 
     @Override
@@ -162,6 +163,7 @@ public class PlayersFragment extends Fragment {
                     bundle.putString("id", playerList.get(i)[0]);
                     bundle.putString("name", playerList.get(i)[1]);
                     bundle.putInt("points", (Integer) playerButtonLayout.getChildAt(i).getTag(R.id.points));
+                    bundle.putBoolean("caught", caught[i]);
 
                     JSONArray pattern = playerBoard.getJSONArray("pattern");
                     int[] patternArray = new int[pattern.length()];
@@ -219,4 +221,14 @@ public class PlayersFragment extends Fragment {
         }
 
     }
+    public void playerCaught (String id){
+        for (int i = 0; i < playerList.size(); i++) {
+            if(playerList.get(i)[0].equals(id)){
+                caught[i] = true;
+            }
+
+        }
+
+    }
 }
+
