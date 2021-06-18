@@ -25,7 +25,6 @@ public class ShakeDetector implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        System.out.println("sensor changed");
 
         float x = event.values[0];
         float y = event.values[1];
