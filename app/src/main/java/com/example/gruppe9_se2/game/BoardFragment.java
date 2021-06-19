@@ -190,6 +190,10 @@ public class BoardFragment extends Fragment {
 
         //TODO
         tile.setOnTouchListener(new TileTouchListener());
+
+        gameStart.runOnUiThread(() -> {
+            center.addView(tile);
+        });
     }
 
     public void startTurn() {
