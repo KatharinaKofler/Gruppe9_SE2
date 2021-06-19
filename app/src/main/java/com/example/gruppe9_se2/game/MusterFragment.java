@@ -243,15 +243,27 @@ public class MusterFragment extends Fragment implements EventListener {
             }
         }
 
-        if (floor > 0) {
-            Bundle result = new Bundle();
-            result.putInt("color", element.getColor());
-            result.putInt("count", floor);
-            getParentFragmentManager().setFragmentResult("floor", result);
-        }
+        if (element.getColor() != 0) {
+            if (floor > 0) {
+                Bundle result = new Bundle();
+                result.putInt("color", element.getColor());
+                result.putInt("count", floor);
+                getParentFragmentManager().setFragmentResult("floor", result);
+            }
 
-        // Send finishTurn to server
-        gameStart.finishTurn(row);
+            // Send finishTurn to server
+            gameStart.finishTurn(row);
+        }
+    }
+
+    public void startRound() {
+        for (int i = 0; i < elements.length; i++) {
+            Element e = elements[i];
+            e.count = 0;
+            e.color = 0;
+
+            setMusterElement(i + 1, e, 0);
+        }
     }
 
     private class Element {

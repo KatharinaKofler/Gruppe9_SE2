@@ -124,7 +124,20 @@ public class BodenFragment extends Fragment {
 
         TextView text = (TextView) layout.getChildAt(1);
         if (text != null) {
-            text.setTextColor(Color.WHITE);
+            if (color != 0) {
+                text.setTextColor(Color.WHITE);
+            } else {
+                text.setTextColor(Color.BLACK);
+            }
+        }
+    }
+
+    public void startRound() {
+        for (int i = 0; i < elements.length; i++) {
+            Element e = elements[i];
+            e.color = 0;
+
+            setBodenElement(i + 1, 0);
         }
     }
 
