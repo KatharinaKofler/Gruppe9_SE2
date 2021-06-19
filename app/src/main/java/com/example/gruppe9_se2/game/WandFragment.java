@@ -45,14 +45,6 @@ public class WandFragment extends Fragment implements EventListener {
         }
         init(view, wand);
 
-        // for testing:
-        if(firstCreate){
-            add(3, 2);
-            add(1, 4);
-            add(2, 5);
-            firstCreate = false;
-        }
-
         return view;
     }
 
