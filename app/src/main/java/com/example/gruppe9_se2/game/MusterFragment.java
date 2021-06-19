@@ -1,18 +1,19 @@
 package com.example.gruppe9_se2.game;
 
 import android.content.ClipData;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.*;
-import android.widget.*;
+import android.widget.GridLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
 import com.example.gruppe9_se2.logic.GameStart;
-import com.example.gruppe9_se2.logic.SocketManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,9 +23,9 @@ public class MusterFragment extends Fragment implements EventListener {
     // GameStart
     private GameStart gameStart;
 
-    // Views
-    private View view;
     private GridLayout gridLayout;
+    private ImageView newTileImage;
+    private TextView newTileText;
 
     // Elements-Array to store Musterreihe
     private final Element[] elements = new Element[5];
@@ -42,23 +43,23 @@ public class MusterFragment extends Fragment implements EventListener {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_muster, container, false);
+        View view = inflater.inflate(R.layout.fragment_muster, container, false);
 
-        //todo get the size of the Spielbrett Muster
+        // Size of Tile
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
         // Fill the 5x5 Grid with ImageViews
         gridLayout = view.findViewById(R.id.gridMuster);
+        newTileImage = view.findViewById(R.id.newTileImage);
+        newTileText = view.findViewById(R.id.newTileText);
 
-        // Sample for Musterreihe
+        // Create Musterreihe
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 LinearLayout linearLayout = new LinearLayout(requireContext());
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                if (i == 0 && j == 0) {
-                    initNewTileField();
-                } else if (j >= 4 - i) {
+                if (j >= 4 - i) {
                     ImageView image = new ImageView(requireContext());
                     image.setImageResource(R.drawable.empty_fliese);
                     image.setTag((i + 1) + "|" + (j + 1));
@@ -71,66 +72,37 @@ public class MusterFragment extends Fragment implements EventListener {
                     }
 
                     linearLayout.addView(image);
-                    gridLayout.addView(linearLayout, i * 5 + j);
-                } else {
-                    gridLayout.addView(linearLayout, i * 5 + j);
                 }
+                gridLayout.addView(linearLayout, i * 5 + j);
             }
         }
 
         return view;
     }
 
-    private void initNewTileField() {
-        GridLayout gridLayout = view.findViewById(R.id.gridMuster);
-        int size = (int) getResources().getDimension(R.dimen.fliese_size);
+    private void addNewTileField(int color, int count) {
+        // Set tile color
+        newTileImage.setImageResource(ResourceHelper.getFlieseResId(color + 1));
+        newTileImage.setTag((color + 1) + "|" + count);
+        newTileImage.setOnTouchListener(new MyTouchListener());
+        newTileImage.setTag(R.id.fromBoard, false);
 
-        RelativeLayout layout = new RelativeLayout(requireContext());
-        layout.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        ImageView newTiles = new ImageView(requireContext());
-        newTiles.setImageResource(R.drawable.empty_fliese);
-        newTiles.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-        newTiles.setPadding(5, 5, 5, 5);
-
-        TextView textView = new TextView(requireContext());
-        textView.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-        textView.setGravity(Gravity.CENTER);
-        textView.setTypeface(null, Typeface.BOLD);
-
-        layout.addView(newTiles, 0);
-        layout.addView(textView, 1);
-        gridLayout.addView(layout, 0);
+        // Set tile text
+        newTileText.setText(String.valueOf(count));
     }
 
-    private void addNewTileField(RelativeLayout layout, int color, int count) {
-        ImageView newTiles = (ImageView) layout.getChildAt(0);
-        int[] tileResourceMap = {R.drawable.fliese_color1, R.drawable.fliese_color2,
-                R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
-        newTiles.setImageResource(tileResourceMap[color]);
-        newTiles.setTag((color + 1) + "|" + count);
-        newTiles.setOnTouchListener(new MyTouchListener());
-        newTiles.setTag(R.id.fromBoard, false);
+    private void clearNewTileField() {
+        // Clear tile color
+        newTileImage.setImageResource(R.drawable.empty_fliese);
+        newTileImage.setOnTouchListener(null);
 
-        TextView textView = (TextView) layout.getChildAt(1);
-        textView.setText(Integer.toString(count));
-    }
-
-    private void clearNewTileField(RelativeLayout layout) {
-        ImageView newTiles = (ImageView) layout.getChildAt(0);
-        newTiles.setImageResource(R.drawable.empty_fliese);
-        newTiles.setOnTouchListener(null);
-
-        TextView textView = (TextView) layout.getChildAt(1);
-        textView.setText(null);
+        // Clear tile text
+        newTileText.setText(null);
     }
 
     public void dragListenerNewTileField(GameStart gameStart) {
         this.gameStart = gameStart;
-        GridLayout gridLayout = view.findViewById(R.id.gridMuster);
-        ImageView tile = (ImageView) ((RelativeLayout) gridLayout.getChildAt(0)).getChildAt(0);
-        tile.setOnDragListener(new NewTileDragListener());
+        newTileImage.setOnDragListener(new NewTileDragListener());
     }
 
     private class NewTileDragListener implements View.OnDragListener {
@@ -168,7 +140,7 @@ public class MusterFragment extends Fragment implements EventListener {
                     gameStart.takePlateTiles(args);
                 }
                 imageView.setOnDragListener(null);
-                addNewTileField((RelativeLayout) v.getParent(), color, count);
+                addNewTileField(color, count);
                 gameStart.disableOnTouchBoard();
             }
             return true;
@@ -207,9 +179,11 @@ public class MusterFragment extends Fragment implements EventListener {
 //                    ((View) event.getLocalState()).setVisibility(View.VISIBLE);
                     break;
                 case DragEvent.ACTION_DROP:
-                    if((boolean)((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) return false;
+                    if ((boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
+                        return false;
+                    }
 
-                    clearNewTileField((RelativeLayout) ((View) event.getLocalState()).getParent());
+                    clearNewTileField();
 
                     ClipData data = event.getClipData();
                     String[] tile = data.getItemAt(0).getText().toString().split("\\|");
