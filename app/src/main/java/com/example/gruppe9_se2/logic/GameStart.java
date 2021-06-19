@@ -26,7 +26,6 @@ import com.example.gruppe9_se2.game.BoardFragment;
 import com.example.gruppe9_se2.game.BodenFragment;
 import com.example.gruppe9_se2.game.EndGameActivity;
 import com.example.gruppe9_se2.game.MusterFragment;
-import com.example.gruppe9_se2.game.PlayerPopup;
 import com.example.gruppe9_se2.game.PlayerResult;
 import com.example.gruppe9_se2.game.PlayersFragment;
 import com.example.gruppe9_se2.game.ShakeDetector;
@@ -345,16 +344,16 @@ public class GameStart extends AppCompatActivity {
     }
 
     public void requestPlayerBoard(String playerId) {
-        Intent intent = new Intent(GameStart.this, PlayerPopup.class);
-        startActivity(intent);
-        /*try {
+        //Intent intent = new Intent(GameStart.this, PlayerPopup.class);
+        //startActivity(intent);
+        try {
             JSONObject args = new JSONObject();
             args.put("playerId", playerId);
             SocketManager.getSocket().emit("boardLookupRequest", args);
 
         } catch (JSONException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     private void updateAllPoints(JSONArray scores) {
