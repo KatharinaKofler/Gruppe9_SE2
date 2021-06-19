@@ -404,7 +404,6 @@ public class GameStart extends AppCompatActivity {
 
     public void deleteShakeDetector() {
         shakeDetector = null;
-        shakeDetector.setCallback(null);
     }
 
     private void cheat() {
