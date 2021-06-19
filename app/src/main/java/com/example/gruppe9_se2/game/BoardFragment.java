@@ -2,6 +2,7 @@ package com.example.gruppe9_se2.game;
 
 import android.content.ClipData;
 import android.os.Bundle;
+import android.service.quicksettings.Tile;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -182,6 +183,8 @@ public class BoardFragment extends Fragment {
         tile.setTag(R.id.color_id, color);
         tile.setTag(R.id.count_id, count);
         tile.setTag(R.id.isCenter, 1);
+
+        tile.setOnTouchListener(new TileTouchListener());
 
         gameStart.runOnUiThread(() -> {
             if(!freshCenter) cleanCenter();
