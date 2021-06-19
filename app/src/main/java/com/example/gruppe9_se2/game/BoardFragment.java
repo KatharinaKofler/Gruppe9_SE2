@@ -104,6 +104,8 @@ public class BoardFragment extends Fragment {
                 }
             });
 
+            cleanCenter();
+
             // get center tiles from args
             JSONObject centerObject = tilesObject.getJSONObject("center");
             center[0] = centerObject.getInt("black");
@@ -112,7 +114,6 @@ public class BoardFragment extends Fragment {
             center[3] = centerObject.getInt("yellow");
             center[4] = centerObject.getInt("red");
 
-            freshCenter = false;
             // update center
             for (int i = 0; i < 5; i++) {
                 for (int j = 0; j < center[i]; j++) {
@@ -187,13 +188,8 @@ public class BoardFragment extends Fragment {
         tile.setTag(R.id.isCenter, 1);
         tile.setTag(R.id.fromBoard, true);
 
-        //tile.setOnTouchListener(new TileTouchListener());
-
-        gameStart.runOnUiThread(() -> {
-            if(!freshCenter) cleanCenter();
-            center.addView(tile);
-        });
-
+        //TODO
+        tile.setOnTouchListener(new TileTouchListener());
     }
 
     public void startTurn() {
