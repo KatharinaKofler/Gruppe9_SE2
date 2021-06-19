@@ -343,9 +343,17 @@ public class GameStart extends AppCompatActivity {
         playersFragment.initPlayerButtons(gameStart);
     }
 
+    public void finishTurn(int row) {
+        try {
+            JSONObject args = new JSONObject();
+            args.put("placeRow", row);
+            SocketManager.getSocket().emit("finishTurn", args);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void requestPlayerBoard(String playerId) {
-        //Intent intent = new Intent(GameStart.this, PlayerPopup.class);
-        //startActivity(intent);
         try {
             JSONObject args = new JSONObject();
             args.put("playerId", playerId);

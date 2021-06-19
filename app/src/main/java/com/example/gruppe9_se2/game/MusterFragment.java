@@ -263,16 +263,8 @@ public class MusterFragment extends Fragment implements EventListener {
             getParentFragmentManager().setFragmentResult("floor", result);
         }
 
-        //TODO Socket
-        JSONObject args = new JSONObject();
-        try {
-            args.put("placeRow", row);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-//        gameStart.finishTurn(args);
-
-        SocketManager.getSocket().emit("finishTurn", args);
+        // Send finishTurn to server
+        gameStart.finishTurn(row);
     }
 
     private class Element {
