@@ -97,6 +97,7 @@ public class BoardFragment extends Fragment {
                     init = true;
                     if(myTurn){
                         startTurn();
+                        myTurn = false;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -143,6 +144,7 @@ public class BoardFragment extends Fragment {
             tile.setPadding(5, 5, 5, 5);
             tile.setTag(R.id.plateNr_id, i);
             tile.setTag(R.id.isCenter, 0);
+            tile.setTag(R.id.fromBoard, true);
             plate.addView(tile, j);
         }
         platesGrid.addView(plate, i);
@@ -183,8 +185,9 @@ public class BoardFragment extends Fragment {
         tile.setTag(R.id.color_id, color);
         tile.setTag(R.id.count_id, count);
         tile.setTag(R.id.isCenter, 1);
+        tile.setTag(R.id.fromBoard, true);
 
-        tile.setOnTouchListener(new TileTouchListener());
+        //tile.setOnTouchListener(new TileTouchListener());
 
         gameStart.runOnUiThread(() -> {
             if(!freshCenter) cleanCenter();
@@ -242,7 +245,7 @@ public class BoardFragment extends Fragment {
                 ClipData data = ClipData.newPlainText("tile", view.getTag(R.id.color_id) + "|" + view.getTag(R.id.count_id));
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
                 view.startDrag(data, shadowBuilder, view, 0);
-                view.setVisibility(View.INVISIBLE);
+                //view.setVisibility(View.INVISIBLE);
                 return true;
             } else {
                 return false;

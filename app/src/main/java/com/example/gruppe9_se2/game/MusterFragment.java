@@ -111,6 +111,7 @@ public class MusterFragment extends Fragment implements EventListener {
         newTiles.setImageResource(tileResourceMap[color]);
         newTiles.setTag((color + 1) + "|" + count);
         newTiles.setOnTouchListener(new MyTouchListener());
+        newTiles.setTag(R.id.fromBoard, false);
 
         TextView textView = (TextView) layout.getChildAt(1);
         textView.setText(Integer.toString(count));
@@ -206,6 +207,8 @@ public class MusterFragment extends Fragment implements EventListener {
 //                    ((View) event.getLocalState()).setVisibility(View.VISIBLE);
                     break;
                 case DragEvent.ACTION_DROP:
+                    if((boolean)((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) return false;
+
                     clearNewTileField((RelativeLayout) ((View) event.getLocalState()).getParent());
 
                     ClipData data = event.getClipData();
