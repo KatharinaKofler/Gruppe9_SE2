@@ -139,7 +139,7 @@ public class PlayersFragment extends Fragment {
                 if (playerButton.getTag(R.id.playerId).equals(id)) {
                     foundId = true;
                     playerButton.setTag(R.id.points, points);
-                    String text = playerList.get(i)[1] + "\n" + points + " Points";
+                    String text = playerList.get(i-1)[1] + "\n" + points + " Points";
                     playerButton.setText(text);
                 }
             }
