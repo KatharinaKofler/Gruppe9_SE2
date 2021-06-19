@@ -207,6 +207,7 @@ public class MusterFragment extends Fragment implements EventListener {
                     break;
                 case DragEvent.ACTION_DROP:
                     clearNewTileField((RelativeLayout) ((View) event.getLocalState()).getParent());
+
                     ClipData data = event.getClipData();
                     String[] tile = data.getItemAt(0).getText().toString().split("\\|");
                     int count = Integer.parseInt(tile[1]);
@@ -215,14 +216,23 @@ public class MusterFragment extends Fragment implements EventListener {
                         int color = Integer.parseInt(tile[0]);
 
                         Element element = elements[row - 1];
+
+                        // If row is empty set color of row
                         if (element.getColor() == 0) {
                             element.setColor(color);
                         }
 
+                        // Row color different, drop not allowed
                         if (element.getColor() != color) {
                             return false;
                         }
 
+                        // Row already full, drop not allowed
+                        if (element.getCount() == row) {
+                            return false;
+                        }
+
+                        // Set elements and notify server
                         setMusterElement(row, element, count);
                     }
 
