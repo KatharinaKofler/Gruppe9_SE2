@@ -148,7 +148,10 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("updateAvailableTiles", args -> boardFragment.updateAllPlates(gameStart, args));
         SocketManager.getSocket().on("nextPlayer", args -> playersFragment.markCurrentPlayer((JSONObject) args[0]));
         SocketManager.getSocket().on("startTurn", args -> startTurn());
-        SocketManager.getSocket().on("startRound", args -> updateAllPoints((JSONArray) args[0]));
+        SocketManager.getSocket().on("startRound", args -> {
+            Log.e("Event", "startRound");
+            updateAllPoints((JSONArray) args[0]);
+        });
         SocketManager.getSocket().on("boardLookupResponse", args -> playersFragment.responsePlayerBoard((JSONObject) args[0]));
         SocketManager.getSocket().on("cheatResponse", args -> bodenFragment.cheatResponse((JSONObject) args[0], gameStart));
         SocketManager.getSocket().on("accuseResponse", args -> accuseResponse((JSONObject) args[0]));

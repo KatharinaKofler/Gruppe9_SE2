@@ -132,22 +132,24 @@ public class PlayersFragment extends Fragment {
     }
 
     public void updatePoints(String id, int points) {
-        boolean foundId = false;
-        for (int i = 1; i < playerButtonLayout.getChildCount(); i++) {
-            Button playerButton = (Button) playerButtonLayout.getChildAt(i);
-            if (playerButton.getTag(R.id.playerId).equals(id)) {
-                foundId = true;
+        gameStart.runOnUiThread(()-> {
+            boolean foundId = false;
+            for (int i = 1; i < playerButtonLayout.getChildCount(); i++) {
+                Button playerButton = (Button) playerButtonLayout.getChildAt(i);
+                if (playerButton.getTag(R.id.playerId).equals(id)) {
+                    foundId = true;
+                    playerButton.setTag(R.id.points, points);
+                    String text = playerList.get(i)[1] + "\n" + points + " Points";
+                    playerButton.setText(text);
+                }
+            }
+            if (!foundId) {
+                Button playerButton = (Button) playerButtonLayout.getChildAt(0);
                 playerButton.setTag(R.id.points, points);
-                String text = playerList.get(i)[1] + "\n" + points + " Points";
+                String text = "Me\n" + points + " Points";
                 playerButton.setText(text);
             }
-        }
-        if (!foundId) {
-            Button playerButton = (Button) playerButtonLayout.getChildAt(0);
-            playerButton.setTag(R.id.points, points);
-            String text = "Me\n" + points + " Points";
-            playerButton.setText(text);
-        }
+        });
     }
 
     public void responsePlayerBoard(JSONObject playerBoard) {
