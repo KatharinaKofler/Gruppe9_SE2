@@ -28,6 +28,8 @@
     <color name="emptyFlieseFill5">#f0cbb6</color>
     <color name="emptyFlieseBorder5">#cfae9b</color>
 
+    <color name="firstMarkerFill">#1f1f1f</color>
+    <color name="firstMarkerBoarder">#000000</color>
 
     <color name="FlieseFill1">#b52222</color>
     <color name="FlieseBorder1">#801717</color>
