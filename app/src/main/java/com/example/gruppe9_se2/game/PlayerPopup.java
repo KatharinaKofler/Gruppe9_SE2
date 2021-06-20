@@ -42,12 +42,10 @@ public class PlayerPopup extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         caught = b.getBoolean("caught");
 
-        //String playerName = b.getString("name");
-        String playerName = "Test";
+        String playerName = b.getString("name");
         ((TextView)findViewById(R.id.playerName)).setText(playerName);
 
-        //int playerPoints = b.getInt("points");
-        int playerPoints = 42;
+        int playerPoints = b.getInt("points");
         ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
 
         playerId = b.getString("id");
