@@ -229,6 +229,16 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
+    private void clearMusterElemente(int row) {
+        for (int j = 0; j < 5; j++) {
+            if (j > (3 - row)) {
+                LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt((row * 5) + j);
+                ImageView imageView = (ImageView) linearLayout.getChildAt(0);
+                imageView.setImageResource(R.drawable.empty_fliese);
+            }
+        }
+    }
+
     private void setMusterElement(int row, Element element, int count) {
         int resId = ResourceHelper.getFlieseResId(element.getColor());
         int floor = element.addCount(row, count);
@@ -258,14 +268,14 @@ public class MusterFragment extends Fragment implements EventListener {
 
     public void startRound(WandFragment wandFragment) {
         for (int i = 0; i < elements.length; i++) {
-            if(i+1==elements[i].count) wandFragment.add(i, elements[i].color);
+            if (i + 1 == elements[i].getCount()) {
+                wandFragment.add(i, elements[i].getColor());
+                clearMusterElemente(i);
+            }
 
             Element e = elements[i];
             e.count = 0;
             e.color = 0;
-
-            setMusterElement(i + 1, e, 0);
-
         }
     }
 
