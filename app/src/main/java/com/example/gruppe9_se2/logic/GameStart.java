@@ -187,7 +187,6 @@ public class GameStart extends AppCompatActivity {
     }
 
 
-
     private void setupGamestart() {
         // setup Image Animation
         ImageView loadingImage = findViewById(R.id.loadingAnimation);
@@ -394,7 +393,7 @@ public class GameStart extends AppCompatActivity {
         int player = 0;
         ArrayList<String[]> playerList = playersFragment.getPlayerList();
         for (int i = 0; i < playerList.size(); i++) {
-            if(playerList.get(i)[0].equals(id)) player = i+1;
+            if (playerList.get(i)[0].equals(id)) player = i + 1;
         }
         playersFragment.playersTurn.set(player);
     }
@@ -411,7 +410,7 @@ public class GameStart extends AppCompatActivity {
         Log.i("Event", "startRound");
         updateAllPoints((JSONArray) args[0]);
 
-        musterFragment.startRound();
+        musterFragment.startRound(wandFragment);
         bodenFragment.startRound();
     }
 
@@ -436,7 +435,7 @@ public class GameStart extends AppCompatActivity {
                 score = scores.getJSONObject(i);
                 int points = score.getInt("points");
                 String uid = score.getString("uid");
-                results.add(new PlayerResult(0, getNameById(uid), points));
+                //results.add(new PlayerResult(0, getNameById(uid), points));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -481,33 +480,45 @@ public class GameStart extends AppCompatActivity {
             String accused = arg.getString("accused");
             String accuser = arg.getString("accuser");
             boolean cheated = arg.getBoolean("cheated");
-            String message;
-            if (cheated) {
-                message = "Oh no! " + getNameById(accuser) + " caught " + getNameById(accused) + " cheating. Minus 10 points for " + getNameById(accused) + ".";
-                playersFragment.playerCaught(accused);
-            } else
-                message = getNameById(accuser) + " thought " + getNameById(accused) + " cheated. Unfortunate for " + getNameById(accuser) + ", because " + getNameById(accused) + " didn't cheat. Minus 10 points for " + getNameById(accuser) + ".";
-            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            getNameById(cheated, accused, accuser);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private String getNameById(String playerId) {
-        final String[] name = new String[1];
+    private void getNameById(Boolean cheated, String accused, String accuser) {
         // Post Request getUser
         String token = "Bearer ";
         token += ApiManager.getToken();
 
         Retrofit retrofit = ApiManager.getInstance();
         UsersApi service = retrofit.create(UsersApi.class);
-        Call<UsersResponse> call = service.executeUsers(playerId, token);
+        Call<UsersResponse> call = service.executeUsers(accused, token);
+        String finalToken = token;
         call.enqueue(new Callback<UsersResponse>() {
-
             @Override
             public void onResponse(Call<UsersResponse> call, Response<UsersResponse> response) {
                 Log.i("getUser", "onResponse successfull: " + response.code());
-                name[0] = response.body().getUsername();
+                assert response.body() != null;
+                String accused = response.body().getUsername();
+
+                call = service.executeUsers(accuser, finalToken);
+                call.enqueue(new Callback<UsersResponse>() {
+                    @Override
+                    public void onResponse(Call<UsersResponse> call, Response<UsersResponse> response) {
+                        Log.i("getUser", "onResponse successfull: " + response.code());
+                        assert response.body() != null;
+                        String accuser = response.body().getUsername();
+
+                        // got both strings
+                        printMessage(cheated, accuser, accused);
+                    }
+
+                    @Override
+                    public void onFailure(Call<UsersResponse> call, Throwable t) {
+                        Log.e("getUser", "onFailure");
+                    }
+                });
             }
 
             @Override
@@ -515,6 +526,16 @@ public class GameStart extends AppCompatActivity {
                 Log.e("getUser", "onFailure");
             }
         });
-        return name[0];
+    }
+
+    private void printMessage(boolean cheated, String accuser, String accused){
+        String message;
+        if (cheated) {
+            message = "Oh no! " + (accuser) + " caught " + (accused) + " cheating. Minus 10 points for " + (accused) + ".";
+            playersFragment.playerCaught(accused);
+        } else
+            message = accuser + " thought " + accused + " cheated. Unfortunate for " + accuser + ", because " + (accused) + " didn't cheat. Minus 10 points for " + accuser + ".";
+
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 }
