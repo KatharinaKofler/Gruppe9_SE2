@@ -108,11 +108,11 @@ public class BoardFragment extends Fragment {
 
             // get center tiles from args
             JSONObject centerObject = tilesObject.getJSONObject("center");
-            center[0] = centerObject.getInt("black");
-            center[1] = centerObject.getInt("white");
+            center[0] = centerObject.getInt("red");
+            center[1] = centerObject.getInt("green");
             center[2] = centerObject.getInt("blue");
-            center[3] = centerObject.getInt("yellow");
-            center[4] = centerObject.getInt("red");
+            center[3] = centerObject.getInt("purple");
+            center[4] = centerObject.getInt("orange");
 
             // update center
             for (int i = 0; i < 5; i++) {

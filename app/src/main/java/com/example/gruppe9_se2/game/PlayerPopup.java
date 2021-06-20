@@ -42,26 +42,22 @@ public class PlayerPopup extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         caught = b.getBoolean("caught");
 
-        //String playerName = b.getString("name");
-        String playerName = "Test";
+        String playerName = b.getString("name");
         ((TextView)findViewById(R.id.playerName)).setText(playerName);
 
-        //int playerPoints = b.getInt("points");
-        int playerPoints = 42;
+        int playerPoints = b.getInt("points");
         ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
 
         playerId = b.getString("id");
 
-        //createWall(b);
-        //createPattern(b);
+        createWall(b);
+        createPattern(b);
 
         ImageButton exitPopUp = (ImageButton) findViewById(R.id.closePopUp);
         exitPopUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
-                //Intent intent = new Intent(PlayerPopup.this, GameStart.class);
-                //PlayerPopup.this.startActivity(intent);
             }
         });
 
