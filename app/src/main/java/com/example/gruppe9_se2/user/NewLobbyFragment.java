@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.user;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ import com.example.gruppe9_se2.api.lobbie.LobbieApi;
 import com.example.gruppe9_se2.api.lobbie.LobbieRequest;
 import com.example.gruppe9_se2.api.lobbie.LobbieResponse;
 import com.example.gruppe9_se2.logic.GameStart;
+
+import org.jetbrains.annotations.NotNull;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,10 +52,11 @@ public class NewLobbyFragment extends Fragment {
             Call<LobbieResponse> call = service.executeLobby(token, request);
             call.enqueue(new Callback<LobbieResponse>() {
                 @Override
-                public void onResponse(Call<LobbieResponse> call, Response<LobbieResponse> response) {
+                public void onResponse(@NotNull Call<LobbieResponse> call, @NotNull Response<LobbieResponse> response) {
                     if (response.isSuccessful()) {
 
                         //Lobby id speichern
+                        assert response.body() != null;
                         String id = response.body().getId();
 
                         Intent intent = new Intent(getContext(), GameStart.class);
@@ -69,8 +73,9 @@ public class NewLobbyFragment extends Fragment {
                     }
                 }
 
+                @SuppressLint("SetTextI18n")
                 @Override
-                public void onFailure(Call<LobbieResponse> call, Throwable t) {
+                public void onFailure(@NotNull Call<LobbieResponse> call, @NotNull Throwable t) {
                     TextView createError = view.findViewById(R.id.createError);
                     createError.setText("Problem accessing server !!!");
                 }

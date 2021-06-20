@@ -26,8 +26,6 @@ public class WandFragment extends Fragment implements EventListener {
     private final int[] emptyFliesenOrder = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
     private final int[] fullFliesenOrder = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
 
-    private Socket mSocket;
-
     static JSONArray wand = new JSONArray();
     static boolean firstCreate = true;
     GridLayout gridLayout;

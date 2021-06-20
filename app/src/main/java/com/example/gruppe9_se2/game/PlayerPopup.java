@@ -23,7 +23,6 @@ public class PlayerPopup extends AppCompatActivity {
 
     private final int[] emptyFliesen = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
     private final int[] fullFliesen = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
-    private boolean caught = false;
     String playerId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +39,7 @@ public class PlayerPopup extends AppCompatActivity {
         if(actionBar != null) actionBar.hide();
 
         Bundle b = getIntent().getExtras();
-        caught = b.getBoolean("caught");
+        boolean caught = b.getBoolean("caught");
 
         String playerName = b.getString("name");
         ((TextView)findViewById(R.id.playerName)).setText(playerName);

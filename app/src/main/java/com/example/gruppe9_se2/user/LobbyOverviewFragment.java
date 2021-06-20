@@ -18,8 +18,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiHelper;
 import com.example.gruppe9_se2.api.base.ApiManager;
-import com.example.gruppe9_se2.api.lobbieGet.Lobbies;
 import com.example.gruppe9_se2.api.lobbieGet.LobbieGetApi;
+import com.example.gruppe9_se2.api.lobbieGet.Lobbies;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -30,9 +32,6 @@ import retrofit2.Retrofit;
 
 public class LobbyOverviewFragment extends Fragment {
 
-
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -41,26 +40,15 @@ public class LobbyOverviewFragment extends Fragment {
         SwipeRefreshLayout refreshLayout = view.findViewById(R.id.swiperefresh);
 
 
-        refreshLayout.setOnRefreshListener(() -> {
-            loadData(view);
-        });
-
-        // TODO exchange with server data
-
-        // Post Request Lobby
-        final String base_URL = "https://gruppe9-se2-backend.herokuapp.com/";
+        refreshLayout.setOnRefreshListener(() -> loadData(view));
 
         loadData(view);
 
         Button btnCreate = view.findViewById(R.id.newLobby);
-        btnCreate.setOnClickListener(v -> {
-            ((LobbyActivity)getActivity()).newLobby();
-        });
+        btnCreate.setOnClickListener(v -> ((LobbyActivity) requireActivity()).newLobby());
 
         Button btnLogout = view.findViewById(R.id.logoutLobby);
-        btnLogout.setOnClickListener(v -> {
-            ((LobbyActivity)getActivity()).logoutLobby();
-        });
+        btnLogout.setOnClickListener(v -> ((LobbyActivity) requireActivity()).logoutLobby());
 
         return view;
     }
@@ -81,10 +69,11 @@ public class LobbyOverviewFragment extends Fragment {
         call.enqueue(new Callback<ArrayList<Lobbies>>() {
             @SuppressLint("ResourceAsColor")
             @Override
-            public void onResponse(Call<ArrayList<Lobbies>> call, Response<ArrayList<Lobbies>> response) {
+            public void onResponse(@NotNull Call<ArrayList<Lobbies>> call, @NotNull Response<ArrayList<Lobbies>> response) {
                 if (response.isSuccessful()) {
 
                     // response.body() ist die ArrayList mit allen Lobbies
+                    assert response.body() != null;
                     int max = response.body().size();
 
                     for (int i = 0; i < max; i++) {
@@ -107,8 +96,9 @@ public class LobbyOverviewFragment extends Fragment {
                 }
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
-            public void onFailure(Call<ArrayList<Lobbies>> call, Throwable t) {
+            public void onFailure(@NotNull Call<ArrayList<Lobbies>> call, @NotNull Throwable t) {
                 TextView tvError = view.findViewById(R.id.tvError);
                 tvError.setText("Problem accessing server !!!");
             }

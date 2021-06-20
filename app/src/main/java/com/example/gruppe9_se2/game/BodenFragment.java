@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.game;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -88,6 +89,7 @@ public class BodenFragment extends Fragment {
     }
 
     private class BodenDragListener implements View.OnDragListener {
+        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
 
         @Override
@@ -153,7 +155,9 @@ public class BodenFragment extends Fragment {
         RelativeLayout layout = (RelativeLayout) gridLayout.getChildAt(pos - 1);
         ImageView image = (ImageView) layout.getChildAt(0);
         if (image != null) {
-            int resId = ResourceHelper.getFlieseResId(color);
+            int resId;
+            if(color==-1) resId = R.drawable.first_taker;
+            else resId = ResourceHelper.getFlieseResId(color);
             image.setImageResource(resId);
 
             Element e = elements[pos - 1];
@@ -203,7 +207,7 @@ public class BodenFragment extends Fragment {
 
     }
 
-    private class Element {
+    private static class Element {
         private int color = 0;
 
         public Element() {

@@ -1,5 +1,7 @@
 package com.example.gruppe9_se2.game;
 
+import android.annotation.SuppressLint;
+
 import java.io.Serializable;
 
 public class PlayerResult implements Serializable {
@@ -13,6 +15,7 @@ public class PlayerResult implements Serializable {
         this.points = points;
     }
 
+    @SuppressLint("DefaultLocale")
     public String getDisplayRank() {
         switch (rank) {
             case 1:
@@ -26,6 +29,7 @@ public class PlayerResult implements Serializable {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     public String getDisplayPoints() {
         return String.format("%d pts", points);
     }

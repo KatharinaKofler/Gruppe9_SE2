@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.logic;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
@@ -32,6 +33,7 @@ import com.example.gruppe9_se2.game.ShakeDetector;
 import com.example.gruppe9_se2.game.WandFragment;
 import com.example.gruppe9_se2.user.LobbyActivity;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -129,13 +131,9 @@ public class GameStart extends AppCompatActivity {
 
         SocketManager.getSocket().connect();
 
-        SocketManager.getSocket().on("connect", args -> {
-            Log.i("GameStart Event", "On connect");
-        });
+        SocketManager.getSocket().on("connect", args -> Log.i("GameStart Event", "On connect"));
 
-        SocketManager.getSocket().on("connect_failed", args -> {
-            Log.i("GameStart Event", "On connect_failed");
-        });
+        SocketManager.getSocket().on("connect_failed", args -> Log.i("GameStart Event", "On connect_failed"));
 
         // gamestart Listeners
         SocketManager.getSocket().on("sync", this::sync);
@@ -167,7 +165,7 @@ public class GameStart extends AppCompatActivity {
             startRound(args);
         });
         SocketManager.getSocket().on("boardLookupResponse", args -> {
-            Log.i("GameStart Event", "On boardLookupResponse");
+            Log.e("GameStart Event", "On boardLookupResponse: "+args[0].toString());
             playersFragment.responsePlayerBoard((JSONObject) args[0]);
         });
         SocketManager.getSocket().on("cheatResponse", args -> {
@@ -189,6 +187,7 @@ public class GameStart extends AppCompatActivity {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private void setupGamestart() {
         // setup Image Animation
         ImageView loadingImage = findViewById(R.id.loadingAnimation);
@@ -356,6 +355,7 @@ public class GameStart extends AppCompatActivity {
         try {
             JSONObject args = new JSONObject();
             args.put("placeRow", row);
+            Log.i("Event send", "finish turn "+args.toString());
             SocketManager.getSocket().emit("finishTurn", args);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -403,7 +403,7 @@ public class GameStart extends AppCompatActivity {
     private void startTurn() {
         GameStart gameStart = this;
         gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "It's your turn!", Toast.LENGTH_LONG).show());
-        Log.e("gamestart", "myTurn!!!");
+        Log.i("gamestart", "myTurn!!!");
         boardFragment.startTurn();
         musterFragment.dragListenerNewTileField(gameStart);
         playersFragment.playersTurn.set(0);
@@ -425,10 +425,12 @@ public class GameStart extends AppCompatActivity {
     }
 
     public void takeCenterTiles(JSONObject args) {
+        Log.i("Event send", "take center tiles"+args.toString());
         SocketManager.getSocket().emit("takeCenterTiles", args);
     }
 
     public void takePlateTiles(JSONObject args) {
+        Log.i("Event send", "take plate tiles "+args.toString());
         SocketManager.getSocket().emit("takePlateTiles", args);
     }
 
@@ -436,7 +438,7 @@ public class GameStart extends AppCompatActivity {
         JSONArray scores = (JSONArray) args[0];
         List<PlayerResult> results = new ArrayList<>();
         for (int i = 0; i < scores.length(); i++) {
-            JSONObject score = null;
+            JSONObject score;
             try {
                 score = scores.getJSONObject(i);
                 int points = score.getInt("points");
@@ -503,7 +505,7 @@ public class GameStart extends AppCompatActivity {
         String finalToken = token;
         call.enqueue(new Callback<UsersResponse>() {
             @Override
-            public void onResponse(Call<UsersResponse> call, Response<UsersResponse> response) {
+            public void onResponse(@NotNull Call<UsersResponse> call, @NotNull Response<UsersResponse> response) {
                 Log.i("getUser", "onResponse successfull: " + response.code());
                 assert response.body() != null;
                 String accused = response.body().getUsername();
@@ -511,7 +513,7 @@ public class GameStart extends AppCompatActivity {
                 call = service.executeUsers(accuser, finalToken);
                 call.enqueue(new Callback<UsersResponse>() {
                     @Override
-                    public void onResponse(Call<UsersResponse> call, Response<UsersResponse> response) {
+                    public void onResponse(@NotNull Call<UsersResponse> call, @NotNull Response<UsersResponse> response) {
                         Log.i("getUser", "onResponse successfull: " + response.code());
                         assert response.body() != null;
                         String accuser = response.body().getUsername();
@@ -521,14 +523,14 @@ public class GameStart extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<UsersResponse> call, Throwable t) {
+                    public void onFailure(@NotNull Call<UsersResponse> call, @NotNull Throwable t) {
                         Log.e("getUser", "onFailure");
                     }
                 });
             }
 
             @Override
-            public void onFailure(Call<UsersResponse> call, Throwable t) {
+            public void onFailure(@NotNull Call<UsersResponse> call, @NotNull Throwable t) {
                 Log.e("getUser", "onFailure");
             }
         });

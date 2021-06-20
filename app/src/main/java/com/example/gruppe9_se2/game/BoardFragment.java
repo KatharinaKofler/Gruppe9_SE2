@@ -1,9 +1,8 @@
 package com.example.gruppe9_se2.game;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.os.Bundle;
-import android.service.quicksettings.Tile;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,18 +12,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 
 
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.logic.GameStart;
-import com.example.gruppe9_se2.logic.SocketManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import io.socket.client.Socket;
 
 public class BoardFragment extends Fragment {
 
@@ -37,7 +33,6 @@ public class BoardFragment extends Fragment {
 
     private boolean init = false;
     private boolean myTurn = false;
-    private volatile boolean freshCenter = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,7 +62,7 @@ public class BoardFragment extends Fragment {
             gameStart.runOnUiThread(() -> {
                 try {
                     for (int i = 0; i < platesObject.length(); i++) {
-                        JSONArray singlePlateArray = null;
+                        JSONArray singlePlateArray;
 
                         singlePlateArray = platesObject.getJSONArray("plate" + i);
 
@@ -115,11 +110,13 @@ public class BoardFragment extends Fragment {
 
             // get center tiles from args
             JSONObject centerObject = tilesObject.getJSONObject("center");
+
             center[0] = centerObject.getInt("red");
             center[1] = centerObject.getInt("green");
             center[2] = centerObject.getInt("blue");
             center[3] = centerObject.getInt("purple");
             center[4] = centerObject.getInt("orange");
+            if (centerObject.getInt("starter") == 1) addToCenter(-1, 1);
 
             // update center
             for (int i = 0; i < 5; i++) {
@@ -176,12 +173,10 @@ public class BoardFragment extends Fragment {
 
     private void cleanCenter(){
         GridLayout center = view.findViewById(R.id.gridCenter);
-        gameStart.runOnUiThread(() -> {
-            center.removeAllViews();
-            freshCenter = true;
-        });
+        gameStart.runOnUiThread(center::removeAllViews);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void addToCenter(int color, int count) {
         GridLayout center = view.findViewById(R.id.gridCenter);
         ImageView tile = new ImageView(requireContext());
@@ -189,7 +184,8 @@ public class BoardFragment extends Fragment {
         tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
         tile.setPadding(5, 5, 5, 5);
 
-        tile.setImageResource(tileResourceMap[color]);
+        if(color == -1) tile.setImageResource(R.drawable.first_taker);
+        else tile.setImageResource(tileResourceMap[color]);
         tile.setTag(R.id.color_id, color);
         tile.setTag(R.id.count_id, count);
         tile.setTag(R.id.isCenter, 1);
@@ -198,18 +194,15 @@ public class BoardFragment extends Fragment {
         //TODO
         tile.setOnTouchListener(new TileTouchListener());
 
-        gameStart.runOnUiThread(() -> {
-            center.addView(tile);
-        });
+        gameStart.runOnUiThread(() -> center.addView(tile));
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void startTurn() {
-        Log.e("board", "startTurn " + init);
         if(!init){
             myTurn = true;
         }
-        else if(!updateFirstNewRound);
-        else {
+        else if(updateFirstNewRound){
             // for plate tiles
             GridLayout board = view.findViewById(R.id.gridPlates);
             for (int i = 0; i < board.getChildCount(); i++) {
@@ -218,7 +211,6 @@ public class BoardFragment extends Fragment {
                     ImageView tile = (ImageView) plate.getChildAt(j);
                     int color = (tile.getTag(R.id.color_id) != null) ? (int) tile.getTag(R.id.color_id) : 0;
                     if (color != -1) {
-                        Log.e("Board", "Tile setOnTouch");
                         tile.setOnTouchListener(new TileTouchListener());
                     }
                 }
@@ -233,6 +225,7 @@ public class BoardFragment extends Fragment {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void disableOnTouch() {
         // for plate tiles
         GridLayout board = view.findViewById(R.id.gridPlates);
@@ -251,7 +244,8 @@ public class BoardFragment extends Fragment {
         }
     }
 
-    private final class TileTouchListener implements View.OnTouchListener {
+    private static final class TileTouchListener implements View.OnTouchListener {
+        @SuppressLint("ClickableViewAccessibility")
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 ClipData data = ClipData.newPlainText("tile", view.getTag(R.id.color_id) + "|" + view.getTag(R.id.count_id));

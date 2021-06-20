@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.user;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -45,7 +46,7 @@ public class RegisterFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             String name = args.getString("name", "");
-            EditText et = view.findViewById(R.id.et_name);
+            @SuppressLint("CutPasteId") EditText et = view.findViewById(R.id.et_name);
             et.setText(name);
         }
 
@@ -54,7 +55,7 @@ public class RegisterFragment extends Fragment {
         Button btnLogin = view.findViewById(R.id.btn_register);
         btnLogin.setOnClickListener(v -> {
 
-            EditText name = view.findViewById(R.id.et_name);
+            @SuppressLint("CutPasteId") EditText name = view.findViewById(R.id.et_name);
             EditText password = view.findViewById(R.id.et_password);
             TextInputLayout nameLayout = view.findViewById(R.id.et_name_layout);
             TextInputLayout passwordLayout = view.findViewById(R.id.et_password_layout);

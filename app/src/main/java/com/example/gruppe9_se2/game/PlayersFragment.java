@@ -35,11 +35,11 @@ public class PlayersFragment extends Fragment {
 
     @SuppressLint("UseCompatLoadingForDrawables")
 
-    private ArrayList<String[]> playerList = new ArrayList<>();
+    private final ArrayList<String[]> playerList = new ArrayList<>();
     LinearLayout playerButtonLayout;
     private GameStart gameStart;
     private boolean isInit = false;
-    private boolean[] caught = new boolean[4];
+    private final boolean[] caught = new boolean[4];
 
     public ObservableInteger playersTurn = new ObservableInteger();
 

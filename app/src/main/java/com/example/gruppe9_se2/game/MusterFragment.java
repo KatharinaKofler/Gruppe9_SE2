@@ -1,8 +1,10 @@
 package com.example.gruppe9_se2.game;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -22,7 +24,6 @@ import java.util.EventListener;
 public class MusterFragment extends Fragment implements EventListener {
     // GameStart
     private GameStart gameStart;
-
     private GridLayout gridLayout;
     private ImageView newTileImage;
     private TextView newTileText;
@@ -88,6 +89,7 @@ public class MusterFragment extends Fragment implements EventListener {
         return view;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void addNewTileField(int color, int count) {
         // Set tile color
         newTileImage.setImageResource(ResourceHelper.getFlieseResId(color + 1));
@@ -99,6 +101,7 @@ public class MusterFragment extends Fragment implements EventListener {
         newTileText.setText(String.valueOf(count));
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void clearNewTileField() {
         // Clear tile color
         newTileImage.setImageResource(R.drawable.empty_fliese);
@@ -155,7 +158,8 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
-    private final class MyTouchListener implements View.OnTouchListener {
+    private static final class MyTouchListener implements View.OnTouchListener {
+        @SuppressLint("ClickableViewAccessibility")
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 ClipData data = ClipData.newPlainText("tile", view.getTag().toString());
@@ -169,6 +173,7 @@ public class MusterFragment extends Fragment implements EventListener {
     }
 
     private class MyPatternDragListener implements View.OnDragListener {
+        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
 
         @Override
@@ -191,39 +196,36 @@ public class MusterFragment extends Fragment implements EventListener {
                     ClipData data = event.getClipData();
                     String[] tile = data.getItemAt(0).getText().toString().split("\\|");
                     int count = Integer.parseInt(tile[1]);
+                    Log.e("MusterFragment", "count: "+count);
                     if (count > 0) {
                         int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
+                        Log.e("MusterFragment", "row: "+row);
                         int color = Integer.parseInt(tile[0]);
+                        Log.e("MusterFragment", "color: "+color);
 
                         Element element = elements[row - 1];
 
                         // If row is empty set color of row
                         if (element.getColor() == 0) {
+                            Log.e("MusterFragment", "element.getColor == 0");
                             element.setColor(color);
                         }
 
                         // Row color different, drop not allowed
                         if (element.getColor() != color) {
+                            Log.e("MusterFragment", "element.getColor != 0");
                             return false;
                         }
 
                         // Row already full, drop not allowed
                         if (element.getCount() == row) {
+                            Log.e("MusterFragment", "element.getCount == row");
                             return false;
                         }
 
                         // Set elements and notify server
                         setMusterElement(row, element, count);
                     }
-
-                    // Dropped, reassign View to ViewGroup
-//                    View view = (View) event.getLocalState();
-//                    ViewGroup owner = (ViewGroup) view.getParent();
-//                    owner.removeView(view);
-//                    LinearLayout container = (LinearLayout) v;
-//                    container.addView(view);
-//                    view.setVisibility(View.VISIBLE);
-
                     break;
                 default:
                     break;
@@ -243,12 +245,15 @@ public class MusterFragment extends Fragment implements EventListener {
     }
 
     private void setMusterElement(int row, Element element, int count) {
+        Log.e("MusterFragment", "setMusterElement");
         int resId = ResourceHelper.getFlieseResId(element.getColor());
         int floor = element.addCount(row, count);
 
+        Log.e("MusterFragment", "element.getCount "+element.getCount());
         for (int i = 0; i < element.getCount(); i++) {
-            int tilePos = (row - 1) * 5 + (4 - i);
 
+            int tilePos = (row - 1) * 5 + (4 - i);
+            Log.e("MusterFragment", "tilePos "+tilePos);
             LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(tilePos);
             ImageView image = (ImageView) linearLayout.getChildAt(0);
             if (image != null) {
@@ -274,15 +279,14 @@ public class MusterFragment extends Fragment implements EventListener {
             if (i + 1 == elements[i].getCount()) {
                 wandFragment.add(i, elements[i].getColor());
                 clearMusterElemente(i);
+                Element e = elements[i];
+                e.count = 0;
+                e.color = 0;
             }
-
-            Element e = elements[i];
-            e.count = 0;
-            e.color = 0;
         }
     }
 
-    private class Element {
+    private static class Element {
         private int color = 0;
         private int count = 0;
 
@@ -303,6 +307,7 @@ public class MusterFragment extends Fragment implements EventListener {
 
         public int addCount(int row, int count) {
             int temp = this.count + count;
+            Log.e("MusterFragment", "temp "+temp);
             if (temp <= row) {
                 this.count = temp;
                 return 0;

@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.user;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,11 +34,6 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
         notifyItemInserted(localData.size() - 1);
     }
 
-    public void insertAll(List<Lobby> data) {
-        localData.addAll(data);
-        notifyDataSetChanged();
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -47,6 +43,7 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
         return new ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Lobby l = localData.get(position);

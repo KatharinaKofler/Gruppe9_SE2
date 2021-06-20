@@ -15,7 +15,7 @@ import java.util.List;
 
 public class InviteListAdapter extends RecyclerView.Adapter<InviteListAdapter.ViewHolder> {
 
-    private List<String> localDataSet;
+    private final List<String> localDataSet;
 
     public InviteListAdapter() {
         super();
