@@ -128,14 +128,13 @@ public class GameStart extends AppCompatActivity {
         mSocket = SocketManager.makeSocket(lobbyID);
 
         SocketManager.getSocket().connect();
-        // check for successfull connection
+
         SocketManager.getSocket().on("connect", args -> {
-            Log.i("myLogs", "Connection successfull");
+            Log.i("GameStart Event", "On connect");
         });
 
-        // error if connect failed
         SocketManager.getSocket().on("connect_failed", args -> {
-            Log.e("myLogs", "connect_failed");
+            Log.i("GameStart Event", "On connect_failed");
         });
 
         // gamestart Listeners
@@ -145,52 +144,49 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("disbandLobby", this::dispandLobby);
         SocketManager.getSocket().on("gameStartAnnounce", this::gameStartAnnounce);
         // game Listeners
-        SocketManager.getSocket().on("updateAvailableTiles", args -> boardFragment.updateAllPlates(gameStart, args));
-        SocketManager.getSocket().on("nextPlayer", args -> playersFragment.markCurrentPlayer((JSONObject) args[0]));
-        SocketManager.getSocket().on("startTurn", args -> startTurn());
-        SocketManager.getSocket().on("startRound", args -> {
-            Log.e("Event", "startRound");
-            updateAllPoints((JSONArray) args[0]);
-
-            musterFragment.startRound();
-            bodenFragment.startRound();
+        SocketManager.getSocket().on("updateAvailableTiles", args -> {
+            Log.i("GameStart Event", "On updateAvailableTiles");
+            boardFragment.updateAllPlates(gameStart, args);
         });
-        SocketManager.getSocket().on("boardLookupResponse", args -> playersFragment.responsePlayerBoard((JSONObject) args[0]));
-        SocketManager.getSocket().on("cheatResponse", args -> bodenFragment.cheatResponse((JSONObject) args[0], gameStart));
-        SocketManager.getSocket().on("accuseResponse", args -> accuseResponse((JSONObject) args[0]));
+        SocketManager.getSocket().on("nextPlayer", args -> {
+            Log.i("GameStart Event", "On nextPlayer");
+            try {
+                updatePlayersTurn(((JSONObject) args[0]).getString("id"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+        SocketManager.getSocket().on("startTurn", args -> {
+            Log.i("GameStart Event", "On startTurn");
+            startTurn();
+        });
+        SocketManager.getSocket().on("startRound", args -> {
+            Log.i("GameStart Event", "On startRound");
+            startRound(args);
+        });
+        SocketManager.getSocket().on("boardLookupResponse", args -> {
+            Log.i("GameStart Event", "On boardLookupResponse");
+            playersFragment.responsePlayerBoard((JSONObject) args[0]);
+        });
+        SocketManager.getSocket().on("cheatResponse", args -> {
+            Log.i("GameStart Event", "On cheatResponse");
+            bodenFragment.cheatResponse((JSONObject) args[0], gameStart);
+        });
+        SocketManager.getSocket().on("accuseResponse", args -> {
+            Log.i("GameStart Event", "On accuseResponse");
+            accuseResponse((JSONObject) args[0]);
+        });
         SocketManager.getSocket().on("gameEnd", args -> {
-            JSONArray scores = (JSONArray) args[0];
-            List<PlayerResult> results = new ArrayList<>();
-            for (int i = 0; i < scores.length(); i++) {
-                JSONObject score = null;
-                try {
-                    score = scores.getJSONObject(i);
-                    int points = score.getInt("points");
-                    String uid = score.getString("uid");
-                    results.add(new PlayerResult(0, getNameById(uid), points));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            Comparator<PlayerResult> compareByPoints = (PlayerResult p1, PlayerResult p2) -> {
-                Integer p1P = p1.points;
-                Integer p2P = p2.points;
-                return p1P.compareTo(p2P);
-            };
-            Collections.sort(results, compareByPoints);
-            for (int i = 0; i < results.size(); i++) {
-                results.get(i).rank = i + 1;
-            }
-            Intent intent = new Intent(this, EndGameActivity.class);
-            intent.putExtra("results", (Serializable) results);
-            startActivity(intent);
+            Log.i("GameStart Event", "On gameEnd");
+            gameEnd(args);
         });
         SocketManager.getSocket().on("error", errorMessage -> {
             // print error message somewhere
-            Log.e("SOCKET_ERROR", (String) errorMessage[0]);
+            Log.i("SOCKET ERROR", (String) errorMessage[0]);
         });
-
     }
+
+
 
     private void setupGamestart() {
         // setup Image Animation
@@ -346,6 +342,12 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().off("playerJoin");
         SocketManager.getSocket().off("playerLeave");
 
+        try {
+            updatePlayersTurn(((JSONObject) args[0]).getString("id"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         playersFragment.initPlayerButtons(gameStart);
     }
 
@@ -362,9 +364,10 @@ public class GameStart extends AppCompatActivity {
     public void requestPlayerBoard(String playerId) {
         try {
             JSONObject args = new JSONObject();
-            args.put("playerId", playerId);
+            args.put("id", playerId);
+            Log.i("GameStart", "Request with PlayerId " + args.getString("id") + " in args");
             SocketManager.getSocket().emit("boardLookupRequest", args);
-
+            Log.i("GameStart", "BoardLookupRequest send");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -386,12 +389,30 @@ public class GameStart extends AppCompatActivity {
 
     // game Methods
 
+    private void updatePlayersTurn(String id) {
+        // find number of player with the id
+        int player = 0;
+        ArrayList<String[]> playerList = playersFragment.getPlayerList();
+        for (int i = 0; i < playerList.size(); i++) {
+            if(playerList.get(i)[0].equals(id)) player = i+1;
+        }
+        playersFragment.playersTurn.set(player);
+    }
+
     private void startTurn() {
         GameStart gameStart = this;
         gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "It's your turn!", Toast.LENGTH_LONG).show());
         boardFragment.startTurn();
         musterFragment.dragListenerNewTileField(gameStart);
-        playersFragment.markMe(true);
+        playersFragment.playersTurn.set(0);
+    }
+
+    private void startRound(Object[] args) {
+        Log.i("Event", "startRound");
+        updateAllPoints((JSONArray) args[0]);
+
+        musterFragment.startRound();
+        bodenFragment.startRound();
     }
 
     public void disableOnTouchBoard() {
@@ -402,9 +423,36 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().emit("takeCenterTiles", args);
     }
 
-
     public void takePlateTiles(JSONObject args) {
         SocketManager.getSocket().emit("takePlateTiles", args);
+    }
+
+    private void gameEnd(Object[] args) {
+        JSONArray scores = (JSONArray) args[0];
+        List<PlayerResult> results = new ArrayList<>();
+        for (int i = 0; i < scores.length(); i++) {
+            JSONObject score = null;
+            try {
+                score = scores.getJSONObject(i);
+                int points = score.getInt("points");
+                String uid = score.getString("uid");
+                results.add(new PlayerResult(0, getNameById(uid), points));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        Comparator<PlayerResult> compareByPoints = (PlayerResult p1, PlayerResult p2) -> {
+            Integer p1P = p1.points;
+            Integer p2P = p2.points;
+            return p1P.compareTo(p2P);
+        };
+        Collections.sort(results, compareByPoints);
+        for (int i = 0; i < results.size(); i++) {
+            results.get(i).rank = i + 1;
+        }
+        Intent intent = new Intent(this, EndGameActivity.class);
+        intent.putExtra("results", (Serializable) results);
+        startActivity(intent);
     }
 
     // cheat function
@@ -458,7 +506,7 @@ public class GameStart extends AppCompatActivity {
 
             @Override
             public void onResponse(Call<UsersResponse> call, Response<UsersResponse> response) {
-                Log.e("getUser", "onResponse successfull: " + response.code());
+                Log.i("getUser", "onResponse successfull: " + response.code());
                 name[0] = response.body().getUsername();
             }
 
