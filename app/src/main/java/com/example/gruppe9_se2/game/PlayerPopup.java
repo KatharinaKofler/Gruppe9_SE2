@@ -54,31 +54,23 @@ public class PlayerPopup extends AppCompatActivity {
         createPattern(b);
 
         ImageButton exitPopUp = (ImageButton) findViewById(R.id.closePopUp);
-        exitPopUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        exitPopUp.setOnClickListener(view -> finish());
 
         ImageButton accuse = (ImageButton) findViewById(R.id.accuse);
         if(caught){
             accuse.setVisibility(View.INVISIBLE);
         } else {
-            accuse.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Socket socket = SocketManager.getSocket();
-                    if (socket != null) {
-                        JSONObject object = new JSONObject();
-                        try {
-                            object.put("id", playerId);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        socket.emit("accuse", object);
-
+            accuse.setOnClickListener(view -> {
+                Socket socket = SocketManager.getSocket();
+                if (socket != null) {
+                    JSONObject object = new JSONObject();
+                    try {
+                        object.put("id", playerId);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+                    socket.emit("accuse", object);
+
                 }
             });
         }
@@ -145,7 +137,8 @@ public class PlayerPopup extends AppCompatActivity {
                 ImageView image = new ImageView(this);
                 image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                 image.setPadding(5,5,5,5);
-                int colorIndex = ((k)+(i)) % 5; // (column + row) % 5
+
+                int colorIndex = (k+5-i)%5;
 
                 if(bitmap[k] == 1) image.setImageResource(fullFliesen[colorIndex]);
                 else image.setImageResource(emptyFliesen[colorIndex]);
