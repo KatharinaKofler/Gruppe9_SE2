@@ -50,16 +50,14 @@ public class PlayerPopup extends AppCompatActivity {
 
         playerId = b.getString("id");
 
-        //createWall(b);
-        //createPattern(b);
+        createWall(b);
+        createPattern(b);
 
         ImageButton exitPopUp = (ImageButton) findViewById(R.id.closePopUp);
         exitPopUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
-                //Intent intent = new Intent(PlayerPopup.this, GameStart.class);
-                //PlayerPopup.this.startActivity(intent);
             }
         });
 
