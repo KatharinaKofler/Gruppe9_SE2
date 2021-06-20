@@ -47,6 +47,8 @@ public class BoardFragment extends Fragment {
         return view;
     }
 
+    public boolean updateFirstNewRound = true;
+
     public void updateAllPlates(GameStart gameStart, Object[] args) {
         // get tiles from args
         this.gameStart = gameStart;
@@ -102,6 +104,11 @@ public class BoardFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                if(!updateFirstNewRound){
+                    updateFirstNewRound = true;
+                    startTurn();
+                }
+
             });
 
             cleanCenter();
@@ -197,9 +204,11 @@ public class BoardFragment extends Fragment {
     }
 
     public void startTurn() {
+        Log.e("board", "startTurn " + init);
         if(!init){
             myTurn = true;
         }
+        else if(!updateFirstNewRound);
         else {
             // for plate tiles
             GridLayout board = view.findViewById(R.id.gridPlates);
@@ -208,7 +217,10 @@ public class BoardFragment extends Fragment {
                 for (int j = 0; j < plate.getChildCount(); j++) {
                     ImageView tile = (ImageView) plate.getChildAt(j);
                     int color = (tile.getTag(R.id.color_id) != null) ? (int) tile.getTag(R.id.color_id) : 0;
-                    if (color != -1) tile.setOnTouchListener(new TileTouchListener());
+                    if (color != -1) {
+                        Log.e("Board", "Tile setOnTouch");
+                        tile.setOnTouchListener(new TileTouchListener());
+                    }
                 }
             }
             // for center tiles

@@ -162,6 +162,8 @@ public class GameStart extends AppCompatActivity {
         });
         SocketManager.getSocket().on("startRound", args -> {
             Log.i("GameStart Event", "On startRound");
+            JSONArray a = (JSONArray) args[0];
+            Log.e("startRound", a.toString());
             startRound(args);
         });
         SocketManager.getSocket().on("boardLookupResponse", args -> {
@@ -401,6 +403,7 @@ public class GameStart extends AppCompatActivity {
     private void startTurn() {
         GameStart gameStart = this;
         gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "It's your turn!", Toast.LENGTH_LONG).show());
+        Log.e("gamestart", "myTurn!!!");
         boardFragment.startTurn();
         musterFragment.dragListenerNewTileField(gameStart);
         playersFragment.playersTurn.set(0);
@@ -408,6 +411,9 @@ public class GameStart extends AppCompatActivity {
 
     private void startRound(Object[] args) {
         Log.i("Event", "startRound");
+
+        boardFragment.updateFirstNewRound = false;
+
         updateAllPoints((JSONArray) args[0]);
 
         musterFragment.startRound(wandFragment);
