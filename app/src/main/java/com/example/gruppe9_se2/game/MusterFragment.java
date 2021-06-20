@@ -256,13 +256,16 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
-    public void startRound() {
+    public void startRound(WandFragment wandFragment) {
         for (int i = 0; i < elements.length; i++) {
+            if(i+1==elements[i].count) wandFragment.add(i, elements[i].color);
+
             Element e = elements[i];
             e.count = 0;
             e.color = 0;
 
             setMusterElement(i + 1, e, 0);
+
         }
     }
 
