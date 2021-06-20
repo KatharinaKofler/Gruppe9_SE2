@@ -242,7 +242,7 @@ public class GameStart extends AppCompatActivity {
 
         containerId = findViewById(R.id.bodenFragment).getId();
         ft = getSupportFragmentManager().beginTransaction();
-        bodenFragment = new BodenFragment();
+        bodenFragment = new BodenFragment(gameStart);
         ft.replace(containerId, bodenFragment);
         ft.commit();
 

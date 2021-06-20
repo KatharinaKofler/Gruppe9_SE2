@@ -38,6 +38,14 @@ public class MusterFragment extends Fragment implements EventListener {
         for (int i = 0; i < elements.length; i++) {
             elements[i] = new Element();
         }
+
+        // Fragment Notifications
+        getParentFragmentManager().setFragmentResultListener("pattern", this, (requestKey, bundle) -> {
+            boolean isClearNewTileField = bundle.getBoolean("clearNewTileField");
+            if (isClearNewTileField) {
+                clearNewTileField();
+            }
+        });
     }
 
     @Override
@@ -150,12 +158,9 @@ public class MusterFragment extends Fragment implements EventListener {
     private final class MyTouchListener implements View.OnTouchListener {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-//                String[] tags = view.getTag().toString().split("\\|");
-//                int color = (int) (1 + Math.random() * 4);
                 ClipData data = ClipData.newPlainText("tile", view.getTag().toString());
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
                 view.startDrag(data, shadowBuilder, view, 0);
-//                view.setVisibility(View.INVISIBLE);
                 return true;
             } else {
                 return false;
@@ -163,9 +168,8 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
-    class MyPatternDragListener implements View.OnDragListener {
+    private class MyPatternDragListener implements View.OnDragListener {
         Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
-        Drawable normalShape = getResources().getDrawable(R.drawable.shape);
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
@@ -175,8 +179,7 @@ public class MusterFragment extends Fragment implements EventListener {
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
                 case DragEvent.ACTION_DRAG_ENDED:
-                    v.setBackground(normalShape);
-//                    ((View) event.getLocalState()).setVisibility(View.VISIBLE);
+                    v.setBackground(null);
                     break;
                 case DragEvent.ACTION_DROP:
                     if ((boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {

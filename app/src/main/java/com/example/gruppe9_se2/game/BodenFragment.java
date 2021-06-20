@@ -1,35 +1,31 @@
 package com.example.gruppe9_se2.game;
 
+import android.content.ClipData;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.GridLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
+import android.view.*;
+import android.widget.*;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
-
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
 import com.example.gruppe9_se2.logic.GameStart;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BodenFragment extends Fragment {
+    // GameStart
+    private final GameStart gameStart;
+
     GridLayout gridLayout;
 
     // Elements-Array to store Bodenreihe
     Element[] elements = new Element[7];
+
+    public BodenFragment(GameStart gameStart) {
+        this.gameStart = gameStart;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,33 +36,12 @@ public class BodenFragment extends Fragment {
             elements[i] = new Element();
         }
 
-        // Fragment Benachrichtigungen
-        getParentFragmentManager().setFragmentResultListener("floor", this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
-                int color = bundle.getInt("color");
-                int count = bundle.getInt("count");
+        // Fragment Notifications
+        getParentFragmentManager().setFragmentResultListener("floor", this, (requestKey, bundle) -> {
+            int color = bundle.getInt("color");
+            int count = bundle.getInt("count");
 
-                // Wenn count 0 oder kleiner dann keine Aktion
-                if (count < 1) {
-                    return;
-                }
-
-                // Bodenelemente setzen
-                int j = 0;
-                for (int i = 0; i < elements.length; i++) {
-                    Element e = elements[i];
-                    if (e.getColor() != 0) {
-                        continue;
-                    }
-
-                    setBodenElement(i + 1, color);
-                    j++;
-                    if (j >= count) {
-                        break;
-                    }
-                }
-            }
+            fillBodenElements(count, color);
         });
     }
 
@@ -78,6 +53,7 @@ public class BodenFragment extends Fragment {
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
         gridLayout = view.findViewById(R.id.gridBoden);
+        gridLayout.setOnDragListener(new BodenDragListener());
 
         for (int i = 0; i < 7; i++) {
             RelativeLayout layout = new RelativeLayout(requireContext());
@@ -109,6 +85,68 @@ public class BodenFragment extends Fragment {
         }
 
         return view;
+    }
+
+    private class BodenDragListener implements View.OnDragListener {
+        Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            switch (event.getAction()) {
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    v.setBackground(enterShape);
+                    break;
+                case DragEvent.ACTION_DRAG_EXITED:
+                case DragEvent.ACTION_DRAG_ENDED:
+                    v.setBackground(null);
+                    break;
+                case DragEvent.ACTION_DROP:
+                    if ((boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
+                        return false;
+                    }
+
+                    Bundle result = new Bundle();
+                    result.putBoolean("clearNewTileField", true);
+                    getParentFragmentManager().setFragmentResult("pattern", result);
+
+                    ClipData data = event.getClipData();
+                    String[] tile = data.getItemAt(0).getText().toString().split("\\|");
+                    int count = Integer.parseInt(tile[1]);
+                    int color = Integer.parseInt(tile[0]);
+
+                    fillBodenElements(count, color);
+
+                    // If manually dropping to Bodenreihe Send finishTurn with row 0 to server
+                    gameStart.finishTurn(0);
+
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
+    }
+
+    private void fillBodenElements(int count, int color) {
+        // Wenn count 0 oder kleiner dann keine Aktion
+        if (count < 1) {
+            return;
+        }
+
+        // Bodenelemente setzen
+        int j = 0;
+        for (int i = 0; i < elements.length; i++) {
+            Element e = elements[i];
+            if (e.getColor() != 0) {
+                continue;
+            }
+
+            setBodenElement(i + 1, color);
+            j++;
+            if (j >= count) {
+                break;
+            }
+        }
     }
 
     private void setBodenElement(int pos, int color) {
