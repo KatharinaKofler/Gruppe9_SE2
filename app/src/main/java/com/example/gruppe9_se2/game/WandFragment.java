@@ -116,10 +116,6 @@ public class WandFragment extends Fragment implements EventListener {
         ImageView imageView = (ImageView) linearLayout.getChildAt(0);
         imageView.setImageResource(imageId);
         imageView.setTag(R.id.drawable_id, imageId);
-
-        //todo calculate points
-
-        //todo add points to total player points
     }
 
     private void createEmptyArray(JSONArray jsonArray){
