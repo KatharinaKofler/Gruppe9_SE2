@@ -39,10 +39,15 @@ public class BodenFragment extends Fragment {
 
         // Fragment Notifications
         getParentFragmentManager().setFragmentResultListener("floor", this, (requestKey, bundle) -> {
-            int color = bundle.getInt("color");
-            int count = bundle.getInt("count");
+            boolean activateFloorDrag = bundle.getBoolean("activateFloorDrag");
+            if (activateFloorDrag) {
+                gridLayout.setOnDragListener(new BodenDragListener());
+            } else {
+                int color = bundle.getInt("color");
+                int count = bundle.getInt("count");
 
-            fillBodenElements(count, color);
+                fillBodenElements(count, color);
+            }
         });
     }
 
@@ -54,7 +59,6 @@ public class BodenFragment extends Fragment {
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
         gridLayout = view.findViewById(R.id.gridBoden);
-        gridLayout.setOnDragListener(new BodenDragListener());
 
         for (int i = 0; i < 7; i++) {
             RelativeLayout layout = new RelativeLayout(requireContext());
