@@ -77,7 +77,7 @@ public class MusterFragment extends Fragment implements EventListener {
 
                     // Test Drop nur auf letzter Spalte
                     if (j == 4) {
-                        image.setOnDragListener(new MyPatternDragListener());
+                        image.setOnDragListener(new MusterDragListener());
                     }
 
                     linearLayout.addView(image);
@@ -117,42 +117,58 @@ public class MusterFragment extends Fragment implements EventListener {
     }
 
     private class NewTileDragListener implements View.OnDragListener {
+        @SuppressWarnings("deprecation")
+        Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
+
         @Override
         public boolean onDrag(View v, DragEvent event) {
-            if (event.getAction() == DragEvent.ACTION_DROP) {
-                ImageView imageView = (ImageView) event.getLocalState();
-
-                int color = (int) imageView.getTag(R.id.color_id);
-                int count = (int) imageView.getTag(R.id.count_id);
-
-                // check if Image comes from Center or Plates
-                int i = (int) imageView.getTag(R.id.isCenter);
-                if (i == 1) {
-                    // Center
-                    // args.color = int 1 bis 5
-                    JSONObject args = new JSONObject();
-                    try {
-                        args.put("color", color + 1);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            switch (event.getAction()) {
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    if ((boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
+                        v.setBackground(enterShape);
                     }
-                    gameStart.takeCenterTiles(args);
-                } else {
-                    // Plates
-                    // args.plate string plate0 bis plate8 und args.color = int 1 bis 5
-                    int plate = (int) imageView.getTag(R.id.plateNr_id);
-                    JSONObject args = new JSONObject();
-                    try {
-                        args.put("plate", "plate" + plate);
-                        args.put("color", color + 1);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    break;
+                case DragEvent.ACTION_DRAG_EXITED:
+                case DragEvent.ACTION_DRAG_ENDED:
+                    v.setBackground(null);
+                    break;
+                case DragEvent.ACTION_DROP:
+                    ImageView imageView = (ImageView) event.getLocalState();
+
+                    int color = (int) imageView.getTag(R.id.color_id);
+                    int count = (int) imageView.getTag(R.id.count_id);
+
+                    // check if Image comes from Center or Plates
+                    int i = (int) imageView.getTag(R.id.isCenter);
+                    if (i == 1) {
+                        // Center
+                        // args.color = int 1 bis 5
+                        JSONObject args = new JSONObject();
+                        try {
+                            args.put("color", color + 1);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        gameStart.takeCenterTiles(args);
+                    } else {
+                        // Plates
+                        // args.plate string plate0 bis plate8 und args.color = int 1 bis 5
+                        int plate = (int) imageView.getTag(R.id.plateNr_id);
+                        JSONObject args = new JSONObject();
+                        try {
+                            args.put("plate", "plate" + plate);
+                            args.put("color", color + 1);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        gameStart.takePlateTiles(args);
                     }
-                    gameStart.takePlateTiles(args);
-                }
-                imageView.setOnDragListener(null);
-                addNewTileField(color, count);
-                gameStart.disableOnTouchBoard();
+                    imageView.setOnDragListener(null);
+                    addNewTileField(color, count);
+                    gameStart.disableOnTouchBoard();
+                    break;
+                default:
+                    break;
             }
             return true;
         }
@@ -173,7 +189,7 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
-    private class MyPatternDragListener implements View.OnDragListener {
+    private class MusterDragListener implements View.OnDragListener {
         @SuppressWarnings("deprecation")
         Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
 
@@ -181,7 +197,9 @@ public class MusterFragment extends Fragment implements EventListener {
         public boolean onDrag(View v, DragEvent event) {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_ENTERED:
-                    v.setBackground(enterShape);
+                    if (!(boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
+                        v.setBackground(enterShape);
+                    }
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
                 case DragEvent.ACTION_DRAG_ENDED:

@@ -99,7 +99,9 @@ public class BodenFragment extends Fragment {
         public boolean onDrag(View v, DragEvent event) {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_ENTERED:
-                    v.setBackground(enterShape);
+                    if (!(boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
+                        v.setBackground(enterShape);
+                    }
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
                 case DragEvent.ACTION_DRAG_ENDED:
