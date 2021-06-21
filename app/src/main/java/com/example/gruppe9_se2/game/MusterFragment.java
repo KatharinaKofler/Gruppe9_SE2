@@ -68,7 +68,7 @@ public class MusterFragment extends Fragment implements EventListener {
                 LinearLayout linearLayout = new LinearLayout(requireContext());
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                if (j >= 4 - i) {
+                if (j > (3 - i)) {
                     ImageView image = new ImageView(requireContext());
                     image.setImageResource(R.drawable.empty_fliese);
                     image.setTag((i + 1) + "|" + (j + 1));
@@ -160,6 +160,7 @@ public class MusterFragment extends Fragment implements EventListener {
 
     private static final class MyTouchListener implements View.OnTouchListener {
         @SuppressLint("ClickableViewAccessibility")
+        @SuppressWarnings("deprecation")
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 ClipData data = ClipData.newPlainText("tile", view.getTag().toString());
@@ -173,7 +174,7 @@ public class MusterFragment extends Fragment implements EventListener {
     }
 
     private class MyPatternDragListener implements View.OnDragListener {
-        @SuppressLint("UseCompatLoadingForDrawables")
+        @SuppressWarnings("deprecation")
         Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
 
         @Override
@@ -290,13 +291,18 @@ public class MusterFragment extends Fragment implements EventListener {
 
     public void startRound(WandFragment wandFragment) {
         for (int i = 0; i < elements.length; i++) {
-            if (i + 1 == elements[i].getCount()) {
+            // If row is full then add to Wandfragment
+            if (elements[i].getCount() == i + 1) {
                 wandFragment.add(i, elements[i].getColor());
-                clearMusterElemente(i);
-                Element e = elements[i];
-                e.count = 0;
-                e.color = 0;
             }
+
+            // Clear row
+            clearMusterElemente(i);
+
+            // Clear element
+            Element e = elements[i];
+            e.count = 0;
+            e.color = 0;
         }
     }
 
