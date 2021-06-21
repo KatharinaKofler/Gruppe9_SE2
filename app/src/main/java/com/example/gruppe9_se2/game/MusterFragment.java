@@ -309,18 +309,17 @@ public class MusterFragment extends Fragment implements EventListener {
 
     public void startRound(WandFragment wandFragment) {
         for (int i = 0; i < elements.length; i++) {
-            // If row is full then add to Wandfragment
             if (elements[i].getCount() == i + 1) {
+                // If row is full then add to Wandfragment
                 wandFragment.add(i, elements[i].getColor());
+
+                // Clear row
+                clearMusterElemente(i);
+
+                // Clear element
+                Element e = elements[i];
+                e.clear();
             }
-
-            // Clear row
-            clearMusterElemente(i);
-
-            // Clear element
-            Element e = elements[i];
-            e.count = 0;
-            e.color = 0;
         }
     }
 
@@ -353,6 +352,11 @@ public class MusterFragment extends Fragment implements EventListener {
                 this.count = row;
                 return temp - row;
             }
+        }
+
+        public void clear() {
+            this.color = 0;
+            this.count = 0;
         }
     }
 }
