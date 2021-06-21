@@ -3,6 +3,7 @@ package com.example.gruppe9_se2.game;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,6 +34,11 @@ public class BoardFragment extends Fragment {
 
     private boolean init = false;
     private boolean myTurn = false;
+
+    private boolean calledUpdateCenterFirst = false;
+    private boolean calledAddListenersFrist = false;
+
+    public boolean myTurnAddListenersToCenter = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,14 +98,14 @@ public class BoardFragment extends Fragment {
 
                     }
                     init = true;
-                    if(myTurn){
+                    if (myTurn) {
                         startTurn();
                         myTurn = false;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if(!updateFirstNewRound){
+                if (!updateFirstNewRound) {
                     updateFirstNewRound = true;
                     startTurn();
                 }
@@ -124,6 +130,7 @@ public class BoardFragment extends Fragment {
                     addToCenter(i, center[i]);
                 }
             }
+
         } catch (JSONException jsonException) {
             jsonException.printStackTrace();
         }
@@ -171,7 +178,7 @@ public class BoardFragment extends Fragment {
         }
     }
 
-    private void cleanCenter(){
+    private void cleanCenter() {
         GridLayout center = view.findViewById(R.id.gridCenter);
         gameStart.runOnUiThread(center::removeAllViews);
     }
@@ -184,25 +191,24 @@ public class BoardFragment extends Fragment {
         tile.setLayoutParams(new LinearLayout.LayoutParams(size, size));
         tile.setPadding(5, 5, 5, 5);
 
-        if(color == -1) tile.setImageResource(R.drawable.first_taker);
+        if (color == -1) tile.setImageResource(R.drawable.first_taker);
         else tile.setImageResource(tileResourceMap[color]);
         tile.setTag(R.id.color_id, color);
         tile.setTag(R.id.count_id, count);
         tile.setTag(R.id.isCenter, 1);
         tile.setTag(R.id.fromBoard, true);
 
-        //TODO
-        tile.setOnTouchListener(new TileTouchListener());
+        if(myTurnAddListenersToCenter) tile.setOnTouchListener(new TileTouchListener());
 
         gameStart.runOnUiThread(() -> center.addView(tile));
     }
 
     @SuppressLint("ClickableViewAccessibility")
     public void startTurn() {
-        if(!init){
+        myTurnAddListenersToCenter = true;
+        if (!init) {
             myTurn = true;
-        }
-        else if(updateFirstNewRound){
+        } else if (updateFirstNewRound) {
             // for plate tiles
             GridLayout board = view.findViewById(R.id.gridPlates);
             for (int i = 0; i < board.getChildCount(); i++) {
@@ -214,13 +220,6 @@ public class BoardFragment extends Fragment {
                         tile.setOnTouchListener(new TileTouchListener());
                     }
                 }
-            }
-            // for center tiles
-            GridLayout center = view.findViewById(R.id.gridCenter);
-            for (int i = 0; i < center.getChildCount(); i++) {
-                ImageView tile = (ImageView) center.getChildAt(i);
-                int color = (tile.getTag(R.id.color_id) != null) ? (int) tile.getTag(R.id.color_id) : 0;
-                if (color != -1) tile.setOnTouchListener(new TileTouchListener());
             }
         }
     }

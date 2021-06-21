@@ -133,6 +133,9 @@ public class MusterFragment extends Fragment implements EventListener {
                     v.setBackground(null);
                     break;
                 case DragEvent.ACTION_DROP:
+
+                    gameStart.finishMyTurn();
+
                     ImageView imageView = (ImageView) event.getLocalState();
 
                     int color = (int) imageView.getTag(R.id.color_id);
