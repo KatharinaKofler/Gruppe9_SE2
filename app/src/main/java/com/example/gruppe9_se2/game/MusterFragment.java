@@ -31,6 +31,12 @@ public class MusterFragment extends Fragment implements EventListener {
     // Elements-Array to store Musterreihe
     private final Element[] elements = new Element[5];
 
+    private boolean starterMarker = false;
+
+    private int lastRowDrop;
+    private int lastColorDrop;
+    private int lastCountDrop;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,8 +144,12 @@ public class MusterFragment extends Fragment implements EventListener {
 
                     ImageView imageView = (ImageView) event.getLocalState();
 
+                    if((boolean) imageView.getTag(R.id.starterMarker)) addStarterMarker();
+
                     int color = (int) imageView.getTag(R.id.color_id);
+                    lastColorDrop = color;
                     int count = (int) imageView.getTag(R.id.count_id);
+                    lastCountDrop = count;
 
                     // check if Image comes from Center or Plates
                     int i = (int) imageView.getTag(R.id.isCenter);
@@ -177,6 +187,8 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
+
+
     private static final class MyTouchListener implements View.OnTouchListener {
         @SuppressLint("ClickableViewAccessibility")
         public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -210,13 +222,22 @@ public class MusterFragment extends Fragment implements EventListener {
                         // If row already full, drop not allowed
                         if (element.getCount() == row) {
                             v.setBackground(forbiddenShape);
-                        } else {
+                        }
+                        else{
                             v.setBackground(allowedShape);
                         }
                     }
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
+                    v.setBackground(null);
+                    break;
                 case DragEvent.ACTION_DRAG_ENDED:
+                    boolean dropped = event.getResult();
+                    Log.e("MusterFragment", "Dropped: "+dropped);
+                    if(!dropped) {
+                        clearNewTileField();
+                        addNewTileField(lastColorDrop, lastCountDrop);
+                    }
                     v.setBackground(null);
                     break;
                 case DragEvent.ACTION_DROP:
@@ -232,9 +253,10 @@ public class MusterFragment extends Fragment implements EventListener {
                     Log.e("MusterFragment", "count: "+count);
                     if (count > 0) {
                         int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
-                        Log.e("MusterFragment", "row: "+row);
+                        lastRowDrop = row;
                         int color = Integer.parseInt(tile[0]);
-                        Log.e("MusterFragment", "color: "+color);
+
+                        if(gameStart.isColorInRow(color, row)) return false;
 
                         Element element = elements[row - 1];
 
@@ -272,12 +294,27 @@ public class MusterFragment extends Fragment implements EventListener {
 
                         // Set elements and notify server
                         setMusterElement(row, element, count);
+
+                        if(starterMarker){
+                            addStarterMarker();
+                            starterMarker = false;
+                        }
                     }
                     break;
                 default:
                     break;
             }
             return true;
+        }
+    }
+
+    public void clearPatternRow(){
+        for (int j = 0; j < 5; j++) {
+            if (j > (3 - lastRowDrop)) {
+                LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt((lastRowDrop * 5) + j);
+                ImageView imageView = (ImageView) linearLayout.getChildAt(0);
+                imageView.setImageResource(R.drawable.empty_fliese);
+            }
         }
     }
 
@@ -319,6 +356,13 @@ public class MusterFragment extends Fragment implements EventListener {
             // Send finishTurn to server
             gameStart.finishTurn(row);
         }
+    }
+
+    private void addStarterMarker(){
+        Bundle result = new Bundle();
+        result.putInt("color", -1);
+        result.putInt("count", 1);
+        getParentFragmentManager().setFragmentResult("floor", result);
     }
 
     public void startRound(WandFragment wandFragment) {

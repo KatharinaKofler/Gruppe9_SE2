@@ -3,7 +3,6 @@ package com.example.gruppe9_se2.game;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -122,12 +121,16 @@ public class BoardFragment extends Fragment {
             center[2] = centerObject.getInt("blue");
             center[3] = centerObject.getInt("purple");
             center[4] = centerObject.getInt("orange");
-            if (centerObject.getInt("starter") == 1) addToCenter(-1, 1);
+            boolean starterMarker = false;
+            if (centerObject.getInt("starter") == 1) {
+                addToCenter(-1, 1, false);
+                starterMarker = true;
+            }
 
             // update center
             for (int i = 0; i < 5; i++) {
                 for (int j = 0; j < center[i]; j++) {
-                    addToCenter(i, center[i]);
+                    addToCenter(i, center[i], starterMarker);
                 }
             }
 
@@ -157,6 +160,7 @@ public class BoardFragment extends Fragment {
             tile.setTag(R.id.plateNr_id, i);
             tile.setTag(R.id.isCenter, 0);
             tile.setTag(R.id.fromBoard, true);
+            tile.setTag(R.id.starterMarker, false);
             plate.addView(tile, j);
         }
         platesGrid.addView(plate, i);
@@ -184,7 +188,7 @@ public class BoardFragment extends Fragment {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void addToCenter(int color, int count) {
+    private void addToCenter(int color, int count, boolean starterMarker) {
         GridLayout center = view.findViewById(R.id.gridCenter);
         ImageView tile = new ImageView(requireContext());
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
@@ -197,6 +201,7 @@ public class BoardFragment extends Fragment {
         tile.setTag(R.id.count_id, count);
         tile.setTag(R.id.isCenter, 1);
         tile.setTag(R.id.fromBoard, true);
+        tile.setTag(R.id.starterMarker, starterMarker);
 
         if(myTurnAddListenersToCenter) tile.setOnTouchListener(new TileTouchListener());
 
