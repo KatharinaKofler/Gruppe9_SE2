@@ -19,7 +19,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.EventListener;
-import java.util.List;
 
 public class WandFragment extends Fragment implements EventListener {
 
@@ -30,7 +29,7 @@ public class WandFragment extends Fragment implements EventListener {
     static boolean firstCreate = true;
     GridLayout gridLayout;
 
-    private ArrayList<ArrayList<Integer>> wall = new ArrayList<>();
+    private final ArrayList<ArrayList<Integer>> wall = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

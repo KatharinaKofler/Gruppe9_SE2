@@ -233,8 +233,6 @@ public class PlayersFragment extends Fragment {
                 startActivity(intent);
             }
         }
-
-
     }
 
     public void markCurrentPlayer(int player) {
@@ -258,9 +256,6 @@ public class PlayersFragment extends Fragment {
     private void onIntegerChanged(int player) {
         if (isInit) markCurrentPlayer(player);
     }
-
-
-
 
     public interface OnIntegerChangeListener {
         void onIntegerChanged(int newValue);

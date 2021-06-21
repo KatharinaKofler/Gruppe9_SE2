@@ -34,9 +34,6 @@ public class BoardFragment extends Fragment {
     private boolean init = false;
     private boolean myTurn = false;
 
-    private boolean calledUpdateCenterFirst = false;
-    private boolean calledAddListenersFrist = false;
-
     public boolean myTurnAddListenersToCenter = false;
 
     @Override

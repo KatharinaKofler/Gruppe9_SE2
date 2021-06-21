@@ -27,10 +27,6 @@ public class InviteListAdapter extends RecyclerView.Adapter<InviteListAdapter.Vi
         notifyItemInserted(localDataSet.size() - 1);
     }
 
-    public void insertAll(List<String> data) {
-        localDataSet.addAll(data);
-        notifyDataSetChanged();
-    }
 
     @NonNull
     @Override
@@ -62,7 +58,7 @@ public class InviteListAdapter extends RecyclerView.Adapter<InviteListAdapter.Vi
             super(view);
             // Define click listener for the ViewHolder's View
 
-            textView = (TextView) view.findViewById(R.id.lobbyName);
+            textView = view.findViewById(R.id.lobbyName);
         }
 
         public TextView getTextView() {

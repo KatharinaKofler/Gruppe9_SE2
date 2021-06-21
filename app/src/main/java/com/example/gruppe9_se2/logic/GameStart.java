@@ -486,9 +486,11 @@ public class GameStart extends AppCompatActivity {
         UsersApi service = retrofit.create(UsersApi.class);
         Call<UsersResponse> call = service.executeUsers(uid, token);
         call.enqueue(new Callback<UsersResponse>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(@NotNull Call<UsersResponse> call, @NotNull Response<UsersResponse> response) {
                 Log.i("getUser", "onResponse successfull: " + response.code());
+                assert response.body() != null;
                 results.add(new PlayerResult(0, response.body().getUsername(), points));
                 if(results.size()==last) startEndGame(results);
 
