@@ -443,11 +443,14 @@ public class GameStart extends AppCompatActivity {
                 score = scores.getJSONObject(i);
                 int points = score.getInt("points");
                 String uid = score.getString("uid");
-                //results.add(new PlayerResult(0, getNameById(uid), points));
+                getNameById(uid, results, points, scores.length());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void startEndGame(List<PlayerResult> results){
         Comparator<PlayerResult> compareByPoints = (PlayerResult p1, PlayerResult p2) -> {
             Integer p1P = p1.points;
             Integer p2P = p2.points;
@@ -460,6 +463,34 @@ public class GameStart extends AppCompatActivity {
         Intent intent = new Intent(this, EndGameActivity.class);
         intent.putExtra("results", (Serializable) results);
         startActivity(intent);
+    }
+
+    private void getNameById(String uid, List<PlayerResult> results, int points, int last) {
+        // Post Request getUser
+        String token = "Bearer ";
+        token += ApiManager.getToken();
+
+        Retrofit retrofit = ApiManager.getInstance();
+        UsersApi service = retrofit.create(UsersApi.class);
+        Call<UsersResponse> call = service.executeUsers(uid, token);
+        call.enqueue(new Callback<UsersResponse>() {
+            @Override
+            public void onResponse(@NotNull Call<UsersResponse> call, @NotNull Response<UsersResponse> response) {
+                Log.i("getUser", "onResponse successfull: " + response.code());
+                results.add(new PlayerResult(0, response.body().getUsername(), points));
+                if(results.size()==last) startEndGame(results);
+
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<UsersResponse> call, @NotNull Throwable t) {
+                Log.e("getUser", "onFailure");
+            }
+        });
+    }
+
+    public void finishMyTurn() {
+        boardFragment.myTurnAddListenersToCenter = false;
     }
 
     // cheat function
@@ -488,13 +519,13 @@ public class GameStart extends AppCompatActivity {
             String accused = arg.getString("accused");
             String accuser = arg.getString("accuser");
             boolean cheated = arg.getBoolean("cheated");
-            getNameById(cheated, accused, accuser);
+            getNameAccuseResponse(cheated, accused, accuser);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void getNameById(Boolean cheated, String accused, String accuser) {
+    private void getNameAccuseResponse(Boolean cheated, String accused, String accuser) {
         // Post Request getUser
         String token = "Bearer ";
         token += ApiManager.getToken();
@@ -546,4 +577,6 @@ public class GameStart extends AppCompatActivity {
 
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
+
+
 }
