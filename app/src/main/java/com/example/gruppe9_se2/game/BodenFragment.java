@@ -93,14 +93,14 @@ public class BodenFragment extends Fragment {
 
     private class BodenDragListener implements View.OnDragListener {
         @SuppressWarnings("deprecation")
-        Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
+        Drawable allowedShape = getResources().getDrawable(R.drawable.shape_drop_target_allowed);
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_ENTERED:
                     if (!(boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
-                        v.setBackground(enterShape);
+                        v.setBackground(allowedShape);
                     }
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:

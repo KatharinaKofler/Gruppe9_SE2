@@ -118,14 +118,14 @@ public class MusterFragment extends Fragment implements EventListener {
 
     private class NewTileDragListener implements View.OnDragListener {
         @SuppressWarnings("deprecation")
-        Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
+        Drawable allowedShape = getResources().getDrawable(R.drawable.shape_drop_target_allowed);
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_ENTERED:
                     if ((boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
-                        v.setBackground(enterShape);
+                        v.setBackground(allowedShape);
                     }
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
@@ -191,14 +191,24 @@ public class MusterFragment extends Fragment implements EventListener {
 
     private class MusterDragListener implements View.OnDragListener {
         @SuppressWarnings("deprecation")
-        Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
+        Drawable allowedShape = getResources().getDrawable(R.drawable.shape_drop_target_allowed);
+        @SuppressWarnings("deprecation")
+        Drawable forbiddenShape = getResources().getDrawable(R.drawable.shape_drop_target_forbidden);
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_ENTERED:
                     if (!(boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
-                        v.setBackground(enterShape);
+                        int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
+                        Element element = elements[row - 1];
+
+                        // If row already full, drop not allowed
+                        if (element.getCount() == row) {
+                            v.setBackground(forbiddenShape);
+                        } else {
+                            v.setBackground(allowedShape);
+                        }
                     }
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
