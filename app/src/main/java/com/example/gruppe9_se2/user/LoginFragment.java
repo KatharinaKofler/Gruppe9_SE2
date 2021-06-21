@@ -70,10 +70,6 @@ public class LoginFragment extends Fragment implements EventListener {
                 passwordLayout.setError(null);
             }
 
-
-            // todo check login data for correctness
-            // todo print error message if incorrect
-            // todo authenticate user if correct and lead to home page
             Retrofit retrofit = ApiManager.getInstance();
             LoginRequest request = new LoginRequest(name.getText().toString(), password.getText().toString());
             LoginApi service = retrofit.create(LoginApi.class);
