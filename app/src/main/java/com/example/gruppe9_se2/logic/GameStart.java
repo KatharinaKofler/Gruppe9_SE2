@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -380,7 +382,6 @@ public class GameStart extends AppCompatActivity {
     }
 
     private void updateAllPoints(JSONArray scores) {
-        // todo check if its JSONArray with those parameters
         try {
             for (int i = 0; i < scores.length(); i++) {
                 JSONObject playerScore = scores.getJSONObject(i);
@@ -444,6 +445,7 @@ public class GameStart extends AppCompatActivity {
     }
 
     private void gameEnd(Object[] args) {
+
         JSONArray scores = (JSONArray) args[0];
         List<PlayerResult> results = new ArrayList<>();
         for (int i = 0; i < scores.length(); i++) {
@@ -459,13 +461,14 @@ public class GameStart extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void startEndGame(List<PlayerResult> results){
         Comparator<PlayerResult> compareByPoints = (PlayerResult p1, PlayerResult p2) -> {
             Integer p1P = p1.points;
             Integer p2P = p2.points;
             return p1P.compareTo(p2P);
         };
-        Collections.sort(results, compareByPoints);
+        Collections.sort(results, compareByPoints.reversed());
         for (int i = 0; i < results.size(); i++) {
             results.get(i).rank = i + 1;
         }
@@ -528,6 +531,8 @@ public class GameStart extends AppCompatActivity {
             String accused = arg.getString("accused");
             String accuser = arg.getString("accuser");
             boolean cheated = arg.getBoolean("cheated");
+            if(cheated) playersFragment.minusPoints(accused);
+            else playersFragment.minusPoints(accuser);
             getNameAccuseResponse(cheated, accused, accuser);
         } catch (JSONException e) {
             e.printStackTrace();

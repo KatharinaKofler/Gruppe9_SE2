@@ -138,6 +138,34 @@ public class PlayersFragment extends Fragment {
         }
     }
 
+    public void minusPoints(String id) {
+        //minus 10 points
+        gameStart.runOnUiThread(() -> {
+            boolean foundId = false;
+            for (int i = 1; i < playerButtonLayout.getChildCount(); i++) {
+                Button playerButton = (Button) playerButtonLayout.getChildAt(i);
+                if (playerButton.getTag(R.id.playerId).equals(id)) {
+                    foundId = true;
+                    int oldPoints = (int) playerButton.getTag(R.id.points);
+                    int newPoints = oldPoints - 10;
+                    if(newPoints<0) newPoints = 0;
+                    playerButton.setTag(R.id.points, newPoints);
+                    String text = playerList.get(i - 1)[1] + "\n" + newPoints + " Points";
+                    playerButton.setText(text);
+                }
+            }
+            if (!foundId) {
+                Button playerButton = (Button) playerButtonLayout.getChildAt(0);
+                int oldPoints = (int) playerButton.getTag(R.id.points);
+                int newPoints = oldPoints - 10;
+                if(newPoints<0) newPoints = 0;
+                playerButton.setTag(R.id.points, newPoints);
+                String text = "Me\n" + newPoints + " Points";
+                playerButton.setText(text);
+            }
+        });
+    }
+
     public void updatePoints(String id, int points) {
         gameStart.runOnUiThread(() -> {
             boolean foundId = false;
@@ -160,9 +188,6 @@ public class PlayersFragment extends Fragment {
     }
 
     public void responsePlayerBoard(JSONObject playerBoard) {
-
-
-        // todo check if JSONObject has all the elements and everything is accessed correctly
         String playerId = null;
         try {
             playerId = playerBoard.getString("id");
@@ -233,6 +258,8 @@ public class PlayersFragment extends Fragment {
     private void onIntegerChanged(int player) {
         if (isInit) markCurrentPlayer(player);
     }
+
+
 
 
     public interface OnIntegerChangeListener {
