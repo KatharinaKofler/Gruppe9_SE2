@@ -278,20 +278,6 @@ public class MusterFragment extends Fragment implements EventListener {
                             return false;
                         }
 
-                        // If no empty row than activate floor as drop target
-                        boolean activateFloorDrag = true;
-                        for (Element e : elements) {
-                            if (e.getColor() == 0) {
-                                //activateFloorDrag = false;
-                                break;
-                            }
-                        }
-                        if (activateFloorDrag) {
-                            Bundle result = new Bundle();
-                            result.putBoolean("activateFloorDrag", true);
-                            getParentFragmentManager().setFragmentResult("floor", result);
-                        }
-
                         // Set elements and notify server
                         setMusterElement(row, element, count);
 

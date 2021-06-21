@@ -8,10 +8,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+
 import androidx.fragment.app.Fragment;
+
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
 import com.example.gruppe9_se2.logic.GameStart;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,15 +42,12 @@ public class BodenFragment extends Fragment {
 
         // Fragment Notifications
         getParentFragmentManager().setFragmentResultListener("floor", this, (requestKey, bundle) -> {
-            boolean activateFloorDrag = bundle.getBoolean("activateFloorDrag");
-            if (activateFloorDrag) {
-                gridLayout.setOnDragListener(new BodenDragListener());
-            } else {
-                int color = bundle.getInt("color");
-                int count = bundle.getInt("count");
 
-                fillBodenElements(count, color);
-            }
+            int color = bundle.getInt("color");
+            int count = bundle.getInt("count");
+
+            fillBodenElements(count, color);
+
         });
     }
 
@@ -59,6 +59,7 @@ public class BodenFragment extends Fragment {
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
         gridLayout = view.findViewById(R.id.gridBoden);
+        gridLayout.setOnDragListener(new BodenDragListener());
 
         for (int i = 0; i < 7; i++) {
             RelativeLayout layout = new RelativeLayout(requireContext());
@@ -163,7 +164,7 @@ public class BodenFragment extends Fragment {
         ImageView image = (ImageView) layout.getChildAt(0);
         if (image != null) {
             int resId;
-            if(color==-1) resId = R.drawable.first_taker;
+            if (color == -1) resId = R.drawable.first_taker;
             else resId = ResourceHelper.getFlieseResId(color);
             image.setImageResource(resId);
 
