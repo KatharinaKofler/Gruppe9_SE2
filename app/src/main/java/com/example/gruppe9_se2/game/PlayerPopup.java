@@ -148,6 +148,7 @@ public class PlayerPopup extends AppCompatActivity {
     }
 
     public static int[] binaryDivision(int value, int length){
+
         int[] bitmap = new int[length];
         for(int l = 0; l < length; l++){
             bitmap[length-1-l] = value%2;

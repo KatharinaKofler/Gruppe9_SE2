@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 public class PlayerPopupTest extends TestCase {
 
     public void testBinaryDivisionNull() {
-
         int length = 4;
         int[] expected = {0, 0, 0, 0};
         int[] actual = PlayerPopup.binaryDivision(0, length);
