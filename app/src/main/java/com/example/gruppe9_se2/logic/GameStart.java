@@ -64,7 +64,7 @@ public class GameStart extends AppCompatActivity {
     private MusterFragment musterFragment;
     private PlayersFragment playersFragment;
     private WandFragment wandFragment;
-
+    
     // everything for shakedetector
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -183,6 +183,11 @@ public class GameStart extends AppCompatActivity {
         SocketManager.getSocket().on("error", errorMessage -> {
             // print error message somewhere
             Log.i("SOCKET ERROR", (String) errorMessage[0]);
+            if(errorMessage[0].equals("wall tile already placed")) {
+                musterFragment.clearPatternRow();
+                gameStart.runOnUiThread(() -> Toast.makeText(gameStart, "You have this color already on the wall!", Toast.LENGTH_LONG).show());
+            }
+
         });
     }
 
@@ -432,6 +437,10 @@ public class GameStart extends AppCompatActivity {
     public void takePlateTiles(JSONObject args) {
         Log.i("Event send", "take plate tiles "+args.toString());
         SocketManager.getSocket().emit("takePlateTiles", args);
+    }
+
+    public boolean isColorInRow(int color, int row){
+        return wandFragment.isColorInRow(color,row);
     }
 
     private void gameEnd(Object[] args) {
