@@ -42,7 +42,7 @@ public class ShakeDetector implements SensorEventListener {
             Log.i("Sensor change", "gForce: "+gForce);
 
             final long now = System.currentTimeMillis();
-            // ignore shake events too close to each other (500ms)
+            // ignore shake events too close to each other
             if (mShakeTimestamp + SHAKE_GAP_TIME_MS > now) {
                 return;
             }
