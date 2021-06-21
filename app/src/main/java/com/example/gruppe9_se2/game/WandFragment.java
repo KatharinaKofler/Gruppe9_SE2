@@ -17,7 +17,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.List;
 
 public class WandFragment extends Fragment implements EventListener {
 
@@ -27,6 +29,8 @@ public class WandFragment extends Fragment implements EventListener {
     static JSONArray wand = new JSONArray();
     static boolean firstCreate = true;
     GridLayout gridLayout;
+
+    private ArrayList<ArrayList<Integer>> wall = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +50,11 @@ public class WandFragment extends Fragment implements EventListener {
 
     // Fill the 5x5 Grid with ImageViews
     private void init(View view, JSONArray jsonArray) {
+        // init wall
+        for (int i = 0; i < 5; i++) {
+            wall.add(i, new ArrayList<>());
+        }
+
         // Imagesize
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
@@ -92,6 +101,10 @@ public class WandFragment extends Fragment implements EventListener {
 
     public void add(int row, int color){ // row 0 to 4, color 0 to 4
         color--;
+
+        //update wall arraylist
+        wall.get(row).add(color);
+
         int imageId = fullFliesenOrder[color];
         // find LinearLayout where to add add the imageId
         int index = color + (6*row);
@@ -140,6 +153,11 @@ public class WandFragment extends Fragment implements EventListener {
 
     private int getColorId(int index){
         return ((index % 5) + (index / 5)) % 5;
+    }
+
+    public boolean isColorInRow(int color, int row){
+        Log.e("WandFragment", "row: "+row+", color: "+color);
+        return wall.get(row-1).contains(color-1);
     }
 
 }
