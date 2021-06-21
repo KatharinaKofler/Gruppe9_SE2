@@ -282,7 +282,7 @@ public class MusterFragment extends Fragment implements EventListener {
                         boolean activateFloorDrag = true;
                         for (Element e : elements) {
                             if (e.getColor() == 0) {
-                                activateFloorDrag = false;
+                                //activateFloorDrag = false;
                                 break;
                             }
                         }
