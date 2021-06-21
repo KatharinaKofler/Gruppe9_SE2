@@ -80,8 +80,8 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
             super(view);
             // Define click listener for the ViewHolder's View
 
-            name = (TextView) view.findViewById(R.id.lobbyName);
-            details = (TextView) view.findViewById(R.id.lobbyDetails);
+            name = view.findViewById(R.id.lobbyName);
+            details = view.findViewById(R.id.lobbyDetails);
             view.setOnClickListener(this);
         }
 

@@ -1,6 +1,5 @@
 package com.example.gruppe9_se2.user;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;

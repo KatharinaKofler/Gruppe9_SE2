@@ -19,8 +19,6 @@ import org.json.JSONObject;
 
 import java.util.EventListener;
 
-import io.socket.client.Socket;
-
 public class WandFragment extends Fragment implements EventListener {
 
     private final int[] emptyFliesenOrder = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};

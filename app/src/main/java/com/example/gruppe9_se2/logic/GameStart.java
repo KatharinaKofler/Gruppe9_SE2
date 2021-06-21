@@ -271,7 +271,7 @@ public class GameStart extends AppCompatActivity {
             playerCount = 1 + playersJSON.length();
             runOnUiThread(() -> ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount)));
             if (playerCount > 1) {
-                runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(true));
+                runOnUiThread(() -> findViewById(R.id.btn_startGame).setEnabled(true));
             }
             for (int i = 0; i < playersJSON.length(); i++) {
                 playersFragment.addPlayerId(playersJSON.getString(i));
@@ -292,7 +292,7 @@ public class GameStart extends AppCompatActivity {
             playerCount++;
             runOnUiThread(() -> ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount)));
             if (playerCount > 1) {
-                runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(true));
+                runOnUiThread(() -> findViewById(R.id.btn_startGame).setEnabled(true));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -309,7 +309,7 @@ public class GameStart extends AppCompatActivity {
             playerCount--;
             runOnUiThread(() -> ((TextView) findViewById(R.id.playercountText)).setText(playerText(playerCount)));
             if (playerCount < 2) {
-                runOnUiThread(() -> ((TextView) findViewById(R.id.btn_startGame)).setEnabled(false));
+                runOnUiThread(() -> findViewById(R.id.btn_startGame).setEnabled(false));
             }
         } catch (JSONException e) {
             e.printStackTrace();

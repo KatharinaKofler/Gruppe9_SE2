@@ -52,10 +52,10 @@ public class PlayerPopup extends AppCompatActivity {
         createWall(b);
         createPattern(b);
 
-        ImageButton exitPopUp = (ImageButton) findViewById(R.id.closePopUp);
+        ImageButton exitPopUp = findViewById(R.id.closePopUp);
         exitPopUp.setOnClickListener(view -> finish());
 
-        ImageButton accuse = (ImageButton) findViewById(R.id.accuse);
+        ImageButton accuse = findViewById(R.id.accuse);
         if(caught){
             accuse.setVisibility(View.INVISIBLE);
         } else {

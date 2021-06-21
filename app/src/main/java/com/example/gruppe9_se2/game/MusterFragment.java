@@ -117,7 +117,7 @@ public class MusterFragment extends Fragment implements EventListener {
     }
 
     private class NewTileDragListener implements View.OnDragListener {
-        @SuppressWarnings("deprecation")
+        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable allowedShape = getResources().getDrawable(R.drawable.shape_drop_target_allowed);
 
         @Override
@@ -176,7 +176,6 @@ public class MusterFragment extends Fragment implements EventListener {
 
     private static final class MyTouchListener implements View.OnTouchListener {
         @SuppressLint("ClickableViewAccessibility")
-        @SuppressWarnings("deprecation")
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 ClipData data = ClipData.newPlainText("tile", view.getTag().toString());
@@ -190,9 +189,11 @@ public class MusterFragment extends Fragment implements EventListener {
     }
 
     private class MusterDragListener implements View.OnDragListener {
-        @SuppressWarnings("deprecation")
+
+        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable allowedShape = getResources().getDrawable(R.drawable.shape_drop_target_allowed);
-        @SuppressWarnings("deprecation")
+
+        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable forbiddenShape = getResources().getDrawable(R.drawable.shape_drop_target_forbidden);
 
         @Override
