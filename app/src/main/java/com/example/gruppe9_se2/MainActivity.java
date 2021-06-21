@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +20,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set game title
+        setTitle(R.string.game_title);
+        
         //Intent intent = new Intent(this, Game.class);
         //startActivity(intent);
         // show content activity main
@@ -78,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         ft.commit();
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateSwitchBtnName(){
         if(login){
             Button btn = findViewById(R.id.btn_switch);

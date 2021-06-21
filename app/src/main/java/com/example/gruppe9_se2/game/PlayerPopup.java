@@ -1,6 +1,5 @@
 package com.example.gruppe9_se2.game;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridLayout;
@@ -13,8 +12,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gruppe9_se2.R;
-import com.example.gruppe9_se2.logic.Game;
 import com.example.gruppe9_se2.logic.SocketManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import io.socket.client.Socket;
 
@@ -22,7 +23,7 @@ public class PlayerPopup extends AppCompatActivity {
 
     private final int[] emptyFliesen = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
     private final int[] fullFliesen = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
-
+    String playerId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,9 +36,10 @@ public class PlayerPopup extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
         // hide action bar
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if(actionBar != null) actionBar.hide();
 
         Bundle b = getIntent().getExtras();
+        boolean caught = b.getBoolean("caught");
 
         String playerName = b.getString("name");
         ((TextView)findViewById(R.id.playerName)).setText(playerName);
@@ -45,31 +47,33 @@ public class PlayerPopup extends AppCompatActivity {
         int playerPoints = b.getInt("points");
         ((TextView)findViewById(R.id.playerPoints)).setText(String.valueOf(playerPoints));
 
-        int playerId = b.getInt("id");
+        playerId = b.getString("id");
 
         createWall(b);
         createPattern(b);
 
         ImageButton exitPopUp = (ImageButton) findViewById(R.id.closePopUp);
-        exitPopUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(PlayerPopup.this, Game.class);
-                PlayerPopup.this.startActivity(intent);
-            }
-        });
+        exitPopUp.setOnClickListener(view -> finish());
 
         ImageButton accuse = (ImageButton) findViewById(R.id.accuse);
-        accuse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if(caught){
+            accuse.setVisibility(View.INVISIBLE);
+        } else {
+            accuse.setOnClickListener(view -> {
                 Socket socket = SocketManager.getSocket();
                 if (socket != null) {
-                    socket.emit("accuse", playerId);
-                    // TODO handle server response
+                    JSONObject object = new JSONObject();
+                    try {
+                        object.put("id", playerId);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    socket.emit("accuse", object);
+
                 }
-            }
-        });
+            });
+        }
+
     }
 
     private void createPattern(Bundle b) {
@@ -132,7 +136,8 @@ public class PlayerPopup extends AppCompatActivity {
                 ImageView image = new ImageView(this);
                 image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                 image.setPadding(5,5,5,5);
-                int colorIndex = ((k)+(i)) % 5; // (column + row) % 5
+
+                int colorIndex = (k+5-i)%5;
 
                 if(bitmap[k] == 1) image.setImageResource(fullFliesen[colorIndex]);
                 else image.setImageResource(emptyFliesen[colorIndex]);
@@ -141,7 +146,6 @@ public class PlayerPopup extends AppCompatActivity {
             }
         }
     }
-
 
     private int[] binaryDivision(int value, int length){
         int[] bitmap = new int[length];

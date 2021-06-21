@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.user;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -41,7 +42,7 @@ public class LoginFragment extends Fragment implements EventListener {
         Bundle args = getArguments();
         if(args != null){
             String name = args.getString("name", "");
-            EditText et = view.findViewById(R.id.et_name);
+            @SuppressLint("CutPasteId") EditText et = view.findViewById(R.id.et_name);
             et.setText(name);
         }
 
@@ -50,7 +51,7 @@ public class LoginFragment extends Fragment implements EventListener {
         Button btnLogin = view.findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(v -> {
 
-            EditText name = view.findViewById(R.id.et_name);
+            @SuppressLint("CutPasteId") EditText name = view.findViewById(R.id.et_name);
             EditText password = view.findViewById(R.id.et_password);
             TextInputLayout nameLayout = view.findViewById(R.id.et_name_layout);
             TextInputLayout passwordLayout = view.findViewById(R.id.et_password_layout);
@@ -69,10 +70,6 @@ public class LoginFragment extends Fragment implements EventListener {
                 passwordLayout.setError(null);
             }
 
-
-            // todo check login data for correctness
-            // todo print error message if incorrect
-            // todo authenticate user if correct and lead to home page
             Retrofit retrofit = ApiManager.getInstance();
             LoginRequest request = new LoginRequest(name.getText().toString(), password.getText().toString());
             LoginApi service = retrofit.create(LoginApi.class);

@@ -1,105 +1,87 @@
 package com.example.gruppe9_se2.game;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.DragEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.util.Log;
+import android.view.*;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.helper.ResourceHelper;
-import com.example.gruppe9_se2.logic.SocketManager;
+import com.example.gruppe9_se2.logic.GameStart;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.EventListener;
 
-import io.socket.client.Socket;
-
 public class MusterFragment extends Fragment implements EventListener {
-    String logTag = "musterFragmentLogs";
-    //todo save all information about this Muster, so it can be a JSON
-    GridLayout gridLayout;
-    Socket mSocket = SocketManager.getSocket();
+    // GameStart
+    private GameStart gameStart;
+    private GridLayout gridLayout;
+    private ImageView newTileImage;
+    private TextView newTileText;
 
     // Elements-Array to store Musterreihe
-    Element[] elements = new Element[5];
+    private final Element[] elements = new Element[5];
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //TODO: Remove, Test only
-//        mSocket = SocketManager.makeSocket("82a1ac5f-b1dc-4034-8667-38e345bdc423");
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         // Initialize empty Elements-Array
         for (int i = 0; i < elements.length; i++) {
             elements[i] = new Element();
         }
 
+        // Fragment Notifications
+        getParentFragmentManager().setFragmentResultListener("pattern", this, (requestKey, bundle) -> {
+            boolean isClearNewTileField = bundle.getBoolean("clearNewTileField");
+            if (isClearNewTileField) {
+                clearNewTileField();
+            }
+        });
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_muster, container, false);
 
-        //todo get the size of the Spielbrett Muster
+        // Size of Tile
         int size = (int) getResources().getDimension(R.dimen.fliese_size);
 
         // Fill the 5x5 Grid with ImageViews
         gridLayout = view.findViewById(R.id.gridMuster);
+        newTileImage = view.findViewById(R.id.newTileImage);
+        newTileText = view.findViewById(R.id.newTileText);
 
-        // Sample for Musterreihe
+        // Create Musterreihe
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 LinearLayout linearLayout = new LinearLayout(requireContext());
                 linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                // Test Fliese
-                if (i == 0 && j == 0) {
-                    String color = String.valueOf((int) (1 + Math.random() * 4));
-                    String count = String.valueOf((int) (1 + Math.random() * 4));
-                    int resId = ResourceHelper.getFlieseResId(color);
-
-                    ImageView testImage = new ImageView(requireContext());
-                    testImage.setImageResource(resId);
-                    testImage.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-                    testImage.setPadding(5, 5, 5, 5);
-
-                    testImage.setTag(color + "|" + count);
-
-                    testImage.setOnTouchListener(new MyTouchListener());
-
-                    linearLayout.addView(testImage);
-                }
-
-                if (j >= 4 - i) {
+                if (j > (3 - i)) {
                     ImageView image = new ImageView(requireContext());
-                    //todo create drawable for empty Image State
-                    int imageId = R.drawable.empty_fliese;
-                    image.setImageResource(imageId);
-                    image.setTag((i+1) + "|" + (j+1));
+                    image.setImageResource(R.drawable.empty_fliese);
+                    image.setTag((i + 1) + "|" + (j + 1));
                     image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                     image.setPadding(5, 5, 5, 5);
 
-                    image.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            String[] pos = v.getTag().toString().split("\\|");
-                            Toast.makeText(getContext(), "Click Row: " + pos[0]+1 + " Col: " + pos[1]+1, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
                     // Test Drop nur auf letzter Spalte
                     if (j == 4) {
-                        image.setOnDragListener(new MyDragListener());
+                        image.setOnDragListener(new MusterDragListener());
                     }
 
                     linearLayout.addView(image);
                 }
-
                 gridLayout.addView(linearLayout, i * 5 + j);
             }
         }
@@ -107,90 +89,83 @@ public class MusterFragment extends Fragment implements EventListener {
         return view;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private void addNewTileField(int color, int count) {
+        // Set tile color
+        newTileImage.setImageResource(ResourceHelper.getFlieseResId(color + 1));
+        newTileImage.setTag((color + 1) + "|" + count);
+        newTileImage.setOnTouchListener(new MyTouchListener());
+        newTileImage.setTag(R.id.fromBoard, false);
 
-    private final class MyTouchListener implements View.OnTouchListener {
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-//                String[] tags = view.getTag().toString().split("\\|");
-//                int color = (int) (1 + Math.random() * 4);
-                ClipData data = ClipData.newPlainText("tile", view.getTag().toString());
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                view.startDrag(data, shadowBuilder, view, 0);
-//                view.setVisibility(View.INVISIBLE);
-                return true;
-            } else {
-                return false;
-            }
-        }
+        // Set tile text
+        newTileText.setText(String.valueOf(count));
     }
 
-    class MyDragListener implements View.OnDragListener {
-        Drawable enterShape = getResources().getDrawable(R.drawable.shape_droptarget);
-        Drawable normalShape = getResources().getDrawable(R.drawable.shape);
+    @SuppressLint("ClickableViewAccessibility")
+    private void clearNewTileField() {
+        // Clear tile color
+        newTileImage.setImageResource(R.drawable.empty_fliese);
+        newTileImage.setOnTouchListener(null);
+
+        // Clear tile text
+        newTileText.setText(null);
+    }
+
+    public void dragListenerNewTileField(GameStart gameStart) {
+        this.gameStart = gameStart;
+        newTileImage.setOnDragListener(new NewTileDragListener());
+    }
+
+    private class NewTileDragListener implements View.OnDragListener {
+        @SuppressWarnings("deprecation")
+        Drawable allowedShape = getResources().getDrawable(R.drawable.shape_drop_target_allowed);
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
-            int action = event.getAction();
             switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_STARTED:
-                    // do nothing
-                    break;
                 case DragEvent.ACTION_DRAG_ENTERED:
-                    v.setBackground(enterShape);
+                    if ((boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
+                        v.setBackground(allowedShape);
+                    }
                     break;
                 case DragEvent.ACTION_DRAG_EXITED:
                 case DragEvent.ACTION_DRAG_ENDED:
-                    v.setBackground(normalShape);
-//                    ((View) event.getLocalState()).setVisibility(View.VISIBLE);
+                    v.setBackground(null);
                     break;
                 case DragEvent.ACTION_DROP:
-                    ClipData data = event.getClipData();
-                    String[] tile = data.getItemAt(0).getText().toString().split("\\|");
-                    int count = Integer.parseInt(tile[1]);
-                    if (count > 0) {
-                        int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
-                        int color = Integer.parseInt(tile[0]);
+                    ImageView imageView = (ImageView) event.getLocalState();
 
-                        Element element = elements[row-1];
-                        if (element.getColor() == 0) {
-                            element.setColor(color);
+                    int color = (int) imageView.getTag(R.id.color_id);
+                    int count = (int) imageView.getTag(R.id.count_id);
+
+                    // check if Image comes from Center or Plates
+                    int i = (int) imageView.getTag(R.id.isCenter);
+                    if (i == 1) {
+                        // Center
+                        // args.color = int 1 bis 5
+                        JSONObject args = new JSONObject();
+                        try {
+                            args.put("color", color + 1);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-
-                        if (element.getColor() != color) {
-                            return false;
+                        gameStart.takeCenterTiles(args);
+                    } else {
+                        // Plates
+                        // args.plate string plate0 bis plate8 und args.color = int 1 bis 5
+                        int plate = (int) imageView.getTag(R.id.plateNr_id);
+                        JSONObject args = new JSONObject();
+                        try {
+                            args.put("plate", "plate" + plate);
+                            args.put("color", color + 1);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-
-                        setMusterElement(row, element, count);
-
-                        //TODO Socket
-                        if (mSocket != null) {
-                            mSocket.emit("finishTurn", String.valueOf(Integer.parseInt(tile[0]) + 1));
-//                        mSocket.on("error", new Emitter.Listener() {
-//                            @Override
-//                            public void call(Object... args) {
-//                                Log.i(logTag,"getState");
-//                            }
-//                        });
-                        }
+                        gameStart.takePlateTiles(args);
                     }
-
-                    // Dropped, reassign View to ViewGroup
-//                    View view = (View) event.getLocalState();
-//                    ViewGroup owner = (ViewGroup) view.getParent();
-//                    owner.removeView(view);
-//                    LinearLayout container = (LinearLayout) v;
-//                    container.addView(view);
-//                    view.setVisibility(View.VISIBLE);
-
-                    Toast.makeText(getContext(), "Dropped", Toast.LENGTH_SHORT).show();
-
-                    View view = (View) event.getLocalState();
-                    String newColor = String.valueOf((int) (1 + Math.random() * 4));
-                    String newCount = String.valueOf((int) (1 + Math.random() * 4));
-                    int resId = ResourceHelper.getFlieseResId(newColor);
-                    ((ImageView) view).setImageResource(resId);
-                    view.setTag(newColor + "|" + newCount);
-                    view.setVisibility(View.VISIBLE);
+                    imageView.setOnDragListener(null);
+                    addNewTileField(color, count);
+                    gameStart.disableOnTouchBoard();
                     break;
                 default:
                     break;
@@ -199,13 +174,129 @@ public class MusterFragment extends Fragment implements EventListener {
         }
     }
 
+    private static final class MyTouchListener implements View.OnTouchListener {
+        @SuppressLint("ClickableViewAccessibility")
+        @SuppressWarnings("deprecation")
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                ClipData data = ClipData.newPlainText("tile", view.getTag().toString());
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                view.startDrag(data, shadowBuilder, view, 0);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private class MusterDragListener implements View.OnDragListener {
+        @SuppressWarnings("deprecation")
+        Drawable allowedShape = getResources().getDrawable(R.drawable.shape_drop_target_allowed);
+        @SuppressWarnings("deprecation")
+        Drawable forbiddenShape = getResources().getDrawable(R.drawable.shape_drop_target_forbidden);
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            switch (event.getAction()) {
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    if (!(boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
+                        int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
+                        Element element = elements[row - 1];
+
+                        // If row already full, drop not allowed
+                        if (element.getCount() == row) {
+                            v.setBackground(forbiddenShape);
+                        } else {
+                            v.setBackground(allowedShape);
+                        }
+                    }
+                    break;
+                case DragEvent.ACTION_DRAG_EXITED:
+                case DragEvent.ACTION_DRAG_ENDED:
+                    v.setBackground(null);
+                    break;
+                case DragEvent.ACTION_DROP:
+                    if ((boolean) ((ImageView) event.getLocalState()).getTag(R.id.fromBoard)) {
+                        return false;
+                    }
+
+                    clearNewTileField();
+
+                    ClipData data = event.getClipData();
+                    String[] tile = data.getItemAt(0).getText().toString().split("\\|");
+                    int count = Integer.parseInt(tile[1]);
+                    Log.e("MusterFragment", "count: "+count);
+                    if (count > 0) {
+                        int row = Integer.parseInt(v.getTag().toString().split("\\|")[0]);
+                        Log.e("MusterFragment", "row: "+row);
+                        int color = Integer.parseInt(tile[0]);
+                        Log.e("MusterFragment", "color: "+color);
+
+                        Element element = elements[row - 1];
+
+                        // If row is empty set color of row
+                        if (element.getColor() == 0) {
+                            Log.e("MusterFragment", "element.getColor == 0");
+                            element.setColor(color);
+                        }
+
+                        // Row color different, drop not allowed
+                        if (element.getColor() != color) {
+                            Log.e("MusterFragment", "element.getColor != 0");
+                            return false;
+                        }
+
+                        // Row already full, drop not allowed
+                        if (element.getCount() == row) {
+                            Log.e("MusterFragment", "element.getCount == row");
+                            return false;
+                        }
+
+                        // If no empty row than activate floor as drop target
+                        boolean activateFloorDrag = true;
+                        for (Element e : elements) {
+                            if (e.getColor() == 0) {
+                                activateFloorDrag = false;
+                                break;
+                            }
+                        }
+                        if (activateFloorDrag) {
+                            Bundle result = new Bundle();
+                            result.putBoolean("activateFloorDrag", true);
+                            getParentFragmentManager().setFragmentResult("floor", result);
+                        }
+
+                        // Set elements and notify server
+                        setMusterElement(row, element, count);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
+    }
+
+    private void clearMusterElemente(int row) {
+        for (int j = 0; j < 5; j++) {
+            if (j > (3 - row)) {
+                LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt((row * 5) + j);
+                ImageView imageView = (ImageView) linearLayout.getChildAt(0);
+                imageView.setImageResource(R.drawable.empty_fliese);
+            }
+        }
+    }
+
     private void setMusterElement(int row, Element element, int count) {
+        Log.e("MusterFragment", "setMusterElement");
         int resId = ResourceHelper.getFlieseResId(element.getColor());
         int floor = element.addCount(row, count);
 
+        Log.e("MusterFragment", "element.getCount "+element.getCount());
         for (int i = 0; i < element.getCount(); i++) {
-            int tilePos = (row - 1) * 5 + (4 - i);
 
+            int tilePos = (row - 1) * 5 + (4 - i);
+            Log.e("MusterFragment", "tilePos "+tilePos);
             LinearLayout linearLayout = (LinearLayout) gridLayout.getChildAt(tilePos);
             ImageView image = (ImageView) linearLayout.getChildAt(0);
             if (image != null) {
@@ -213,15 +304,36 @@ public class MusterFragment extends Fragment implements EventListener {
             }
         }
 
-        if (floor > 0) {
-            Bundle result = new Bundle();
-            result.putInt("color", element.getColor());
-            result.putInt("count", floor);
-            getParentFragmentManager().setFragmentResult("floor", result);
+        if (element.getColor() != 0) {
+            if (floor > 0) {
+                Bundle result = new Bundle();
+                result.putInt("color", element.getColor());
+                result.putInt("count", floor);
+                getParentFragmentManager().setFragmentResult("floor", result);
+            }
+
+            // Send finishTurn to server
+            gameStart.finishTurn(row);
         }
     }
 
-    private class Element {
+    public void startRound(WandFragment wandFragment) {
+        for (int i = 0; i < elements.length; i++) {
+            if (elements[i].getCount() == i + 1) {
+                // If row is full then add to Wandfragment
+                wandFragment.add(i, elements[i].getColor());
+
+                // Clear row
+                clearMusterElemente(i);
+
+                // Clear element
+                Element e = elements[i];
+                e.clear();
+            }
+        }
+    }
+
+    private static class Element {
         private int color = 0;
         private int count = 0;
 
@@ -242,6 +354,7 @@ public class MusterFragment extends Fragment implements EventListener {
 
         public int addCount(int row, int count) {
             int temp = this.count + count;
+            Log.e("MusterFragment", "temp "+temp);
             if (temp <= row) {
                 this.count = temp;
                 return 0;
@@ -249,6 +362,11 @@ public class MusterFragment extends Fragment implements EventListener {
                 this.count = row;
                 return temp - row;
             }
+        }
+
+        public void clear() {
+            this.color = 0;
+            this.count = 0;
         }
     }
 }

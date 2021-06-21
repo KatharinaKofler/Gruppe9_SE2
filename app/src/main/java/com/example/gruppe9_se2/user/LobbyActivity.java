@@ -15,6 +15,8 @@ import com.example.gruppe9_se2.MainActivity;
 import com.example.gruppe9_se2.R;
 import com.example.gruppe9_se2.api.base.ApiManager;
 
+import java.util.Objects;
+
 public class LobbyActivity extends AppCompatActivity {
     //player is able to enter a lobby
     //player is able to leave a lobby
@@ -44,7 +46,7 @@ public class LobbyActivity extends AppCompatActivity {
         ft.replace(containerId, overview);
         ft.commit();
 
-        getSupportActionBar().setTitle("Lobby Overview");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Lobby Overview");
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
@@ -55,16 +57,8 @@ public class LobbyActivity extends AppCompatActivity {
         ft.replace(containerId, newLobby);
         ft.commit();
 
-        getSupportActionBar().setTitle("Create new lobby");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Create new lobby");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    public void backToOverview(){
-        Fragment backToOverview = new LobbyOverviewFragment();
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(containerId, backToOverview);
-        ft.commit();
     }
 
     public void logoutLobby() {
@@ -72,36 +66,27 @@ public class LobbyActivity extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.logout)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
+                .setPositiveButton(android.R.string.ok, (dialog, id) -> {
+                    dialog.dismiss();
 
-                        // Delete token
-                        ApiManager.deleteToken();
+                    // Delete token
+                    ApiManager.deleteToken();
 
-                        // Close current activity and start MainActivity
-                        activity.finish();
-                        Intent intent = new Intent(activity, MainActivity.class);
-                        startActivity(intent);
-                    }
+                    // Close current activity and start MainActivity
+                    activity.finish();
+                    Intent intent = new Intent(activity, MainActivity.class);
+                    startActivity(intent);
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
+                .setNegativeButton(android.R.string.cancel, (dialog, id) -> dialog.dismiss());
         builder.show();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                showLobbyOverview();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            showLobbyOverview();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }

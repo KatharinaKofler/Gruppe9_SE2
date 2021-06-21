@@ -7,7 +7,7 @@
         android:id="@+id/gridPlates"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:columnCount="5">
+        android:columnCount="3">
 
     </GridLayout>
 

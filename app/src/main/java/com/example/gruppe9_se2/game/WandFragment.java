@@ -26,8 +26,6 @@ public class WandFragment extends Fragment implements EventListener {
     private final int[] emptyFliesenOrder = {R.drawable.empty_fliese_color1, R.drawable.empty_fliese_color2, R.drawable.empty_fliese_color3, R.drawable.empty_fliese_color4, R.drawable.empty_fliese_color5};
     private final int[] fullFliesenOrder = {R.drawable.fliese_color1, R.drawable.fliese_color2, R.drawable.fliese_color3, R.drawable.fliese_color4, R.drawable.fliese_color5};
 
-    private Socket mSocket;
-
     static JSONArray wand = new JSONArray();
     static boolean firstCreate = true;
     GridLayout gridLayout;
@@ -44,14 +42,6 @@ public class WandFragment extends Fragment implements EventListener {
             //firstCreate = false;
         }
         init(view, wand);
-
-        // for testing:
-        if(firstCreate){
-            add(3, 2);
-            add(1, 4);
-            add(2, 5);
-            firstCreate = false;
-        }
 
         return view;
     }
@@ -124,10 +114,6 @@ public class WandFragment extends Fragment implements EventListener {
         ImageView imageView = (ImageView) linearLayout.getChildAt(0);
         imageView.setImageResource(imageId);
         imageView.setTag(R.id.drawable_id, imageId);
-
-        //todo calculate points
-
-        //todo add points to total player points
     }
 
     private void createEmptyArray(JSONArray jsonArray){
@@ -157,96 +143,5 @@ public class WandFragment extends Fragment implements EventListener {
     private int getColorId(int index){
         return ((index % 5) + (index / 5)) % 5;
     }
-
-    // todo delete all following functions
-/*
-    private boolean addDragListener(View v) {
-
-        ClipData.Item item = new ClipData.Item(v.getTag(R.id.drawable_id).toString());
-        String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-
-        // clip description Tag is important for setting the correct drawable on drop
-        ClipData dragData = new ClipData(v.getTag(R.id.drawable_id).toString(), mimeTypes, item);
-        View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
-
-        v.startDrag(dragData, myShadow, v, 0);
-        
-        // this sets the image to an emptyFliese image in the correct color
-        int colorId = (int) v.getTag(R.id.color_id);
-        setImage((ImageView) v, emptyFliesenOrder[colorId]);
-        ((LinearLayout)v.getParent()).setTag(R.id.assigned, false);
-
-        return true;
-    }
-
-    private void setImage(ImageView iv, int drawable_id){
-        iv.setImageResource(drawable_id);
-        iv.setTag(R.id.drawable_id, drawable_id);
-    }
-
-    private boolean addDropListener(View v, DragEvent event){
-        // other Events: ACTION_DRAG_STARTED, ACTION_DRAG_ENTERED, ACTION_DRAG_LOCATION, ACTION_DRAG_EXITED, ACTION_DRAG_ENDED
-        // Drop Event fires, when dragged Object is dropped on this View
-        if (event.getAction() == DragEvent.ACTION_DROP) {
-
-            ImageView dragView = (ImageView) event.getLocalState();
-            int drawableId = Integer.parseInt((String) event.getClipData().getDescription().getLabel());
-
-            boolean alreadyAssigned = (boolean) v.getTag(R.id.assigned);
-            int acceptableColor = (int) v.getTag(R.id.acceptable_color_id);
-            int dragColor = (int) dragView.getTag(R.id.color_id);
-            boolean correctColor = (acceptableColor == dragColor);
-            if((!alreadyAssigned) && correctColor){
-
-                // drop is ok -> change view
-                v.setTag(R.id.assigned, true);
-                // update JSON
-                int index = 0;
-                try {
-                    index = (int) v.getTag(R.id.index_id);
-                    JSONObject updated =  wand.getJSONObject(index);
-                    updated.remove("assigned");
-                    updated.put("assigned", true);
-                    wand.put(index, updated);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                // set dropView to the image dragged there
-                ImageView dropView = (ImageView) ((LinearLayout) v).getChildAt(0);
-                setImage(dropView, drawableId);
-                //todo change to OnTouch with MotionEvent ACTION_DOWN
-                dropView.setOnLongClickListener(this::addDragListener);
-
-                JSONObject drop = new JSONObject();
-                try {
-                    drop.put("from", (int) ((LinearLayout)dragView.getParent()).getTag(R.id.index_id));
-                    drop.put("to", index);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                mSocket.emit("dropOnWand", drop);
-                //todo let Server send Event to other Fragment where the drag came from
-            }
-
-            else{
-                //todo print error message to screen, you can't drop here
-                // and maybe tell Musterreihe Fragment
-
-                // change dragview image back to what it prev was
-                setImage(dragView, drawableId);
-                ((LinearLayout)dragView.getParent()).setTag(R.id.assigned, true);
-                //todo remove following line, just for testing
-                setImage(dragView, fullFliesenOrder[dragColor]);
-
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-
-    */
 
 }

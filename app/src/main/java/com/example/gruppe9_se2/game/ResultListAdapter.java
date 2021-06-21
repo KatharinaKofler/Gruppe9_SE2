@@ -1,9 +1,6 @@
-package com.example.gruppe9_se2.user;
+package com.example.gruppe9_se2.game;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,51 +10,40 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gruppe9_se2.R;
-import com.example.gruppe9_se2.logic.GameStart;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.ViewHolder> {
+public class ResultListAdapter extends RecyclerView.Adapter<ResultListAdapter.ViewHolder> {
 
-    private final List<Lobby> localData;
-    private final Context context;
+    private final List<PlayerResult> localData;
 
-    public LobbyListAdapter(Context context) {
+    public ResultListAdapter() {
         super();
         localData = new ArrayList<>();
-        this.context = context;
     }
 
-    public void insert(Lobby lobby) {
-        localData.add(lobby);
+    public void insert(PlayerResult result) {
+        localData.add(result);
         notifyItemInserted(localData.size() - 1);
     }
+
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.lobby_list_item, parent, false);
+                .inflate(R.layout.player_result_item, parent, false);
 
         return new ViewHolder(view);
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Lobby l = localData.get(position);
-        holder.getName().setText(l.getName());
-        holder.getDetails().setText("Press to join.");
-        holder.setOnClickListener((view) -> {
-            Intent intent = new Intent(context, GameStart.class);
-            Bundle b = new Bundle();
-            b.putString("LobbyID", l.id);
-            b.putBoolean("isOwner", false);
-            intent.putExtras(b);
-
-            context.startActivity(intent);
-        });
+        PlayerResult r = localData.get(position);
+        holder.getRank().setText(r.getDisplayRank());
+        holder.getPoints().setText(r.getDisplayPoints());
+        holder.getUsername().setText(r.username);
     }
 
 
@@ -72,25 +58,31 @@ public class LobbyListAdapter extends RecyclerView.Adapter<LobbyListAdapter.View
      * (custom ViewHolder).
      */
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final TextView name;
-        private final TextView details;
+        private final TextView rank;
+        private final TextView username;
+        private final TextView points;
         private View.OnClickListener onClickListener;
 
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
 
-            name = (TextView) view.findViewById(R.id.lobbyName);
-            details = (TextView) view.findViewById(R.id.lobbyDetails);
+            rank = view.findViewById(R.id.rank);
+            username = view.findViewById(R.id.username);
+            points = view.findViewById(R.id.resultPoints);
             view.setOnClickListener(this);
         }
 
-        public TextView getName() {
-            return name;
+        public TextView getRank() {
+            return rank;
         }
 
-        public TextView getDetails() {
-            return details;
+        public TextView getUsername() {
+            return username;
+        }
+
+        public TextView getPoints() {
+            return points;
         }
 
         public void setOnClickListener(View.OnClickListener onClickListener) {

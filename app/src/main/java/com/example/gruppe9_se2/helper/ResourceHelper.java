@@ -3,9 +3,6 @@ package com.example.gruppe9_se2.helper;
 import com.example.gruppe9_se2.R;
 
 public class ResourceHelper {
-    public static int getFlieseResId(String color) {
-        return getFlieseResId(Integer.parseInt(color));
-    }
 
     public static int getFlieseResId(int color) {
         int resId;
