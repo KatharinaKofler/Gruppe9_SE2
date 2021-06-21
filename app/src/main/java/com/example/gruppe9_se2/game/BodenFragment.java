@@ -1,5 +1,6 @@
 package com.example.gruppe9_se2.game;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -92,7 +93,8 @@ public class BodenFragment extends Fragment {
     }
 
     private class BodenDragListener implements View.OnDragListener {
-        @SuppressWarnings("deprecation")
+
+        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable allowedShape = getResources().getDrawable(R.drawable.shape_drop_target_allowed);
 
         @Override
